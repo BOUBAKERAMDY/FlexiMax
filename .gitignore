@@ -1,0 +1,14 @@
+# Données volumineuses — ne pas versionner
+data/raw/
+data/processed/
+*.parquet
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
