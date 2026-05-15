@@ -1,0 +1,18 @@
+# Data
+*.csv
+*.parquet
+*.h5
+
+# Dossiers data
+data/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+venv/
+.venv/
