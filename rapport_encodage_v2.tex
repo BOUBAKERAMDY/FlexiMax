@@ -1,0 +1,4537 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{float}
+\usetikzlibrary{arrows.meta, calc, backgrounds}
+\tcbuselibrary{skins}
+
+\geometry{margin=2.5cm}
+
+%% ── Palette de couleurs ──────────────────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31,73,125}
+\definecolor{rowgray}{RGB}{242,242,242}
+\definecolor{lightblue}{RGB}{217,229,244}
+\definecolor{accentorange}{RGB}{204,102,0}
+\definecolor{accentgreen}{RGB}{0,140,70}
+\definecolor{accentred}{RGB}{180,30,30}
+
+%% ── En-tête / pied de page ───────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{headerblue}{\small Rapport d'Encodage — FlexiMax}}
+\lhead{\small \leftmark}
+\rfoot{\thepage}
+
+%% ── Formatage des titres ─────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headerblue!80}}{}{0em}{}
+
+%% ── Types de colonnes personnalisés ──────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+%% ── Barre de R-value (largeur proportionnelle, max=3 cm) ─────────────────────
+%%   #1 = fraction décimale dans [0,1]
+\newcommand{\rvaluebar}[1]{%
+  \begin{tikzpicture}[baseline=-0.3ex]
+    \fill[accentorange!75] (0,-0.10) rectangle ({#1*3.0cm}, 0.10);
+    \draw[gray!40, thin]   (0,-0.10) rectangle (3.0cm,      0.10);
+  \end{tikzpicture}%
+}
+
+%% ── Boîte de formule ─────────────────────────────────────────────────────────
+\tcbset{formulebox/.style={
+  enhanced, colback=headerblue!6, colframe=headerblue!50,
+  boxrule=0.5pt, arc=3pt, top=3pt, bottom=3pt, left=6pt, right=6pt,
+  fonttitle=\bfseries\small\color{headerblue}
+}}
+
+%% ── Commande : rose des vents ────────────────────────────────────────────────
+%% Usage : \compassrose   (réutilisé sections 5 et 8)
+\newcommand{\compassrose}{%
+\begin{tikzpicture}[scale=1.65, >=Stealth]
+  % Fond et cercle
+  \fill[headerblue!5] (0,0) circle (1cm);
+  \draw[headerblue!55, thick] (0,0) circle (1cm);
+  % Guides diagonaux légers
+  \draw[gray!18, thin] (-0.707,-0.707)--(0.707,0.707);
+  \draw[gray!18, thin] ( 0.707,-0.707)--(-0.707,0.707);
+  % Axes (x = sin, y = cos)
+  \draw[->, gray!45] (-1.28,0) -- (1.36,0)
+        node[right, font=\tiny, color=gray!70] {$\sin(\theta)$};
+  \draw[->, gray!45] (0,-1.28) -- (0,1.38)
+        node[above, font=\tiny, color=gray!70] {$\cos(\theta)$};
+  % 8 points : coordonnée = (sin θ, cos θ) en convention compas
+  \foreach \nom/\sx/\cy/\anch in {%
+    N/  0.000/ 1.000/above,
+    NE/ 0.707/ 0.707/above right,
+    E/  1.000/ 0.000/right,
+    SE/ 0.707/-0.707/below right,
+    S/  0.000/-1.000/below,
+    SW/-0.707/-0.707/below left,
+    W/ -1.000/ 0.000/left,
+    NW/-0.707/ 0.707/above left}
+  {
+    \fill[headerblue] (\sx,\cy) circle (2pt);
+    \node[\anch, font=\scriptsize\bfseries, color=headerblue, inner sep=2.5pt]
+         at (\sx,\cy) {\nom};
+  }
+  % Mise en évidence de l'exemple « South »
+  \fill[accentorange] (0,-1) circle (2.8pt);
+  \draw[accentorange!80, ->] (0.52,-0.80) -- (0.06,-0.97);
+  \node[right, font=\tiny, color=accentorange] at (0.52,-0.78)
+       {S : $\sin{=}0,\;\cos{=}{-1}$};
+\end{tikzpicture}%
+}
+
+%% ── Table sin/cos des 8 orientations ─────────────────────────────────────────
+\newcommand{\sincostabl}{%
+\renewcommand{\arraystretch}{1.18}%
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Dir.} & $\boldsymbol\theta$\textbf{°} &
+$\boldsymbol{\sin\theta}$ & $\boldsymbol{\cos\theta}$ \\
+\midrule
+\rowcolor{rowgray} N  &   0 & $0$     & $+1$    \\
+NE                    &  45 & $+0.71$ & $+0.71$ \\
+\rowcolor{rowgray} E  &  90 & $+1$    & $0$     \\
+SE                    & 135 & $+0.71$ & $-0.71$ \\
+\rowcolor{accentorange!22} S  & 180 & $0$ & $-1$ \\
+SW                    & 225 & $-0.71$ & $-0.71$ \\
+\rowcolor{rowgray} W  & 270 & $-1$    & $0$     \\
+NW                    & 315 & $-0.71$ & $+0.71$ \\
+\bottomrule
+\end{tabular}%
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ═════════════════════════════════════════════════════════════════════════════
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{1.8cm}
+
+  \begin{tikzpicture}
+    \fill[headerblue] (0,0) rectangle (15.5cm, 1.3cm);
+    \node[white, font=\LARGE\bfseries] at (7.75cm, 0.65cm)
+         {Rapport d'Encodage des Variables};
+  \end{tikzpicture}
+
+  \vspace{0.45cm}
+  {\large\color{gray} Projet FlexiMax — Préparation des Features\par}
+  \vspace{1.8cm}
+
+  \begin{tabular}{@{}ll@{}}
+    \textbf{Fichier d'entrée}     & \texttt{metadata\_features.parquet} \\[5pt]
+    \textbf{Fichier de sortie}    & \texttt{features\_encodees.parquet} \\[5pt]
+    \textbf{Dimensions initiales} & 549\,971 lignes $\times$ 394 colonnes \\[5pt]
+    \textbf{Dimensions finales}   & 549\,971 lignes $\times$ 415+ colonnes \\[5pt]
+    \textbf{Date}                 & Juin 2026 \\
+  \end{tabular}
+
+  \vspace{1.8cm}
+  \rule{15.5cm}{0.4pt}
+  \vspace{0.4cm}
+
+  {\normalsize Ce document décrit l'ensemble des transformations, encodages\\
+  et suppressions appliqués aux variables brutes du dataset ResStock.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Vue d'ensemble}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Le pipeline d'encodage transforme les variables catégorielles et textuelles
+brutes en représentations numériques exploitables par les modèles de machine
+learning. Chaque groupe fait l'objet d'une stratégie adaptée à sa sémantique.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Étape} & \textbf{Colonnes} & \textbf{Shape} \\
+\midrule
+\rowcolor{rowgray} Données brutes & 394 & $549\,971 \times 394$ \\
+Après suppression & 349 & $549\,971 \times 349$ \\
+\rowcolor{rowgray} Après encodage complet & 415+ & $549\,971 \times 415+$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Suppression des colonnes inutiles}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Colonnes constantes (\texttt{nunique} $\leq 1$)}
+20 colonnes à valeur unique supprimées automatiquement — aucune information
+discriminante.
+
+\subsection{Colonnes redondantes ou hors-scope}
+
+\begin{center}
+\begin{tabular}{L{7cm}L{7cm}}
+\toprule
+\textbf{Colonne supprimée} & \textbf{Raison} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.building\_america\_climate\_zone} & Redondant avec ASHRAE \\
+\texttt{in.cec\_climate\_zone} & Redondant avec ASHRAE \\
+\rowcolor{rowgray}
+\texttt{in.census\_division}, \texttt{in.census\_division\_recs} & Géographique haute cardinalité \\
+\texttt{in.county}, \texttt{in.puma}, \texttt{in.city}, \texttt{in.state} & Géographique haute cardinalité \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type\_and\_fuel} & Redondant avec colonnes séparées \\
+\texttt{in.upgrade\_name} & Non pertinent \\
+\rowcolor{rowgray}
+\texttt{in.hot\_water\_distribution} & Non pertinent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Imputation par groupe}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Les 34 colonnes numériques sont imputées par la \textbf{médiane par zone
+climatique ASHRAE}, ce qui préserve les spécificités régionales
+(climat, altitude, usage énergétique).
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\rowcolor{rowgray} Variable de groupement
+  & \texttt{in.ashrae\_iecc\_climate\_zone\_2004} \\
+Méthode & Médiane par groupe, puis médiane globale \\
+\rowcolor{rowgray} Colonnes imputées & 34 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 1 — Zone climatique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.ashrae\_iecc\_climate\_zone\_2004} : \textbf{One-Hot Encoding}
+(\texttt{drop\_first}) $\to$ 16 colonnes binaires \texttt{climate\_*}
+(17 zones de \texttt{1A} à \texttt{8AK}).
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Valeur brute} & \textbf{Colonne créée} \\
+\midrule
+\rowcolor{rowgray} \texttt{"3B"} & \texttt{climate\_3B = 1} \\
+\texttt{"5A"} & \texttt{climate\_5A = 1} \\
+\rowcolor{rowgray} autres zones & \texttt{climate\_* = 0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 2 — Géométrie du bâtiment}
+\label{sec:geo}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Encodage circulaire de l'orientation}
+
+L'orientation est un angle discret (8 directions cardinales).
+L'encodage sin/cos préserve la \textbf{continuité cyclique} : Nord et NNW
+restent proches dans l'espace des features.
+
+\begin{tcolorbox}[formulebox, title={Formule}]
+\[
+  \textit{orientation\_sin} = \sin\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr),
+  \qquad
+  \textit{orientation\_cos} = \cos\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr)
+\]
+$\theta$ = angle compas (Nord = 0°, Est = 90°, Sud = 180°, Ouest = 270°)
+\end{tcolorbox}
+
+\bigskip
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+  \centering
+  \compassrose
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.50\textwidth}
+  \centering
+  \sincostabl
+\end{minipage}
+
+\medskip
+\noindent\small\textit{Le cercle ci-dessus place chaque direction au point
+$(\sin\theta,\;\cos\theta)$.
+La direction \textbf{South} (exemple du rapport) donne $\sin=0$, $\cos=-1$.}
+
+\subsection{Surfaces vitrées par façade (\texttt{in.window\_areas})}
+
+La chaîne \texttt{"F15 B15 L15 R15"} est décomposée en 4 colonnes
+numériques (pourcentage de surface vitrée par orientation) :
+
+\begin{center}
+\begin{tikzpicture}[scale=1.1, >=Stealth]
+  % Contour bâtiment
+  \fill[headerblue!10] (0,0) rectangle (4,2.5);
+  \draw[thick, headerblue] (0,0) rectangle (4,2.5);
+  \node[font=\small, color=headerblue!70] at (2,1.25) {Bâtiment};
+  % Flèche Nord
+  \draw[->, thick, gray!60] (4.7,0.7) -- (4.7,1.5);
+  \node[above, font=\tiny, color=gray!60] at (4.7,1.5) {N};
+  % Façade Front (bas)
+  \draw[accentorange, line width=3pt] (0.7,0) -- (3.3,0);
+  \node[below, font=\tiny\bfseries, color=accentorange] at (2,-0.08)
+       {\texttt{window\_front\_pct}};
+  % Back (haut)
+  \draw[accentorange, line width=3pt] (0.7,2.5) -- (3.3,2.5);
+  \node[above, font=\tiny\bfseries, color=accentorange] at (2,2.58)
+       {\texttt{window\_back\_pct}};
+  % Left (gauche)
+  \draw[headerblue!70, line width=3pt] (0,0.8) -- (0,1.7);
+  \node[left, font=\tiny\bfseries, color=headerblue!70, align=right]
+       at (-0.08,1.25) {\texttt{window\_}\\\texttt{left\_pct}};
+  % Right (droite)
+  \draw[headerblue!70, line width=3pt] (4,0.8) -- (4,1.7);
+  \node[right, font=\tiny\bfseries, color=headerblue!70, align=left]
+       at (4.08,1.25) {\texttt{window\_}\\\texttt{right\_pct}};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Résumé du groupe Géométrie}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.orientation} & Circ.\ sin/cos & \texttt{"South"} $\to$ sin=0, cos=$-$1 \\
+\texttt{in.window\_areas} & Extraction F/B/L/R & 4 colonnes \% \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_number\_units\_*} & Midpoint & \texttt{"3-4"} $\to$ 3.5 \\
+\texttt{in.geometry\_building\_level\_mf} & Ordinal & Bottom=0, Middle=1, Top=2 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_horizontal\_location\_*} & Fusion + OHE & \texttt{"Middle"} $\to$ \texttt{horiz\_Middle=1} \\
+\texttt{in.geometry\_attic\_type} & Ordinal thermique & None=0, Vented=1, Unvented=2, Finished=3 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_foundation\_type} & Ordinal thermique & Ambient=0 \dots Heated Basement=4 \\
+\texttt{in.geometry\_garage} & Ordinal & None=0, 1~Car=1, 2~Car=2, 3~Car=3 \\
+\rowcolor{rowgray}
+\texttt{in.neighbors} & Distance ft + flag & dist=15, both=1 \\
+\texttt{in.corridor} & Binaire & Not Applicable=0, Double-Loaded=1 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_wall\_exterior\_finish} & Matériau OHE + clarté & \texttt{wall\_finish\_brick=1, dark=0} \\
+\texttt{in.geometry\_wall\_type} & OHE & \texttt{wall\_type\_Wood Stud=1} \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_type\_recs} & OHE & Single-Family Detached \\
+\texttt{in.sqft..ft2}, \texttt{in.door\_area} & Supprimés & Redondant / Constante \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 3 — Enveloppe thermique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Matériaux de toiture — Résistance thermique (valeur R)}
+
+La valeur R (m²·K/W) quantifie la \textbf{résistance au flux de chaleur} :
+plus elle est élevée, meilleure est l'isolation.
+Elle est utilisée directement comme feature numérique float.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{L{3.5cm}C{2.4cm}L{5.5cm}L{2.8cm}}
+\toprule
+\textbf{Matériau} & \textbf{R (m²·K/W)} & \textbf{Isolation relative} & \textbf{Caractéristique} \\
+\midrule
+\rowcolor{rowgray}
+Ardoise \small(Slate)      & 0.05 & \rvaluebar{0.05} & Pierre dense \\
+Métal \small(Metal)        & 0.17 & \rvaluebar{0.17} & Haute conductivité \\
+\rowcolor{rowgray}
+Bardeaux \small(Asphalt)   & 0.44 & \rvaluebar{0.44} & Standard résidentiel \\
+Tuile \small(Clay Tile)    & 0.80 & \rvaluebar{0.80} & Bonne inertie thermique \\
+\rowcolor{rowgray}
+Bois \small(Wood Shingles) & 1.00 & \rvaluebar{1.00} & Meilleur isolant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Décomposition des fenêtres (\texttt{in.windows})}
+
+\begin{tcolorbox}[formulebox, title={Exemple : \texttt{"Double, Low-E, Non-metal"}}]
+\begin{tabular}{@{}llll@{}}
+\texttt{window\_panes = 2} &
+\texttt{window\_low\_e = 1} &
+\texttt{window\_metal\_frame = 0} &
+\texttt{window\_storm = 0}
+\end{tabular}
+\end{tcolorbox}
+
+\begin{center}
+\begin{tabular}{L{3.5cm}L{1.8cm}L{2.5cm}L{5.5cm}}
+\toprule
+\textbf{Feature créée} & \textbf{Type} & \textbf{Valeurs} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{window\_panes}        & Ordinal & 1, 2, 3 & Single / Double / Triple vitrage \\
+\texttt{window\_low\_e}       & Binaire & 0, 1    & Revêtement Low-E \\
+\rowcolor{rowgray}
+\texttt{window\_metal\_frame} & Binaire & 0, 1    & Cadre métallique \\
+\texttt{window\_storm}        & Binaire & 0, 1    & Double fenêtre tempête \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Autres variables de l'enveloppe}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Remarque} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.ground\_thermal\_conductivity} & Float & [0.5 – 2.6] W/m·K \\
+\texttt{in.interior\_shading} & Supprimé & Constante \\
+\rowcolor{rowgray}
+\texttt{in.overhangs}, \texttt{in.eaves} & Supprimés & Constantes \\
+\texttt{in.doors}, \texttt{in.radiant\_barrier} & Supprimés & Constantes \\
+\rowcolor{rowgray}
+\texttt{in.infiltration} & Supprimé & Redondant avec \texttt{air\_leakage\_to\_outside\_ach50} \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 4 — Systèmes HVAC}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Séparation AFUE / HSPF pour le chauffage}
+
+La colonne \texttt{in.hvac\_heating\_efficiency} mélange deux métriques
+physiquement incomparables, séparées par un seuil à $> 1{,}0$ :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.15]
+  % Bloc AFUE
+  \fill[headerblue!20] (0,-0.32) rectangle (3.2, 0.32);
+  \draw[headerblue!55, thick] (0,-0.32) rectangle (3.2, 0.32);
+  \node[font=\small\bfseries, color=headerblue] at (1.6,0) {AFUE};
+  \node[below, font=\tiny, color=headerblue!80] at (0,-0.32) {0.60};
+  \node[below, font=\tiny, color=headerblue!80] at (3.2,-0.32) {1.0};
+  \draw (0,-0.32)--(0,-0.46) (3.2,-0.32)--(3.2,-0.46);
+
+  % Ligne de seuil
+  \draw[accentred, thick, dashed] (3.2,-0.58) -- (3.2, 0.62);
+  \node[above, font=\tiny\bfseries, color=accentred] at (3.2, 0.64)
+       {seuil $> 1$};
+
+  % Bloc HSPF
+  \fill[accentgreen!18] (3.3,-0.32) rectangle (9.2, 0.32);
+  \draw[accentgreen!55, thick] (3.3,-0.32) rectangle (9.2, 0.32);
+  \node[font=\small\bfseries, color=accentgreen] at (6.25,0)
+       {HSPF \small (pompe à chaleur)};
+  \node[below, font=\tiny, color=accentgreen!80] at (3.3,-0.32) {6.2};
+  \node[below, font=\tiny, color=accentgreen!80] at (9.2,-0.32) {14.0};
+  \draw (3.3,-0.32)--(3.3,-0.46) (9.2,-0.32)--(9.2,-0.46);
+
+  % Étiquettes au-dessus
+  \node[above, font=\tiny, color=headerblue!80] at (1.6,0.32)
+       {Combustible / Résistance élec.};
+  \node[above, font=\tiny, color=accentgreen!80] at (6.25,0.32)
+       {PAC air-air (ASHP)};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[formulebox, title={Règle de séparation}]
+\texttt{hvac\_efficiency\_HSPF} $\leftarrow$ valeur si valeur $> 1.0$ \quad
+(pompe à chaleur)\\
+\texttt{hvac\_efficiency\_AFUE} $\leftarrow$ valeur sinon \quad
+(combustible ou résistance)
+\end{tcolorbox}
+
+\subsection{Résumé groupe HVAC}
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type} & OHE & Fuel Furnace, ASHP, \dots \\
+\texttt{in.hvac\_cooling\_type} & OHE & Central AC, None, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_heating\_efficiency} & Split AFUE/HSPF & voir ci-dessus \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_cooling\_efficiency} & SEER/EER float & [8.0 – 15.0] \\
+\texttt{in.hvac\_cooling\_partial\_space\_conditioning} & \% float [0–1] & \texttt{"40\%"} $\to$ 0.40 \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_efficiency} & AFUE float & [0.76 – 0.925] \\
+\texttt{in.heating\_fuel} & OHE & Natural Gas, Propane, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_has\_shared\_system} & OHE & None, Shared Heating, \dots \\
+\texttt{in.hvac\_secondary\_heating\_type} & OHE & Boiler, Electric Baseboard, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_shared\_efficiencies} & OHE & — \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 5 — Périodes d'offset des consignes}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.8cm}L{5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\multirow{3}{5.2cm}{\texttt{in.cooling\_setpoint\_offset\_period}}
+  & \texttt{cool\_direction} & Setup=$+1$, Setback=$-1$, None=$0$ \\
+  & \texttt{cool\_period\_type} & Day=1, Night=2, Both=3 \\
+\rowcolor{rowgray}
+  & \texttt{cool\_start\_sin/cos} & Heure encodée circulairement \\
+\multirow{2}{5.2cm}{\texttt{in.heating\_setpoint\_offset\_period}}
+  & \texttt{heat\_period\_type} & idem \\
+  & \texttt{heat\_start\_sin/cos} & Heure encodée circulairement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 6 — Occupants et socio-économique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.tenure} & Binaire & Owner=1, Renter=0 \\
+\texttt{in.vacancy\_status} & Binaire & Occupied=1, Vacant=0 \\
+\rowcolor{rowgray}
+\texttt{in.household\_has\_tribal\_persons} & Binaire & Yes=1, No=0 \\
+\texttt{in.usage\_level} & Ordinal & Low=0, Medium=1, High=2 \\
+\rowcolor{rowgray}
+\texttt{in.federal\_poverty\_level} & Midpoint float & \texttt{"100-150\%"} $\to$ 1.25 \\
+\texttt{in.area\_median\_income} & Midpoint float & \texttt{"80-100\%"} $\to$ 0.90 \\
+\rowcolor{rowgray}
+\texttt{in.state\_metro\_median\_income} & Midpoint float & \texttt{"400\%+"} $\to$ 4.0 \\
+\texttt{in.units\_represented, in.representative\_income}
+  & Supprimés & Constante / Poids d'échantillonnage \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Distributions :}
+\texttt{in.tenure} — Owner : 307\,512 · Renter : 175\,822.\quad
+\texttt{in.usage\_level} — Low : 137\,495 · Medium : 274\,985 · High : 137\,491.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 7 — Véhicule électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_ownership} & Binaire & Yes=1, No=0 \\
+\texttt{in.electric\_vehicle\_outlet\_access} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_charger} & Ordinal & None=0, Level~1=1, Level~2=2 \\
+\texttt{in.electric\_vehicle\_charge\_at\_home} & Midpoint float & [0.095 – 1.0] \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_miles\_traveled} & Numérique miles/an & [1\,000 – 22\,500] \\
+\texttt{in.electric\_vehicle\_battery} & Supprimé & Haute cardinalité \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 8 — Énergie solaire et stockage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.pv\_orientation} utilise le même encodage circulaire que
+\texttt{in.orientation} (section~\ref{sec:geo}) ; les panneaux \texttt{None}
+reçoivent \texttt{NaN}.
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.has\_pv} & Binaire & Yes=1, No=0 \\
+\texttt{in.pv\_system\_size} & Float kWDC & \texttt{"None"} $\to$ 0.0, sinon [1–13] \\
+\rowcolor{rowgray}
+\texttt{in.pv\_orientation} & Circ.\ sin/cos & cf.\ rose des vents §\ref{sec:geo} \\
+\texttt{in.battery} & Supprimé & 100\,\% ``None'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 9 — Eau chaude sanitaire}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_efficiency} & UEF float
+  & HP: 3.45, Solar: 4.0, Gaz std: 0.59, Élec premium: 0.95 \\
+\texttt{in.water\_heater\_technology} & OHE
+  & heat\_pump, tankless, solar, indirect, storage \\
+\rowcolor{rowgray}
+\texttt{in.solar\_collector\_area} & Numérique m²
+  & \texttt{"40 sqft"} $\to$ 3.72\,m² \\
+\texttt{in.water\_heater\_orientation} & Degrés + sin/cos
+  & N=0°, E=90°, S=180°, W=270° \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_fuel} & OHE
+  & electricity, natural\_gas, propane, fuel\_oil, solar \\
+\texttt{in.water\_heater\_in\_unit} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_location} & Groupement + OHE
+  & conditioned / semi\_conditioned / unconditioned \\
+\bottomrule
+\end{longtable}
+
+\textbf{Groupes thermiques de localisation :}
+\begin{itemize}[noitemsep, topsep=2pt]
+  \item \textbf{conditioned} : Living Space, Conditioned Mechanical Room, Heated Basement
+  \item \textbf{semi\_conditioned} : Garage, Attic
+  \item \textbf{unconditioned} : Outside, Crawlspace, Unheated Basement
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 10 — Panneau électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{7cm}L{2.5cm}L{4.5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Type} & \textbf{Plage} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_panel\_service\_rating..a}
+  & Float32 & 60, 100, 150, 200, 400\,A \\
+\texttt{in.electric\_panel\_breaker\_space\_total\_count}
+  & Float32 & [8 – 60] emplacements \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 11 — Appareils électroménagers}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{4.0cm}L{4.2cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Détail} \\
+\midrule
+\endhead
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Lavage \& séchage}} \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_dryer}
+  & \texttt{\_efficiency}, \texttt{\_has}, \texttt{\_electric}, \texttt{\_gas}
+  & Élec=2.7, Gaz/Propane=2.39, None=0 \\
+\texttt{in.clothes\_washer}
+  & \texttt{\_efficiency} & EnergyStar=2.07, Std=0.95 \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_washer\_presence} & \texttt{\_has} & Yes=1, No=0 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Cuisine}} \\
+\texttt{in.cooking\_range}
+  & \texttt{cooking\_type\_*}
+  & OHE : induction, electric, gas, propane, none \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Froid}} \\
+\rowcolor{rowgray}
+\texttt{in.refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & Extraction facteur d'efficacité \\
+\texttt{in.misc\_extra\_refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & idem \\
+\rowcolor{rowgray}
+\texttt{in.misc\_freezer} & \texttt{\_ef} & idem \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Éclairage}} \\
+\texttt{in.lighting}
+  & \texttt{\_efficiency} & Incandescent=1, CFL=2, LED=3 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Gaz domestique}} \\
+\rowcolor{rowgray}
+\texttt{in.misc\_gas\_fireplace/grill/lighting}
+  & \texttt{...\_present} & Binaire (1 si présent) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Piscine \& Spa}} \\
+\texttt{in.misc\_hot\_tub\_spa}
+  & \texttt{has\_hot\_tub}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool} & \texttt{has\_pool} & 1 si présent \\
+\texttt{in.misc\_pool\_heater}
+  & \texttt{pool\_heat\_pump}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool\_pump} & \texttt{\_hp}
+  & Chevaux-vapeur (float) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Divers}} \\
+\texttt{in.misc\_well\_pump} & \texttt{has\_well\_pump} & Binaire \\
+\rowcolor{rowgray}
+\texttt{in.ceiling\_fan}
+  & \texttt{has\_ceiling\_fan}, \texttt{\_used} & Binaires \\
+\texttt{in.dishwasher}
+  & \texttt{dishwasher\_kwh}, \texttt{has\_dishwasher}
+  & \texttt{"290 Rated kWh"} $\to$ 290.0 \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Récapitulatif des stratégies d'encodage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{L{4.5cm}C{2.8cm}L{6.7cm}}
+\toprule
+\textbf{Stratégie} & \textbf{Nb colonnes} & \textbf{Usage} \\
+\midrule
+\rowcolor{rowgray}
+Suppression & 50+ & Constantes, redondantes, hors-scope \\
+One-Hot Encoding & 10 groupes & Variables nominales sans ordre \\
+\rowcolor{rowgray}
+Encodage ordinal & 6 variables & Variables ordinales (niveau, type) \\
+Encodage circulaire sin/cos & 3 variables & Orientation, heure, angle \\
+\rowcolor{rowgray}
+Extraction numérique & 8 variables & R-value, EF, kWh, HP, m² \\
+Midpoint de plage & 5 variables & Revenus, pourcentages \\
+\rowcolor{rowgray}
+Split par seuil & 1 variable & HVAC heating (AFUE vs HSPF) \\
+Binaire (Yes/No) & 12 variables & Présence d'équipement \\
+\bottomrule\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{float}
+\usetikzlibrary{arrows.meta, calc, backgrounds}
+\tcbuselibrary{skins}
+
+\geometry{margin=2.5cm}
+
+%% ── Palette de couleurs ──────────────────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31,73,125}
+\definecolor{rowgray}{RGB}{242,242,242}
+\definecolor{lightblue}{RGB}{217,229,244}
+\definecolor{accentorange}{RGB}{204,102,0}
+\definecolor{accentgreen}{RGB}{0,140,70}
+\definecolor{accentred}{RGB}{180,30,30}
+
+%% ── En-tête / pied de page ───────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{headerblue}{\small Rapport d'Encodage — FlexiMax}}
+\lhead{\small \leftmark}
+\rfoot{\thepage}
+
+%% ── Formatage des titres ─────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headerblue!80}}{}{0em}{}
+
+%% ── Types de colonnes personnalisés ──────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+%% ── Barre de R-value (largeur proportionnelle, max=3 cm) ─────────────────────
+%%   #1 = fraction décimale dans [0,1]
+\newcommand{\rvaluebar}[1]{%
+  \begin{tikzpicture}[baseline=-0.3ex]
+    \fill[accentorange!75] (0,-0.10) rectangle ({#1*3.0cm}, 0.10);
+    \draw[gray!40, thin]   (0,-0.10) rectangle (3.0cm,      0.10);
+  \end{tikzpicture}%
+}
+
+%% ── Boîte de formule ─────────────────────────────────────────────────────────
+\tcbset{formulebox/.style={
+  enhanced, colback=headerblue!6, colframe=headerblue!50,
+  boxrule=0.5pt, arc=3pt, top=3pt, bottom=3pt, left=6pt, right=6pt,
+  fonttitle=\bfseries\small\color{headerblue}
+}}
+
+%% ── Commande : rose des vents ────────────────────────────────────────────────
+%% Usage : \compassrose   (réutilisé sections 5 et 8)
+\newcommand{\compassrose}{%
+\begin{tikzpicture}[scale=1.65, >=Stealth]
+  % Fond et cercle
+  \fill[headerblue!5] (0,0) circle (1cm);
+  \draw[headerblue!55, thick] (0,0) circle (1cm);
+  % Guides diagonaux légers
+  \draw[gray!18, thin] (-0.707,-0.707)--(0.707,0.707);
+  \draw[gray!18, thin] ( 0.707,-0.707)--(-0.707,0.707);
+  % Axes (x = sin, y = cos)
+  \draw[->, gray!45] (-1.28,0) -- (1.36,0)
+        node[right, font=\tiny, color=gray!70] {$\sin(\theta)$};
+  \draw[->, gray!45] (0,-1.28) -- (0,1.38)
+        node[above, font=\tiny, color=gray!70] {$\cos(\theta)$};
+  % 8 points : coordonnée = (sin θ, cos θ) en convention compas
+  \foreach \nom/\sx/\cy/\anch in {%
+    N/  0.000/ 1.000/above,
+    NE/ 0.707/ 0.707/above right,
+    E/  1.000/ 0.000/right,
+    SE/ 0.707/-0.707/below right,
+    S/  0.000/-1.000/below,
+    SW/-0.707/-0.707/below left,
+    W/ -1.000/ 0.000/left,
+    NW/-0.707/ 0.707/above left}
+  {
+    \fill[headerblue] (\sx,\cy) circle (2pt);
+    \node[\anch, font=\scriptsize\bfseries, color=headerblue, inner sep=2.5pt]
+         at (\sx,\cy) {\nom};
+  }
+  % Mise en évidence de l'exemple « South »
+  \fill[accentorange] (0,-1) circle (2.8pt);
+  \draw[accentorange!80, ->] (0.52,-0.80) -- (0.06,-0.97);
+  \node[right, font=\tiny, color=accentorange] at (0.52,-0.78)
+       {S : $\sin{=}0,\;\cos{=}{-1}$};
+\end{tikzpicture}%
+}
+
+%% ── Table sin/cos des 8 orientations ─────────────────────────────────────────
+\newcommand{\sincostabl}{%
+\renewcommand{\arraystretch}{1.18}%
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Dir.} & $\boldsymbol\theta$\textbf{°} &
+$\boldsymbol{\sin\theta}$ & $\boldsymbol{\cos\theta}$ \\
+\midrule
+\rowcolor{rowgray} N  &   0 & $0$     & $+1$    \\
+NE                    &  45 & $+0.71$ & $+0.71$ \\
+\rowcolor{rowgray} E  &  90 & $+1$    & $0$     \\
+SE                    & 135 & $+0.71$ & $-0.71$ \\
+\rowcolor{accentorange!22} S  & 180 & $0$ & $-1$ \\
+SW                    & 225 & $-0.71$ & $-0.71$ \\
+\rowcolor{rowgray} W  & 270 & $-1$    & $0$     \\
+NW                    & 315 & $-0.71$ & $+0.71$ \\
+\bottomrule
+\end{tabular}%
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ═════════════════════════════════════════════════════════════════════════════
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{1.8cm}
+
+  \begin{tikzpicture}
+    \fill[headerblue] (0,0) rectangle (15.5cm, 1.3cm);
+    \node[white, font=\LARGE\bfseries] at (7.75cm, 0.65cm)
+         {Rapport d'Encodage des Variables};
+  \end{tikzpicture}
+
+  \vspace{0.45cm}
+  {\large\color{gray} Projet FlexiMax — Préparation des Features\par}
+  \vspace{1.8cm}
+
+  \begin{tabular}{@{}ll@{}}
+    \textbf{Fichier d'entrée}     & \texttt{metadata\_features.parquet} \\[5pt]
+    \textbf{Fichier de sortie}    & \texttt{features\_encodees.parquet} \\[5pt]
+    \textbf{Dimensions initiales} & 549\,971 lignes $\times$ 394 colonnes \\[5pt]
+    \textbf{Dimensions finales}   & 549\,971 lignes $\times$ 415+ colonnes \\[5pt]
+    \textbf{Date}                 & Juin 2026 \\
+  \end{tabular}
+
+  \vspace{1.8cm}
+  \rule{15.5cm}{0.4pt}
+  \vspace{0.4cm}
+
+  {\normalsize Ce document décrit l'ensemble des transformations, encodages\\
+  et suppressions appliqués aux variables brutes du dataset ResStock.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Vue d'ensemble}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Le pipeline d'encodage transforme les variables catégorielles et textuelles
+brutes en représentations numériques exploitables par les modèles de machine
+learning. Chaque groupe fait l'objet d'une stratégie adaptée à sa sémantique.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Étape} & \textbf{Colonnes} & \textbf{Shape} \\
+\midrule
+\rowcolor{rowgray} Données brutes & 394 & $549\,971 \times 394$ \\
+Après suppression & 349 & $549\,971 \times 349$ \\
+\rowcolor{rowgray} Après encodage complet & 415+ & $549\,971 \times 415+$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Suppression des colonnes inutiles}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Colonnes constantes (\texttt{nunique} $\leq 1$)}
+20 colonnes à valeur unique supprimées automatiquement — aucune information
+discriminante.
+
+\subsection{Colonnes redondantes ou hors-scope}
+
+\begin{center}
+\begin{tabular}{L{7cm}L{7cm}}
+\toprule
+\textbf{Colonne supprimée} & \textbf{Raison} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.building\_america\_climate\_zone} & Redondant avec ASHRAE \\
+\texttt{in.cec\_climate\_zone} & Redondant avec ASHRAE \\
+\rowcolor{rowgray}
+\texttt{in.census\_division}, \texttt{in.census\_division\_recs} & Géographique haute cardinalité \\
+\texttt{in.county}, \texttt{in.puma}, \texttt{in.city}, \texttt{in.state} & Géographique haute cardinalité \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type\_and\_fuel} & Redondant avec colonnes séparées \\
+\texttt{in.upgrade\_name} & Non pertinent \\
+\rowcolor{rowgray}
+\texttt{in.hot\_water\_distribution} & Non pertinent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Imputation par groupe}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Les 34 colonnes numériques sont imputées par la \textbf{médiane par zone
+climatique ASHRAE}, ce qui préserve les spécificités régionales
+(climat, altitude, usage énergétique).
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\rowcolor{rowgray} Variable de groupement
+  & \texttt{in.ashrae\_iecc\_climate\_zone\_2004} \\
+Méthode & Médiane par groupe, puis médiane globale \\
+\rowcolor{rowgray} Colonnes imputées & 34 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 1 — Zone climatique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.ashrae\_iecc\_climate\_zone\_2004} : \textbf{One-Hot Encoding}
+(\texttt{drop\_first}) $\to$ 16 colonnes binaires \texttt{climate\_*}
+(17 zones de \texttt{1A} à \texttt{8AK}).
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Valeur brute} & \textbf{Colonne créée} \\
+\midrule
+\rowcolor{rowgray} \texttt{"3B"} & \texttt{climate\_3B = 1} \\
+\texttt{"5A"} & \texttt{climate\_5A = 1} \\
+\rowcolor{rowgray} autres zones & \texttt{climate\_* = 0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 2 — Géométrie du bâtiment}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Encodage circulaire de l'orientation}
+
+L'orientation est un angle discret (8 directions cardinales).
+L'encodage sin/cos préserve la \textbf{continuité cyclique} : Nord et NNW
+restent proches dans l'espace des features.
+
+\begin{tcolorbox}[formulebox, title={Formule}]
+\[
+  \textit{orientation\_sin} = \sin\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr),
+  \qquad
+  \textit{orientation\_cos} = \cos\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr)
+\]
+$\theta$ = angle compas (Nord = 0°, Est = 90°, Sud = 180°, Ouest = 270°)
+\end{tcolorbox}
+
+\bigskip
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+  \centering
+  \compassrose
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.50\textwidth}
+  \centering
+  \sincostabl
+\end{minipage}
+
+\medskip
+\noindent\small\textit{Le cercle ci-dessus place chaque direction au point
+$(\sin\theta,\;\cos\theta)$.
+La direction \textbf{South} (exemple du rapport) donne $\sin=0$, $\cos=-1$.}
+
+\subsection{Surfaces vitrées par façade (\texttt{in.window\_areas})}
+
+La chaîne \texttt{"F15 B15 L15 R15"} est décomposée en 4 colonnes
+numériques (pourcentage de surface vitrée par orientation) :
+
+\begin{center}
+\begin{tikzpicture}[scale=1.1, >=Stealth]
+  % Contour bâtiment
+  \fill[headerblue!10] (0,0) rectangle (4,2.5);
+  \draw[thick, headerblue] (0,0) rectangle (4,2.5);
+  \node[font=\small, color=headerblue!70] at (2,1.25) {Bâtiment};
+  % Flèche Nord
+  \draw[->, thick, gray!60] (4.7,0.7) -- (4.7,1.5);
+  \node[above, font=\tiny, color=gray!60] at (4.7,1.5) {N};
+  % Façade Front (bas)
+  \draw[accentorange, line width=3pt] (0.7,0) -- (3.3,0);
+  \node[below, font=\tiny\bfseries, color=accentorange] at (2,-0.08)
+       {\texttt{window\_front\_pct}};
+  % Back (haut)
+  \draw[accentorange, line width=3pt] (0.7,2.5) -- (3.3,2.5);
+  \node[above, font=\tiny\bfseries, color=accentorange] at (2,2.58)
+       {\texttt{window\_back\_pct}};
+  % Left (gauche)
+  \draw[headerblue!70, line width=3pt] (0,0.8) -- (0,1.7);
+  \node[left, font=\tiny\bfseries, color=headerblue!70, align=right]
+       at (-0.08,1.25) {\texttt{window\_}\\\texttt{left\_pct}};
+  % Right (droite)
+  \draw[headerblue!70, line width=3pt] (4,0.8) -- (4,1.7);
+  \node[right, font=\tiny\bfseries, color=headerblue!70, align=left]
+       at (4.08,1.25) {\texttt{window\_}\\\texttt{right\_pct}};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Résumé du groupe Géométrie}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.orientation} & Circ.\ sin/cos & \texttt{"South"} $\to$ sin=0, cos=$-$1 \\
+\texttt{in.window\_areas} & Extraction F/B/L/R & 4 colonnes \% \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_number\_units\_*} & Midpoint & \texttt{"3-4"} $\to$ 3.5 \\
+\texttt{in.geometry\_building\_level\_mf} & Ordinal & Bottom=0, Middle=1, Top=2 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_horizontal\_location\_*} & Fusion + OHE & \texttt{"Middle"} $\to$ \texttt{horiz\_Middle=1} \\
+\texttt{in.geometry\_attic\_type} & Ordinal thermique & None=0, Vented=1, Unvented=2, Finished=3 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_foundation\_type} & Ordinal thermique & Ambient=0 \dots Heated Basement=4 \\
+\texttt{in.geometry\_garage} & Ordinal & None=0, 1~Car=1, 2~Car=2, 3~Car=3 \\
+\rowcolor{rowgray}
+\texttt{in.neighbors} & Distance ft + flag & dist=15, both=1 \\
+\texttt{in.corridor} & Binaire & Not Applicable=0, Double-Loaded=1 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_wall\_exterior\_finish} & Matériau OHE + clarté & \texttt{wall\_finish\_brick=1, dark=0} \\
+\texttt{in.geometry\_wall\_type} & OHE & \texttt{wall\_type\_Wood Stud=1} \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_type\_recs} & OHE & Single-Family Detached \\
+\texttt{in.sqft..ft2}, \texttt{in.door\_area} & Supprimés & Redondant / Constante \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 3 — Enveloppe thermique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Matériaux de toiture — Résistance thermique (valeur R)}
+
+La valeur R (m²·K/W) quantifie la \textbf{résistance au flux de chaleur} :
+plus elle est élevée, meilleure est l'isolation.
+Elle est utilisée directement comme feature numérique float.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{L{3.5cm}C{2.4cm}L{5.5cm}L{2.8cm}}
+\toprule
+\textbf{Matériau} & \textbf{R (m²·K/W)} & \textbf{Isolation relative} & \textbf{Caractéristique} \\
+\midrule
+\rowcolor{rowgray}
+Ardoise \small(Slate)      & 0.05 & \rvaluebar{0.05} & Pierre dense \\
+Métal \small(Metal)        & 0.17 & \rvaluebar{0.17} & Haute conductivité \\
+\rowcolor{rowgray}
+Bardeaux \small(Asphalt)   & 0.44 & \rvaluebar{0.44} & Standard résidentiel \\
+Tuile \small(Clay Tile)    & 0.80 & \rvaluebar{0.80} & Bonne inertie thermique \\
+\rowcolor{rowgray}
+Bois \small(Wood Shingles) & 1.00 & \rvaluebar{1.00} & Meilleur isolant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Décomposition des fenêtres (\texttt{in.windows})}
+
+\begin{tcolorbox}[formulebox, title={Exemple : \texttt{"Double, Low-E, Non-metal"}}]
+\begin{tabular}{@{}llll@{}}
+\texttt{window\_panes = 2} &
+\texttt{window\_low\_e = 1} &
+\texttt{window\_metal\_frame = 0} &
+\texttt{window\_storm = 0}
+\end{tabular}
+\end{tcolorbox}
+
+\begin{center}
+\begin{tabular}{L{3.5cm}L{1.8cm}L{2.5cm}L{5.5cm}}
+\toprule
+\textbf{Feature créée} & \textbf{Type} & \textbf{Valeurs} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{window\_panes}        & Ordinal & 1, 2, 3 & Single / Double / Triple vitrage \\
+\texttt{window\_low\_e}       & Binaire & 0, 1    & Revêtement Low-E \\
+\rowcolor{rowgray}
+\texttt{window\_metal\_frame} & Binaire & 0, 1    & Cadre métallique \\
+\texttt{window\_storm}        & Binaire & 0, 1    & Double fenêtre tempête \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Autres variables de l'enveloppe}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Remarque} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.ground\_thermal\_conductivity} & Float & [0.5 – 2.6] W/m·K \\
+\texttt{in.interior\_shading} & Supprimé & Constante \\
+\rowcolor{rowgray}
+\texttt{in.overhangs}, \texttt{in.eaves} & Supprimés & Constantes \\
+\texttt{in.doors}, \texttt{in.radiant\_barrier} & Supprimés & Constantes \\
+\rowcolor{rowgray}
+\texttt{in.infiltration} & Supprimé & Redondant avec \texttt{air\_leakage\_to\_outside\_ach50} \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 4 — Systèmes HVAC}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Séparation AFUE / HSPF pour le chauffage}
+
+La colonne \texttt{in.hvac\_heating\_efficiency} mélange deux métriques
+physiquement incomparables, séparées par un seuil à $> 1{,}0$ :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.15]
+  % Bloc AFUE
+  \fill[headerblue!20] (0,-0.32) rectangle (3.2, 0.32);
+  \draw[headerblue!55, thick] (0,-0.32) rectangle (3.2, 0.32);
+  \node[font=\small\bfseries, color=headerblue] at (1.6,0) {AFUE};
+  \node[below, font=\tiny, color=headerblue!80] at (0,-0.32) {0.60};
+  \node[below, font=\tiny, color=headerblue!80] at (3.2,-0.32) {1.0};
+  \draw (0,-0.32)--(0,-0.46) (3.2,-0.32)--(3.2,-0.46);
+
+  % Ligne de seuil
+  \draw[accentred, thick, dashed] (3.2,-0.58) -- (3.2, 0.62);
+  \node[above, font=\tiny\bfseries, color=accentred] at (3.2, 0.64)
+       {seuil $> 1$};
+
+  % Bloc HSPF
+  \fill[accentgreen!18] (3.3,-0.32) rectangle (9.2, 0.32);
+  \draw[accentgreen!55, thick] (3.3,-0.32) rectangle (9.2, 0.32);
+  \node[font=\small\bfseries, color=accentgreen] at (6.25,0)
+       {HSPF \small (pompe à chaleur)};
+  \node[below, font=\tiny, color=accentgreen!80] at (3.3,-0.32) {6.2};
+  \node[below, font=\tiny, color=accentgreen!80] at (9.2,-0.32) {14.0};
+  \draw (3.3,-0.32)--(3.3,-0.46) (9.2,-0.32)--(9.2,-0.46);
+
+  % Étiquettes au-dessus
+  \node[above, font=\tiny, color=headerblue!80] at (1.6,0.32)
+       {Combustible / Résistance élec.};
+  \node[above, font=\tiny, color=accentgreen!80] at (6.25,0.32)
+       {PAC air-air (ASHP)};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[formulebox, title={Règle de séparation}]
+\texttt{hvac\_efficiency\_HSPF} $\leftarrow$ valeur si valeur $> 1.0$ \quad
+(pompe à chaleur)\\
+\texttt{hvac\_efficiency\_AFUE} $\leftarrow$ valeur sinon \quad
+(combustible ou résistance)
+\end{tcolorbox}
+
+\subsection{Résumé groupe HVAC}
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type} & OHE & Fuel Furnace, ASHP, \dots \\
+\texttt{in.hvac\_cooling\_type} & OHE & Central AC, None, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_heating\_efficiency} & Split AFUE/HSPF & voir ci-dessus \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_cooling\_efficiency} & SEER/EER float & [8.0 – 15.0] \\
+\texttt{in.hvac\_cooling\_partial\_space\_conditioning} & \% float [0–1] & \texttt{"40\%"} $\to$ 0.40 \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_efficiency} & AFUE float & [0.76 – 0.925] \\
+\texttt{in.heating\_fuel} & OHE & Natural Gas, Propane, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_has\_shared\_system} & OHE & None, Shared Heating, \dots \\
+\texttt{in.hvac\_secondary\_heating\_type} & OHE & Boiler, Electric Baseboard, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_shared\_efficiencies} & OHE & — \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 5 — Périodes d'offset des consignes}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.8cm}L{5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\multirow{3}{5.2cm}{\texttt{in.cooling\_setpoint\_offset\_period}}
+  & \texttt{cool\_direction} & Setup=$+1$, Setback=$-1$, None=$0$ \\
+  & \texttt{cool\_period\_type} & Day=1, Night=2, Both=3 \\
+\rowcolor{rowgray}
+  & \texttt{cool\_start\_sin/cos} & Heure encodée circulairement \\
+\multirow{2}{5.2cm}{\texttt{in.heating\_setpoint\_offset\_period}}
+  & \texttt{heat\_period\_type} & idem \\
+  & \texttt{heat\_start\_sin/cos} & Heure encodée circulairement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 6 — Occupants et socio-économique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.tenure} & Binaire & Owner=1, Renter=0 \\
+\texttt{in.vacancy\_status} & Binaire & Occupied=1, Vacant=0 \\
+\rowcolor{rowgray}
+\texttt{in.household\_has\_tribal\_persons} & Binaire & Yes=1, No=0 \\
+\texttt{in.usage\_level} & Ordinal & Low=0, Medium=1, High=2 \\
+\rowcolor{rowgray}
+\texttt{in.federal\_poverty\_level} & Midpoint float & \texttt{"100-150\%"} $\to$ 1.25 \\
+\texttt{in.area\_median\_income} & Midpoint float & \texttt{"80-100\%"} $\to$ 0.90 \\
+\rowcolor{rowgray}
+\texttt{in.state\_metro\_median\_income} & Midpoint float & \texttt{"400\%+"} $\to$ 4.0 \\
+\texttt{in.units\_represented, in.representative\_income}
+  & Supprimés & Constante / Poids d'échantillonnage \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Distributions :}
+\texttt{in.tenure} — Owner : 307\,512 · Renter : 175\,822.\quad
+\texttt{in.usage\_level} — Low : 137\,495 · Medium : 274\,985 · High : 137\,491.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 7 — Véhicule électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_ownership} & Binaire & Yes=1, No=0 \\
+\texttt{in.electric\_vehicle\_outlet\_access} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_charger} & Ordinal & None=0, Level~1=1, Level~2=2 \\
+\texttt{in.electric\_vehicle\_charge\_at\_home} & Midpoint float & [0.095 – 1.0] \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_miles\_traveled} & Numérique miles/an & [1\,000 – 22\,500] \\
+\texttt{in.electric\_vehicle\_battery} & Supprimé & Haute cardinalité \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 8 — Énergie solaire et stockage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.pv\_orientation} utilise le même encodage circulaire que
+\texttt{in.orientation} (section~\ref{sec:geo}) ; les panneaux \texttt{None}
+reçoivent \texttt{NaN}.
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.has\_pv} & Binaire & Yes=1, No=0 \\
+\texttt{in.pv\_system\_size} & Float kWDC & \texttt{"None"} $\to$ 0.0, sinon [1–13] \\
+\rowcolor{rowgray}
+\texttt{in.pv\_orientation} & Circ.\ sin/cos & cf.\ rose des vents §\ref{sec:geo} \\
+\texttt{in.battery} & Supprimé & 100\,\% ``None'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 9 — Eau chaude sanitaire}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_efficiency} & UEF float
+  & HP: 3.45, Solar: 4.0, Gaz std: 0.59, Élec premium: 0.95 \\
+\texttt{in.water\_heater\_technology} & OHE
+  & heat\_pump, tankless, solar, indirect, storage \\
+\rowcolor{rowgray}
+\texttt{in.solar\_collector\_area} & Numérique m²
+  & \texttt{"40 sqft"} $\to$ 3.72\,m² \\
+\texttt{in.water\_heater\_orientation} & Degrés + sin/cos
+  & N=0°, E=90°, S=180°, W=270° \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_fuel} & OHE
+  & electricity, natural\_gas, propane, fuel\_oil, solar \\
+\texttt{in.water\_heater\_in\_unit} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_location} & Groupement + OHE
+  & conditioned / semi\_conditioned / unconditioned \\
+\bottomrule
+\end{longtable}
+
+\textbf{Groupes thermiques de localisation :}
+\begin{itemize}[noitemsep, topsep=2pt]
+  \item \textbf{conditioned} : Living Space, Conditioned Mechanical Room, Heated Basement
+  \item \textbf{semi\_conditioned} : Garage, Attic
+  \item \textbf{unconditioned} : Outside, Crawlspace, Unheated Basement
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 10 — Panneau électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{7cm}L{2.5cm}L{4.5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Type} & \textbf{Plage} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_panel\_service\_rating..a}
+  & Float32 & 60, 100, 150, 200, 400\,A \\
+\texttt{in.electric\_panel\_breaker\_space\_total\_count}
+  & Float32 & [8 – 60] emplacements \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 11 — Appareils électroménagers}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{4.0cm}L{4.2cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Détail} \\
+\midrule
+\endhead
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Lavage \& séchage}} \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_dryer}
+  & \texttt{\_efficiency}, \texttt{\_has}, \texttt{\_electric}, \texttt{\_gas}
+  & Élec=2.7, Gaz/Propane=2.39, None=0 \\
+\texttt{in.clothes\_washer}
+  & \texttt{\_efficiency} & EnergyStar=2.07, Std=0.95 \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_washer\_presence} & \texttt{\_has} & Yes=1, No=0 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Cuisine}} \\
+\texttt{in.cooking\_range}
+  & \texttt{cooking\_type\_*}
+  & OHE : induction, electric, gas, propane, none \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Froid}} \\
+\rowcolor{rowgray}
+\texttt{in.refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & Extraction facteur d'efficacité \\
+\texttt{in.misc\_extra\_refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & idem \\
+\rowcolor{rowgray}
+\texttt{in.misc\_freezer} & \texttt{\_ef} & idem \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Éclairage}} \\
+\texttt{in.lighting}
+  & \texttt{\_efficiency} & Incandescent=1, CFL=2, LED=3 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Gaz domestique}} \\
+\rowcolor{rowgray}
+\texttt{in.misc\_gas\_fireplace/grill/lighting}
+  & \texttt{...\_present} & Binaire (1 si présent) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Piscine \& Spa}} \\
+\texttt{in.misc\_hot\_tub\_spa}
+  & \texttt{has\_hot\_tub}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool} & \texttt{has\_pool} & 1 si présent \\
+\texttt{in.misc\_pool\_heater}
+  & \texttt{pool\_heat\_pump}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool\_pump} & \texttt{\_hp}
+  & Chevaux-vapeur (float) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Divers}} \\
+\texttt{in.misc\_well\_pump} & \texttt{has\_well\_pump} & Binaire \\
+\rowcolor{rowgray}
+\texttt{in.ceiling\_fan}
+  & \texttt{has\_ceiling\_fan}, \texttt{\_used} & Binaires \\
+\texttt{in.dishwasher}
+  & \texttt{dishwasher\_kwh}, \texttt{has\_dishwasher}
+  & \texttt{"290 Rated kWh"} $\to$ 290.0 \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Récapitulatif des stratégies d'encodage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{L{4.5cm}C{2.8cm}L{6.7cm}}
+\toprule
+\textbf{Stratégie} & \textbf{Nb colonnes} & \textbf{Usage} \\
+\midrule
+\rowcolor{rowgray}
+Suppression & 50+ & Constantes, redondantes, hors-scope \\
+One-Hot Encoding & 10 groupes & Variables nominales sans ordre \\
+\rowcolor{rowgray}
+Encodage ordinal & 6 variables & Variables ordinales (niveau, type) \\
+Encodage circulaire sin/cos & 3 variables & Orientation, heure, angle \\
+\rowcolor{rowgray}
+Extraction numérique & 8 variables & R-value, EF, kWh, HP, m² \\
+Midpoint de plage & 5 variables & Revenus, pourcentages \\
+\rowcolor{rowgray}
+Split par seuil & 1 variable & HVAC heating (AFUE vs HSPF) \\
+Binaire (Yes/No) & 12 variables & Présence d'équipement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\textbf{Remarque générale :} Toutes les transformations respectent
+la sémantique physique des variables (R-values, UEF, SEER, HSPF).
+Les variables binaires utilisent le type \texttt{int8} pour minimiser
+l'empreinte mémoire.
+
+\end{document}
+\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{float}
+\usetikzlibrary{arrows.meta, calc, backgrounds}
+\tcbuselibrary{skins}
+
+\geometry{margin=2.5cm}
+
+%% ── Palette de couleurs ──────────────────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31,73,125}
+\definecolor{rowgray}{RGB}{242,242,242}
+\definecolor{lightblue}{RGB}{217,229,244}
+\definecolor{accentorange}{RGB}{204,102,0}
+\definecolor{accentgreen}{RGB}{0,140,70}
+\definecolor{accentred}{RGB}{180,30,30}
+
+%% ── En-tête / pied de page ───────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{headerblue}{\small Rapport d'Encodage — FlexiMax}}
+\lhead{\small \leftmark}
+\rfoot{\thepage}
+
+%% ── Formatage des titres ─────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headerblue!80}}{}{0em}{}
+
+%% ── Types de colonnes personnalisés ──────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+%% ── Barre de R-value (largeur proportionnelle, max=3 cm) ─────────────────────
+%%   #1 = fraction décimale dans [0,1]
+\newcommand{\rvaluebar}[1]{%
+  \begin{tikzpicture}[baseline=-0.3ex]
+    \fill[accentorange!75] (0,-0.10) rectangle ({#1*3.0cm}, 0.10);
+    \draw[gray!40, thin]   (0,-0.10) rectangle (3.0cm,      0.10);
+  \end{tikzpicture}%
+}
+
+%% ── Boîte de formule ─────────────────────────────────────────────────────────
+\tcbset{formulebox/.style={
+  enhanced, colback=headerblue!6, colframe=headerblue!50,
+  boxrule=0.5pt, arc=3pt, top=3pt, bottom=3pt, left=6pt, right=6pt,
+  fonttitle=\bfseries\small\color{headerblue}
+}}
+
+%% ── Commande : rose des vents ────────────────────────────────────────────────
+%% Usage : \compassrose   (réutilisé sections 5 et 8)
+\newcommand{\compassrose}{%
+\begin{tikzpicture}[scale=1.65, >=Stealth]
+  % Fond et cercle
+  \fill[headerblue!5] (0,0) circle (1cm);
+  \draw[headerblue!55, thick] (0,0) circle (1cm);
+  % Guides diagonaux légers
+  \draw[gray!18, thin] (-0.707,-0.707)--(0.707,0.707);
+  \draw[gray!18, thin] ( 0.707,-0.707)--(-0.707,0.707);
+  % Axes (x = sin, y = cos)
+  \draw[->, gray!45] (-1.28,0) -- (1.36,0)
+        node[right, font=\tiny, color=gray!70] {$\sin(\theta)$};
+  \draw[->, gray!45] (0,-1.28) -- (0,1.38)
+        node[above, font=\tiny, color=gray!70] {$\cos(\theta)$};
+  % 8 points : coordonnée = (sin θ, cos θ) en convention compas
+  \foreach \nom/\sx/\cy/\anch in {%
+    N/  0.000/ 1.000/above,
+    NE/ 0.707/ 0.707/above right,
+    E/  1.000/ 0.000/right,
+    SE/ 0.707/-0.707/below right,
+    S/  0.000/-1.000/below,
+    SW/-0.707/-0.707/below left,
+    W/ -1.000/ 0.000/left,
+    NW/-0.707/ 0.707/above left}
+  {
+    \fill[headerblue] (\sx,\cy) circle (2pt);
+    \node[\anch, font=\scriptsize\bfseries, color=headerblue, inner sep=2.5pt]
+         at (\sx,\cy) {\nom};
+  }
+  % Mise en évidence de l'exemple « South »
+  \fill[accentorange] (0,-1) circle (2.8pt);
+  \draw[accentorange!80, ->] (0.52,-0.80) -- (0.06,-0.97);
+  \node[right, font=\tiny, color=accentorange] at (0.52,-0.78)
+       {S : $\sin{=}0,\;\cos{=}{-1}$};
+\end{tikzpicture}%
+}
+
+%% ── Table sin/cos des 8 orientations ─────────────────────────────────────────
+\newcommand{\sincostabl}{%
+\renewcommand{\arraystretch}{1.18}%
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Dir.} & $\boldsymbol\theta$\textbf{°} &
+$\boldsymbol{\sin\theta}$ & $\boldsymbol{\cos\theta}$ \\
+\midrule
+\rowcolor{rowgray} N  &   0 & $0$     & $+1$    \\
+NE                    &  45 & $+0.71$ & $+0.71$ \\
+\rowcolor{rowgray} E  &  90 & $+1$    & $0$     \\
+SE                    & 135 & $+0.71$ & $-0.71$ \\
+\rowcolor{accentorange!22} S  & 180 & $0$ & $-1$ \\
+SW                    & 225 & $-0.71$ & $-0.71$ \\
+\rowcolor{rowgray} W  & 270 & $-1$    & $0$     \\
+NW                    & 315 & $-0.71$ & $+0.71$ \\
+\bottomrule
+\end{tabular}%
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ═════════════════════════════════════════════════════════════════════════════
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{1.8cm}
+
+  \begin{tikzpicture}
+    \fill[headerblue] (0,0) rectangle (15.5cm, 1.3cm);
+    \node[white, font=\LARGE\bfseries] at (7.75cm, 0.65cm)
+         {Rapport d'Encodage des Variables};
+  \end{tikzpicture}
+
+  \vspace{0.45cm}
+  {\large\color{gray} Projet FlexiMax — Préparation des Features\par}
+  \vspace{1.8cm}
+
+  \begin{tabular}{@{}ll@{}}
+    \textbf{Fichier d'entrée}     & \texttt{metadata\_features.parquet} \\[5pt]
+    \textbf{Fichier de sortie}    & \texttt{features\_encodees.parquet} \\[5pt]
+    \textbf{Dimensions initiales} & 549\,971 lignes $\times$ 394 colonnes \\[5pt]
+    \textbf{Dimensions finales}   & 549\,971 lignes $\times$ 415+ colonnes \\[5pt]
+    \textbf{Date}                 & Juin 2026 \\
+  \end{tabular}
+
+  \vspace{1.8cm}
+  \rule{15.5cm}{0.4pt}
+  \vspace{0.4cm}
+
+  {\normalsize Ce document décrit l'ensemble des transformations, encodages\\
+  et suppressions appliqués aux variables brutes du dataset ResStock.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Vue d'ensemble}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Le pipeline d'encodage transforme les variables catégorielles et textuelles
+brutes en représentations numériques exploitables par les modèles de machine
+learning. Chaque groupe fait l'objet d'une stratégie adaptée à sa sémantique.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Étape} & \textbf{Colonnes} & \textbf{Shape} \\
+\midrule
+\rowcolor{rowgray} Données brutes & 394 & $549\,971 \times 394$ \\
+Après suppression & 349 & $549\,971 \times 349$ \\
+\rowcolor{rowgray} Après encodage complet & 415+ & $549\,971 \times 415+$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Suppression des colonnes inutiles}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Colonnes constantes (\texttt{nunique} $\leq 1$)}
+20 colonnes à valeur unique supprimées automatiquement — aucune information
+discriminante.
+
+\subsection{Colonnes redondantes ou hors-scope}
+
+\begin{center}
+\begin{tabular}{L{7cm}L{7cm}}
+\toprule
+\textbf{Colonne supprimée} & \textbf{Raison} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.building\_america\_climate\_zone} & Redondant avec ASHRAE \\
+\texttt{in.cec\_climate\_zone} & Redondant avec ASHRAE \\
+\rowcolor{rowgray}
+\texttt{in.census\_division}, \texttt{in.census\_division\_recs} & Géographique haute cardinalité \\
+\texttt{in.county}, \texttt{in.puma}, \texttt{in.city}, \texttt{in.state} & Géographique haute cardinalité \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type\_and\_fuel} & Redondant avec colonnes séparées \\
+\texttt{in.upgrade\_name} & Non pertinent \\
+\rowcolor{rowgray}
+\texttt{in.hot\_water\_distribution} & Non pertinent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Imputation par groupe}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Les 34 colonnes numériques sont imputées par la \textbf{médiane par zone
+climatique ASHRAE}, ce qui préserve les spécificités régionales
+(climat, altitude, usage énergétique).
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\rowcolor{rowgray} Variable de groupement
+  & \texttt{in.ashrae\_iecc\_climate\_zone\_2004} \\
+Méthode & Médiane par groupe, puis médiane globale \\
+\rowcolor{rowgray} Colonnes imputées & 34 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 1 — Zone climatique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.ashrae\_iecc\_climate\_zone\_2004} : \textbf{One-Hot Encoding}
+(\texttt{drop\_first}) $\to$ 16 colonnes binaires \texttt{climate\_*}
+(17 zones de \texttt{1A} à \texttt{8AK}).
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Valeur brute} & \textbf{Colonne créée} \\
+\midrule
+\rowcolor{rowgray} \texttt{"3B"} & \texttt{climate\_3B = 1} \\
+\texttt{"5A"} & \texttt{climate\_5A = 1} \\
+\rowcolor{rowgray} autres zones & \texttt{climate\_* = 0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 2 — Géométrie du bâtiment}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Encodage circulaire de l'orientation}
+
+L'orientation est un angle discret (8 directions cardinales).
+L'encodage sin/cos préserve la \textbf{continuité cyclique} : Nord et NNW
+restent proches dans l'espace des features.
+
+\begin{tcolorbox}[formulebox, title={Formule}]
+\[
+  \textit{orientation\_sin} = \sin\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr),
+  \qquad
+  \textit{orientation\_cos} = \cos\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr)
+\]
+$\theta$ = angle compas (Nord = 0°, Est = 90°, Sud = 180°, Ouest = 270°)
+\end{tcolorbox}
+
+\bigskip
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+  \centering
+  \compassrose
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.50\textwidth}
+  \centering
+  \sincostabl
+\end{minipage}
+
+\medskip
+\noindent\small\textit{Le cercle ci-dessus place chaque direction au point
+$(\sin\theta,\;\cos\theta)$.
+La direction \textbf{South} (exemple du rapport) donne $\sin=0$, $\cos=-1$.}
+
+\subsection{Surfaces vitrées par façade (\texttt{in.window\_areas})}
+
+La chaîne \texttt{"F15 B15 L15 R15"} est décomposée en 4 colonnes
+numériques (pourcentage de surface vitrée par orientation) :
+
+\begin{center}
+\begin{tikzpicture}[scale=1.1, >=Stealth]
+  % Contour bâtiment
+  \fill[headerblue!10] (0,0) rectangle (4,2.5);
+  \draw[thick, headerblue] (0,0) rectangle (4,2.5);
+  \node[font=\small, color=headerblue!70] at (2,1.25) {Bâtiment};
+  % Flèche Nord
+  \draw[->, thick, gray!60] (4.7,0.7) -- (4.7,1.5);
+  \node[above, font=\tiny, color=gray!60] at (4.7,1.5) {N};
+  % Façade Front (bas)
+  \draw[accentorange, line width=3pt] (0.7,0) -- (3.3,0);
+  \node[below, font=\tiny\bfseries, color=accentorange] at (2,-0.08)
+       {\texttt{window\_front\_pct}};
+  % Back (haut)
+  \draw[accentorange, line width=3pt] (0.7,2.5) -- (3.3,2.5);
+  \node[above, font=\tiny\bfseries, color=accentorange] at (2,2.58)
+       {\texttt{window\_back\_pct}};
+  % Left (gauche)
+  \draw[headerblue!70, line width=3pt] (0,0.8) -- (0,1.7);
+  \node[left, font=\tiny\bfseries, color=headerblue!70, align=right]
+       at (-0.08,1.25) {\texttt{window\_}\\\texttt{left\_pct}};
+  % Right (droite)
+  \draw[headerblue!70, line width=3pt] (4,0.8) -- (4,1.7);
+  \node[right, font=\tiny\bfseries, color=headerblue!70, align=left]
+       at (4.08,1.25) {\texttt{window\_}\\\texttt{right\_pct}};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Résumé du groupe Géométrie}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.orientation} & Circ.\ sin/cos & \texttt{"South"} $\to$ sin=0, cos=$-$1 \\
+\texttt{in.window\_areas} & Extraction F/B/L/R & 4 colonnes \% \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_number\_units\_*} & Midpoint & \texttt{"3-4"} $\to$ 3.5 \\
+\texttt{in.geometry\_building\_level\_mf} & Ordinal & Bottom=0, Middle=1, Top=2 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_horizontal\_location\_*} & Fusion + OHE & \texttt{"Middle"} $\to$ \texttt{horiz\_Middle=1} \\
+\texttt{in.geometry\_attic\_type} & Ordinal thermique & None=0, Vented=1, Unvented=2, Finished=3 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_foundation\_type} & Ordinal thermique & Ambient=0 \dots Heated Basement=4 \\
+\texttt{in.geometry\_garage} & Ordinal & None=0, 1~Car=1, 2~Car=2, 3~Car=3 \\
+\rowcolor{rowgray}
+\texttt{in.neighbors} & Distance ft + flag & dist=15, both=1 \\
+\texttt{in.corridor} & Binaire & Not Applicable=0, Double-Loaded=1 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_wall\_exterior\_finish} & Matériau OHE + clarté & \texttt{wall\_finish\_brick=1, dark=0} \\
+\texttt{in.geometry\_wall\_type} & OHE & \texttt{wall\_type\_Wood Stud=1} \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_type\_recs} & OHE & Single-Family Detached \\
+\texttt{in.sqft..ft2}, \texttt{in.door\_area} & Supprimés & Redondant / Constante \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 3 — Enveloppe thermique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Matériaux de toiture — Résistance thermique (valeur R)}
+
+La valeur R (m²·K/W) quantifie la \textbf{résistance au flux de chaleur} :
+plus elle est élevée, meilleure est l'isolation.
+Elle est utilisée directement comme feature numérique float.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{L{3.5cm}C{2.4cm}L{5.5cm}L{2.8cm}}
+\toprule
+\textbf{Matériau} & \textbf{R (m²·K/W)} & \textbf{Isolation relative} & \textbf{Caractéristique} \\
+\midrule
+\rowcolor{rowgray}
+Ardoise \small(Slate)      & 0.05 & \rvaluebar{0.05} & Pierre dense \\
+Métal \small(Metal)        & 0.17 & \rvaluebar{0.17} & Haute conductivité \\
+\rowcolor{rowgray}
+Bardeaux \small(Asphalt)   & 0.44 & \rvaluebar{0.44} & Standard résidentiel \\
+Tuile \small(Clay Tile)    & 0.80 & \rvaluebar{0.80} & Bonne inertie thermique \\
+\rowcolor{rowgray}
+Bois \small(Wood Shingles) & 1.00 & \rvaluebar{1.00} & Meilleur isolant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Décomposition des fenêtres (\texttt{in.windows})}
+
+\begin{tcolorbox}[formulebox, title={Exemple : \texttt{"Double, Low-E, Non-metal"}}]
+\begin{tabular}{@{}llll@{}}
+\texttt{window\_panes = 2} &
+\texttt{window\_low\_e = 1} &
+\texttt{window\_metal\_frame = 0} &
+\texttt{window\_storm = 0}
+\end{tabular}
+\end{tcolorbox}
+
+\begin{center}
+\begin{tabular}{L{3.5cm}L{1.8cm}L{2.5cm}L{5.5cm}}
+\toprule
+\textbf{Feature créée} & \textbf{Type} & \textbf{Valeurs} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{window\_panes}        & Ordinal & 1, 2, 3 & Single / Double / Triple vitrage \\
+\texttt{window\_low\_e}       & Binaire & 0, 1    & Revêtement Low-E \\
+\rowcolor{rowgray}
+\texttt{window\_metal\_frame} & Binaire & 0, 1    & Cadre métallique \\
+\texttt{window\_storm}        & Binaire & 0, 1    & Double fenêtre tempête \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Autres variables de l'enveloppe}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Remarque} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.ground\_thermal\_conductivity} & Float & [0.5 – 2.6] W/m·K \\
+\texttt{in.interior\_shading} & Supprimé & Constante \\
+\rowcolor{rowgray}
+\texttt{in.overhangs}, \texttt{in.eaves} & Supprimés & Constantes \\
+\texttt{in.doors}, \texttt{in.radiant\_barrier} & Supprimés & Constantes \\
+\rowcolor{rowgray}
+\texttt{in.infiltration} & Supprimé & Redondant avec \texttt{air\_leakage\_to\_outside\_ach50} \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 4 — Systèmes HVAC}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Séparation AFUE / HSPF pour le chauffage}
+
+La colonne \texttt{in.hvac\_heating\_efficiency} mélange deux métriques
+physiquement incomparables, séparées par un seuil à $> 1{,}0$ :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.15]
+  % Bloc AFUE
+  \fill[headerblue!20] (0,-0.32) rectangle (3.2, 0.32);
+  \draw[headerblue!55, thick] (0,-0.32) rectangle (3.2, 0.32);
+  \node[font=\small\bfseries, color=headerblue] at (1.6,0) {AFUE};
+  \node[below, font=\tiny, color=headerblue!80] at (0,-0.32) {0.60};
+  \node[below, font=\tiny, color=headerblue!80] at (3.2,-0.32) {1.0};
+  \draw (0,-0.32)--(0,-0.46) (3.2,-0.32)--(3.2,-0.46);
+
+  % Ligne de seuil
+  \draw[accentred, thick, dashed] (3.2,-0.58) -- (3.2, 0.62);
+  \node[above, font=\tiny\bfseries, color=accentred] at (3.2, 0.64)
+       {seuil $> 1$};
+
+  % Bloc HSPF
+  \fill[accentgreen!18] (3.3,-0.32) rectangle (9.2, 0.32);
+  \draw[accentgreen!55, thick] (3.3,-0.32) rectangle (9.2, 0.32);
+  \node[font=\small\bfseries, color=accentgreen] at (6.25,0)
+       {HSPF \small (pompe à chaleur)};
+  \node[below, font=\tiny, color=accentgreen!80] at (3.3,-0.32) {6.2};
+  \node[below, font=\tiny, color=accentgreen!80] at (9.2,-0.32) {14.0};
+  \draw (3.3,-0.32)--(3.3,-0.46) (9.2,-0.32)--(9.2,-0.46);
+
+  % Étiquettes au-dessus
+  \node[above, font=\tiny, color=headerblue!80] at (1.6,0.32)
+       {Combustible / Résistance élec.};
+  \node[above, font=\tiny, color=accentgreen!80] at (6.25,0.32)
+       {PAC air-air (ASHP)};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[formulebox, title={Règle de séparation}]
+\texttt{hvac\_efficiency\_HSPF} $\leftarrow$ valeur si valeur $> 1.0$ \quad
+(pompe à chaleur)\\
+\texttt{hvac\_efficiency\_AFUE} $\leftarrow$ valeur sinon \quad
+(combustible ou résistance)
+\end{tcolorbox}
+
+\subsection{Résumé groupe HVAC}
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type} & OHE & Fuel Furnace, ASHP, \dots \\
+\texttt{in.hvac\_cooling\_type} & OHE & Central AC, None, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_heating\_efficiency} & Split AFUE/HSPF & voir ci-dessus \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_cooling\_efficiency} & SEER/EER float & [8.0 – 15.0] \\
+\texttt{in.hvac\_cooling\_partial\_space\_conditioning} & \% float [0–1] & \texttt{"40\%"} $\to$ 0.40 \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_efficiency} & AFUE float & [0.76 – 0.925] \\
+\texttt{in.heating\_fuel} & OHE & Natural Gas, Propane, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_has\_shared\_system} & OHE & None, Shared Heating, \dots \\
+\texttt{in.hvac\_secondary\_heating\_type} & OHE & Boiler, Electric Baseboard, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_shared\_efficiencies} & OHE & — \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 5 — Périodes d'offset des consignes}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.8cm}L{5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\multirow{3}{5.2cm}{\texttt{in.cooling\_setpoint\_offset\_period}}
+  & \texttt{cool\_direction} & Setup=$+1$, Setback=$-1$, None=$0$ \\
+  & \texttt{cool\_period\_type} & Day=1, Night=2, Both=3 \\
+\rowcolor{rowgray}
+  & \texttt{cool\_start\_sin/cos} & Heure encodée circulairement \\
+\multirow{2}{5.2cm}{\texttt{in.heating\_setpoint\_offset\_period}}
+  & \texttt{heat\_period\_type} & idem \\
+  & \texttt{heat\_start\_sin/cos} & Heure encodée circulairement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 6 — Occupants et socio-économique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.tenure} & Binaire & Owner=1, Renter=0 \\
+\texttt{in.vacancy\_status} & Binaire & Occupied=1, Vacant=0 \\
+\rowcolor{rowgray}
+\texttt{in.household\_has\_tribal\_persons} & Binaire & Yes=1, No=0 \\
+\texttt{in.usage\_level} & Ordinal & Low=0, Medium=1, High=2 \\
+\rowcolor{rowgray}
+\texttt{in.federal\_poverty\_level} & Midpoint float & \texttt{"100-150\%"} $\to$ 1.25 \\
+\texttt{in.area\_median\_income} & Midpoint float & \texttt{"80-100\%"} $\to$ 0.90 \\
+\rowcolor{rowgray}
+\texttt{in.state\_metro\_median\_income} & Midpoint float & \texttt{"400\%+"} $\to$ 4.0 \\
+\texttt{in.units\_represented, in.representative\_income}
+  & Supprimés & Constante / Poids d'échantillonnage \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Distributions :}
+\texttt{in.tenure} — Owner : 307\,512 · Renter : 175\,822.\quad
+\texttt{in.usage\_level} — Low : 137\,495 · Medium : 274\,985 · High : 137\,491.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 7 — Véhicule électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_ownership} & Binaire & Yes=1, No=0 \\
+\texttt{in.electric\_vehicle\_outlet\_access} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_charger} & Ordinal & None=0, Level~1=1, Level~2=2 \\
+\texttt{in.electric\_vehicle\_charge\_at\_home} & Midpoint float & [0.095 – 1.0] \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_miles\_traveled} & Numérique miles/an & [1\,000 – 22\,500] \\
+\texttt{in.electric\_vehicle\_battery} & Supprimé & Haute cardinalité \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 8 — Énergie solaire et stockage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.pv\_orientation} utilise le même encodage circulaire que
+\texttt{in.orientation} (section~\ref{sec:geo}) ; les panneaux \texttt{None}
+reçoivent \texttt{NaN}.
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.has\_pv} & Binaire & Yes=1, No=0 \\
+\texttt{in.pv\_system\_size} & Float kWDC & \texttt{"None"} $\to$ 0.0, sinon [1–13] \\
+\rowcolor{rowgray}
+\texttt{in.pv\_orientation} & Circ.\ sin/cos & cf.\ rose des vents §\ref{sec:geo} \\
+\texttt{in.battery} & Supprimé & 100\,\% ``None'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 9 — Eau chaude sanitaire}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_efficiency} & UEF float
+  & HP: 3.45, Solar: 4.0, Gaz std: 0.59, Élec premium: 0.95 \\
+\texttt{in.water\_heater\_technology} & OHE
+  & heat\_pump, tankless, solar, indirect, storage \\
+\rowcolor{rowgray}
+\texttt{in.solar\_collector\_area} & Numérique m²
+  & \texttt{"40 sqft"} $\to$ 3.72\,m² \\
+\texttt{in.water\_heater\_orientation} & Degrés + sin/cos
+  & N=0°, E=90°, S=180°, W=270° \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_fuel} & OHE
+  & electricity, natural\_gas, propane, fuel\_oil, solar \\
+\texttt{in.water\_heater\_in\_unit} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_location} & Groupement + OHE
+  & conditioned / semi\_conditioned / unconditioned \\
+\bottomrule
+\end{longtable}
+
+\textbf{Groupes thermiques de localisation :}
+\begin{itemize}[noitemsep, topsep=2pt]
+  \item \textbf{conditioned} : Living Space, Conditioned Mechanical Room, Heated Basement
+  \item \textbf{semi\_conditioned} : Garage, Attic
+  \item \textbf{unconditioned} : Outside, Crawlspace, Unheated Basement
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 10 — Panneau électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{7cm}L{2.5cm}L{4.5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Type} & \textbf{Plage} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_panel\_service\_rating..a}
+  & Float32 & 60, 100, 150, 200, 400\,A \\
+\texttt{in.electric\_panel\_breaker\_space\_total\_count}
+  & Float32 & [8 – 60] emplacements \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 11 — Appareils électroménagers}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{4.0cm}L{4.2cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Détail} \\
+\midrule
+\endhead
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Lavage \& séchage}} \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_dryer}
+  & \texttt{\_efficiency}, \texttt{\_has}, \texttt{\_electric}, \texttt{\_gas}
+  & Élec=2.7, Gaz/Propane=2.39, None=0 \\
+\texttt{in.clothes\_washer}
+  & \texttt{\_efficiency} & EnergyStar=2.07, Std=0.95 \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_washer\_presence} & \texttt{\_has} & Yes=1, No=0 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Cuisine}} \\
+\texttt{in.cooking\_range}
+  & \texttt{cooking\_type\_*}
+  & OHE : induction, electric, gas, propane, none \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Froid}} \\
+\rowcolor{rowgray}
+\texttt{in.refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & Extraction facteur d'efficacité \\
+\texttt{in.misc\_extra\_refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & idem \\
+\rowcolor{rowgray}
+\texttt{in.misc\_freezer} & \texttt{\_ef} & idem \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Éclairage}} \\
+\texttt{in.lighting}
+  & \texttt{\_efficiency} & Incandescent=1, CFL=2, LED=3 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Gaz domestique}} \\
+\rowcolor{rowgray}
+\texttt{in.misc\_gas\_fireplace/grill/lighting}
+  & \texttt{...\_present} & Binaire (1 si présent) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Piscine \& Spa}} \\
+\texttt{in.misc\_hot\_tub\_spa}
+  & \texttt{has\_hot\_tub}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool} & \texttt{has\_pool} & 1 si présent \\
+\texttt{in.misc\_pool\_heater}
+  & \texttt{pool\_heat\_pump}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool\_pump} & \texttt{\_hp}
+  & Chevaux-vapeur (float) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Divers}} \\
+\texttt{in.misc\_well\_pump} & \texttt{has\_well\_pump} & Binaire \\
+\rowcolor{rowgray}
+\texttt{in.ceiling\_fan}
+  & \texttt{has\_ceiling\_fan}, \texttt{\_used} & Binaires \\
+\texttt{in.dishwasher}
+  & \texttt{dishwasher\_kwh}, \texttt{has\_dishwasher}
+  & \texttt{"290 Rated kWh"} $\to$ 290.0 \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Récapitulatif des stratégies d'encodage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{L{4.5cm}C{2.8cm}L{6.7cm}}
+\toprule
+\textbf{Stratégie} & \textbf{Nb colonnes} & \textbf{Usage} \\
+\midrule
+\rowcolor{rowgray}
+Suppression & 50+ & Constantes, redondantes, hors-scope \\
+One-Hot Encoding & 10 groupes & Variables nominales sans ordre \\
+\rowcolor{rowgray}
+Encodage ordinal & 6 variables & Variables ordinales (niveau, type) \\
+Encodage circulaire sin/cos & 3 variables & Orientation, heure, angle \\
+\rowcolor{rowgray}
+Extraction numérique & 8 variables & R-value, EF, kWh, HP, m² \\
+Midpoint de plage & 5 variables & Revenus, pourcentages \\
+\rowcolor{rowgray}
+Split par seuil & 1 variable & HVAC heating (AFUE vs HSPF) \\
+Binaire (Yes/No) & 12 variables & Présence d'équipement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\textbf{Remarque générale :} Toutes les transformations respectent
+la sémantique physique des variables (R-values, UEF, SEER, HSPF).
+Les variables binaires utilisent le type \texttt{int8} pour minimiser
+l'empreinte mémoire.
+
+\end{document}
+v\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{float}
+\usetikzlibrary{arrows.meta, calc, backgrounds}
+\tcbuselibrary{skins}
+
+\geometry{margin=2.5cm}
+
+%% ── Palette de couleurs ──────────────────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31,73,125}
+\definecolor{rowgray}{RGB}{242,242,242}
+\definecolor{lightblue}{RGB}{217,229,244}
+\definecolor{accentorange}{RGB}{204,102,0}
+\definecolor{accentgreen}{RGB}{0,140,70}
+\definecolor{accentred}{RGB}{180,30,30}
+
+%% ── En-tête / pied de page ───────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{headerblue}{\small Rapport d'Encodage — FlexiMax}}
+\lhead{\small \leftmark}
+\rfoot{\thepage}
+
+%% ── Formatage des titres ─────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headerblue!80}}{}{0em}{}
+
+%% ── Types de colonnes personnalisés ──────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+%% ── Barre de R-value (largeur proportionnelle, max=3 cm) ─────────────────────
+%%   #1 = fraction décimale dans [0,1]
+\newcommand{\rvaluebar}[1]{%
+  \begin{tikzpicture}[baseline=-0.3ex]
+    \fill[accentorange!75] (0,-0.10) rectangle ({#1*3.0cm}, 0.10);
+    \draw[gray!40, thin]   (0,-0.10) rectangle (3.0cm,      0.10);
+  \end{tikzpicture}%
+}
+
+%% ── Boîte de formule ─────────────────────────────────────────────────────────
+\tcbset{formulebox/.style={
+  enhanced, colback=headerblue!6, colframe=headerblue!50,
+  boxrule=0.5pt, arc=3pt, top=3pt, bottom=3pt, left=6pt, right=6pt,
+  fonttitle=\bfseries\small\color{headerblue}
+}}
+
+%% ── Commande : rose des vents ────────────────────────────────────────────────
+%% Usage : \compassrose   (réutilisé sections 5 et 8)
+\newcommand{\compassrose}{%
+\begin{tikzpicture}[scale=1.65, >=Stealth]
+  % Fond et cercle
+  \fill[headerblue!5] (0,0) circle (1cm);
+  \draw[headerblue!55, thick] (0,0) circle (1cm);
+  % Guides diagonaux légers
+  \draw[gray!18, thin] (-0.707,-0.707)--(0.707,0.707);
+  \draw[gray!18, thin] ( 0.707,-0.707)--(-0.707,0.707);
+  % Axes (x = sin, y = cos)
+  \draw[->, gray!45] (-1.28,0) -- (1.36,0)
+        node[right, font=\tiny, color=gray!70] {$\sin(\theta)$};
+  \draw[->, gray!45] (0,-1.28) -- (0,1.38)
+        node[above, font=\tiny, color=gray!70] {$\cos(\theta)$};
+  % 8 points : coordonnée = (sin θ, cos θ) en convention compas
+  \foreach \nom/\sx/\cy/\anch in {%
+    N/  0.000/ 1.000/above,
+    NE/ 0.707/ 0.707/above right,
+    E/  1.000/ 0.000/right,
+    SE/ 0.707/-0.707/below right,
+    S/  0.000/-1.000/below,
+    SW/-0.707/-0.707/below left,
+    W/ -1.000/ 0.000/left,
+    NW/-0.707/ 0.707/above left}
+  {
+    \fill[headerblue] (\sx,\cy) circle (2pt);
+    \node[\anch, font=\scriptsize\bfseries, color=headerblue, inner sep=2.5pt]
+         at (\sx,\cy) {\nom};
+  }
+  % Mise en évidence de l'exemple « South »
+  \fill[accentorange] (0,-1) circle (2.8pt);
+  \draw[accentorange!80, ->] (0.52,-0.80) -- (0.06,-0.97);
+  \node[right, font=\tiny, color=accentorange] at (0.52,-0.78)
+       {S : $\sin{=}0,\;\cos{=}{-1}$};
+\end{tikzpicture}%
+}
+
+%% ── Table sin/cos des 8 orientations ─────────────────────────────────────────
+\newcommand{\sincostabl}{%
+\renewcommand{\arraystretch}{1.18}%
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Dir.} & $\boldsymbol\theta$\textbf{°} &
+$\boldsymbol{\sin\theta}$ & $\boldsymbol{\cos\theta}$ \\
+\midrule
+\rowcolor{rowgray} N  &   0 & $0$     & $+1$    \\
+NE                    &  45 & $+0.71$ & $+0.71$ \\
+\rowcolor{rowgray} E  &  90 & $+1$    & $0$     \\
+SE                    & 135 & $+0.71$ & $-0.71$ \\
+\rowcolor{accentorange!22} S  & 180 & $0$ & $-1$ \\
+SW                    & 225 & $-0.71$ & $-0.71$ \\
+\rowcolor{rowgray} W  & 270 & $-1$    & $0$     \\
+NW                    & 315 & $-0.71$ & $+0.71$ \\
+\bottomrule
+\end{tabular}%
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ═════════════════════════════════════════════════════════════════════════════
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{1.8cm}
+
+  \begin{tikzpicture}
+    \fill[headerblue] (0,0) rectangle (15.5cm, 1.3cm);
+    \node[white, font=\LARGE\bfseries] at (7.75cm, 0.65cm)
+         {Rapport d'Encodage des Variables};
+  \end{tikzpicture}
+
+  \vspace{0.45cm}
+  {\large\color{gray} Projet FlexiMax — Préparation des Features\par}
+  \vspace{1.8cm}
+
+  \begin{tabular}{@{}ll@{}}
+    \textbf{Fichier d'entrée}     & \texttt{metadata\_features.parquet} \\[5pt]
+    \textbf{Fichier de sortie}    & \texttt{features\_encodees.parquet} \\[5pt]
+    \textbf{Dimensions initiales} & 549\,971 lignes $\times$ 394 colonnes \\[5pt]
+    \textbf{Dimensions finales}   & 549\,971 lignes $\times$ 415+ colonnes \\[5pt]
+    \textbf{Date}                 & Juin 2026 \\
+  \end{tabular}
+
+  \vspace{1.8cm}
+  \rule{15.5cm}{0.4pt}
+  \vspace{0.4cm}
+
+  {\normalsize Ce document décrit l'ensemble des transformations, encodages\\
+  et suppressions appliqués aux variables brutes du dataset ResStock.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Vue d'ensemble}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Le pipeline d'encodage transforme les variables catégorielles et textuelles
+brutes en représentations numériques exploitables par les modèles de machine
+learning. Chaque groupe fait l'objet d'une stratégie adaptée à sa sémantique.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Étape} & \textbf{Colonnes} & \textbf{Shape} \\
+\midrule
+\rowcolor{rowgray} Données brutes & 394 & $549\,971 \times 394$ \\
+Après suppression & 349 & $549\,971 \times 349$ \\
+\rowcolor{rowgray} Après encodage complet & 415+ & $549\,971 \times 415+$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Suppression des colonnes inutiles}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Colonnes constantes (\texttt{nunique} $\leq 1$)}
+20 colonnes à valeur unique supprimées automatiquement — aucune information
+discriminante.
+
+\subsection{Colonnes redondantes ou hors-scope}
+
+\begin{center}
+\begin{tabular}{L{7cm}L{7cm}}
+\toprule
+\textbf{Colonne supprimée} & \textbf{Raison} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.building\_america\_climate\_zone} & Redondant avec ASHRAE \\
+\texttt{in.cec\_climate\_zone} & Redondant avec ASHRAE \\
+\rowcolor{rowgray}
+\texttt{in.census\_division}, \texttt{in.census\_division\_recs} & Géographique haute cardinalité \\
+\texttt{in.county}, \texttt{in.puma}, \texttt{in.city}, \texttt{in.state} & Géographique haute cardinalité \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type\_and\_fuel} & Redondant avec colonnes séparées \\
+\texttt{in.upgrade\_name} & Non pertinent \\
+\rowcolor{rowgray}
+\texttt{in.hot\_water\_distribution} & Non pertinent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Imputation par groupe}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Les 34 colonnes numériques sont imputées par la \textbf{médiane par zone
+climatique ASHRAE}, ce qui préserve les spécificités régionales
+(climat, altitude, usage énergétique).
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\rowcolor{rowgray} Variable de groupement
+  & \texttt{in.ashrae\_iecc\_climate\_zone\_2004} \\
+Méthode & Médiane par groupe, puis médiane globale \\
+\rowcolor{rowgray} Colonnes imputées & 34 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 1 — Zone climatique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.ashrae\_iecc\_climate\_zone\_2004} : \textbf{One-Hot Encoding}
+(\texttt{drop\_first}) $\to$ 16 colonnes binaires \texttt{climate\_*}
+(17 zones de \texttt{1A} à \texttt{8AK}).
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Valeur brute} & \textbf{Colonne créée} \\
+\midrule
+\rowcolor{rowgray} \texttt{"3B"} & \texttt{climate\_3B = 1} \\
+\texttt{"5A"} & \texttt{climate\_5A = 1} \\
+\rowcolor{rowgray} autres zones & \texttt{climate\_* = 0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 2 — Géométrie du bâtiment}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Encodage circulaire de l'orientation}
+
+L'orientation est un angle discret (8 directions cardinales).
+L'encodage sin/cos préserve la \textbf{continuité cyclique} : Nord et NNW
+restent proches dans l'espace des features.
+
+\begin{tcolorbox}[formulebox, title={Formule}]
+\[
+  \textit{orientation\_sin} = \sin\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr),
+  \qquad
+  \textit{orientation\_cos} = \cos\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr)
+\]
+$\theta$ = angle compas (Nord = 0°, Est = 90°, Sud = 180°, Ouest = 270°)
+\end{tcolorbox}
+
+\bigskip
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+  \centering
+  \compassrose
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.50\textwidth}
+  \centering
+  \sincostabl
+\end{minipage}
+
+\medskip
+\noindent\small\textit{Le cercle ci-dessus place chaque direction au point
+$(\sin\theta,\;\cos\theta)$.
+La direction \textbf{South} (exemple du rapport) donne $\sin=0$, $\cos=-1$.}
+
+\subsection{Surfaces vitrées par façade (\texttt{in.window\_areas})}
+
+La chaîne \texttt{"F15 B15 L15 R15"} est décomposée en 4 colonnes
+numériques (pourcentage de surface vitrée par orientation) :
+
+\begin{center}
+\begin{tikzpicture}[scale=1.1, >=Stealth]
+  % Contour bâtiment
+  \fill[headerblue!10] (0,0) rectangle (4,2.5);
+  \draw[thick, headerblue] (0,0) rectangle (4,2.5);
+  \node[font=\small, color=headerblue!70] at (2,1.25) {Bâtiment};
+  % Flèche Nord
+  \draw[->, thick, gray!60] (4.7,0.7) -- (4.7,1.5);
+  \node[above, font=\tiny, color=gray!60] at (4.7,1.5) {N};
+  % Façade Front (bas)
+  \draw[accentorange, line width=3pt] (0.7,0) -- (3.3,0);
+  \node[below, font=\tiny\bfseries, color=accentorange] at (2,-0.08)
+       {\texttt{window\_front\_pct}};
+  % Back (haut)
+  \draw[accentorange, line width=3pt] (0.7,2.5) -- (3.3,2.5);
+  \node[above, font=\tiny\bfseries, color=accentorange] at (2,2.58)
+       {\texttt{window\_back\_pct}};
+  % Left (gauche)
+  \draw[headerblue!70, line width=3pt] (0,0.8) -- (0,1.7);
+  \node[left, font=\tiny\bfseries, color=headerblue!70, align=right]
+       at (-0.08,1.25) {\texttt{window\_}\\\texttt{left\_pct}};
+  % Right (droite)
+  \draw[headerblue!70, line width=3pt] (4,0.8) -- (4,1.7);
+  \node[right, font=\tiny\bfseries, color=headerblue!70, align=left]
+       at (4.08,1.25) {\texttt{window\_}\\\texttt{right\_pct}};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Résumé du groupe Géométrie}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.orientation} & Circ.\ sin/cos & \texttt{"South"} $\to$ sin=0, cos=$-$1 \\
+\texttt{in.window\_areas} & Extraction F/B/L/R & 4 colonnes \% \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_number\_units\_*} & Midpoint & \texttt{"3-4"} $\to$ 3.5 \\
+\texttt{in.geometry\_building\_level\_mf} & Ordinal & Bottom=0, Middle=1, Top=2 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_horizontal\_location\_*} & Fusion + OHE & \texttt{"Middle"} $\to$ \texttt{horiz\_Middle=1} \\
+\texttt{in.geometry\_attic\_type} & Ordinal thermique & None=0, Vented=1, Unvented=2, Finished=3 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_foundation\_type} & Ordinal thermique & Ambient=0 \dots Heated Basement=4 \\
+\texttt{in.geometry\_garage} & Ordinal & None=0, 1~Car=1, 2~Car=2, 3~Car=3 \\
+\rowcolor{rowgray}
+\texttt{in.neighbors} & Distance ft + flag & dist=15, both=1 \\
+\texttt{in.corridor} & Binaire & Not Applicable=0, Double-Loaded=1 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_wall\_exterior\_finish} & Matériau OHE + clarté & \texttt{wall\_finish\_brick=1, dark=0} \\
+\texttt{in.geometry\_wall\_type} & OHE & \texttt{wall\_type\_Wood Stud=1} \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_type\_recs} & OHE & Single-Family Detached \\
+\texttt{in.sqft..ft2}, \texttt{in.door\_area} & Supprimés & Redondant / Constante \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 3 — Enveloppe thermique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Matériaux de toiture — Résistance thermique (valeur R)}
+
+La valeur R (m²·K/W) quantifie la \textbf{résistance au flux de chaleur} :
+plus elle est élevée, meilleure est l'isolation.
+Elle est utilisée directement comme feature numérique float.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{L{3.5cm}C{2.4cm}L{5.5cm}L{2.8cm}}
+\toprule
+\textbf{Matériau} & \textbf{R (m²·K/W)} & \textbf{Isolation relative} & \textbf{Caractéristique} \\
+\midrule
+\rowcolor{rowgray}
+Ardoise \small(Slate)      & 0.05 & \rvaluebar{0.05} & Pierre dense \\
+Métal \small(Metal)        & 0.17 & \rvaluebar{0.17} & Haute conductivité \\
+\rowcolor{rowgray}
+Bardeaux \small(Asphalt)   & 0.44 & \rvaluebar{0.44} & Standard résidentiel \\
+Tuile \small(Clay Tile)    & 0.80 & \rvaluebar{0.80} & Bonne inertie thermique \\
+\rowcolor{rowgray}
+Bois \small(Wood Shingles) & 1.00 & \rvaluebar{1.00} & Meilleur isolant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Décomposition des fenêtres (\texttt{in.windows})}
+
+\begin{tcolorbox}[formulebox, title={Exemple : \texttt{"Double, Low-E, Non-metal"}}]
+\begin{tabular}{@{}llll@{}}
+\texttt{window\_panes = 2} &
+\texttt{window\_low\_e = 1} &
+\texttt{window\_metal\_frame = 0} &
+\texttt{window\_storm = 0}
+\end{tabular}
+\end{tcolorbox}
+
+\begin{center}
+\begin{tabular}{L{3.5cm}L{1.8cm}L{2.5cm}L{5.5cm}}
+\toprule
+\textbf{Feature créée} & \textbf{Type} & \textbf{Valeurs} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{window\_panes}        & Ordinal & 1, 2, 3 & Single / Double / Triple vitrage \\
+\texttt{window\_low\_e}       & Binaire & 0, 1    & Revêtement Low-E \\
+\rowcolor{rowgray}
+\texttt{window\_metal\_frame} & Binaire & 0, 1    & Cadre métallique \\
+\texttt{window\_storm}        & Binaire & 0, 1    & Double fenêtre tempête \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Autres variables de l'enveloppe}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Remarque} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.ground\_thermal\_conductivity} & Float & [0.5 – 2.6] W/m·K \\
+\texttt{in.interior\_shading} & Supprimé & Constante \\
+\rowcolor{rowgray}
+\texttt{in.overhangs}, \texttt{in.eaves} & Supprimés & Constantes \\
+\texttt{in.doors}, \texttt{in.radiant\_barrier} & Supprimés & Constantes \\
+\rowcolor{rowgray}
+\texttt{in.infiltration} & Supprimé & Redondant avec \texttt{air\_leakage\_to\_outside\_ach50} \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 4 — Systèmes HVAC}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Séparation AFUE / HSPF pour le chauffage}
+
+La colonne \texttt{in.hvac\_heating\_efficiency} mélange deux métriques
+physiquement incomparables, séparées par un seuil à $> 1{,}0$ :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.15]
+  % Bloc AFUE
+  \fill[headerblue!20] (0,-0.32) rectangle (3.2, 0.32);
+  \draw[headerblue!55, thick] (0,-0.32) rectangle (3.2, 0.32);
+  \node[font=\small\bfseries, color=headerblue] at (1.6,0) {AFUE};
+  \node[below, font=\tiny, color=headerblue!80] at (0,-0.32) {0.60};
+  \node[below, font=\tiny, color=headerblue!80] at (3.2,-0.32) {1.0};
+  \draw (0,-0.32)--(0,-0.46) (3.2,-0.32)--(3.2,-0.46);
+
+  % Ligne de seuil
+  \draw[accentred, thick, dashed] (3.2,-0.58) -- (3.2, 0.62);
+  \node[above, font=\tiny\bfseries, color=accentred] at (3.2, 0.64)
+       {seuil $> 1$};
+
+  % Bloc HSPF
+  \fill[accentgreen!18] (3.3,-0.32) rectangle (9.2, 0.32);
+  \draw[accentgreen!55, thick] (3.3,-0.32) rectangle (9.2, 0.32);
+  \node[font=\small\bfseries, color=accentgreen] at (6.25,0)
+       {HSPF \small (pompe à chaleur)};
+  \node[below, font=\tiny, color=accentgreen!80] at (3.3,-0.32) {6.2};
+  \node[below, font=\tiny, color=accentgreen!80] at (9.2,-0.32) {14.0};
+  \draw (3.3,-0.32)--(3.3,-0.46) (9.2,-0.32)--(9.2,-0.46);
+
+  % Étiquettes au-dessus
+  \node[above, font=\tiny, color=headerblue!80] at (1.6,0.32)
+       {Combustible / Résistance élec.};
+  \node[above, font=\tiny, color=accentgreen!80] at (6.25,0.32)
+       {PAC air-air (ASHP)};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[formulebox, title={Règle de séparation}]
+\texttt{hvac\_efficiency\_HSPF} $\leftarrow$ valeur si valeur $> 1.0$ \quad
+(pompe à chaleur)\\
+\texttt{hvac\_efficiency\_AFUE} $\leftarrow$ valeur sinon \quad
+(combustible ou résistance)
+\end{tcolorbox}
+
+\subsection{Résumé groupe HVAC}
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type} & OHE & Fuel Furnace, ASHP, \dots \\
+\texttt{in.hvac\_cooling\_type} & OHE & Central AC, None, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_heating\_efficiency} & Split AFUE/HSPF & voir ci-dessus \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_cooling\_efficiency} & SEER/EER float & [8.0 – 15.0] \\
+\texttt{in.hvac\_cooling\_partial\_space\_conditioning} & \% float [0–1] & \texttt{"40\%"} $\to$ 0.40 \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_efficiency} & AFUE float & [0.76 – 0.925] \\
+\texttt{in.heating\_fuel} & OHE & Natural Gas, Propane, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_has\_shared\_system} & OHE & None, Shared Heating, \dots \\
+\texttt{in.hvac\_secondary\_heating\_type} & OHE & Boiler, Electric Baseboard, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_shared\_efficiencies} & OHE & — \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 5 — Périodes d'offset des consignes}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.8cm}L{5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\multirow{3}{5.2cm}{\texttt{in.cooling\_setpoint\_offset\_period}}
+  & \texttt{cool\_direction} & Setup=$+1$, Setback=$-1$, None=$0$ \\
+  & \texttt{cool\_period\_type} & Day=1, Night=2, Both=3 \\
+\rowcolor{rowgray}
+  & \texttt{cool\_start\_sin/cos} & Heure encodée circulairement \\
+\multirow{2}{5.2cm}{\texttt{in.heating\_setpoint\_offset\_period}}
+  & \texttt{heat\_period\_type} & idem \\
+  & \texttt{heat\_start\_sin/cos} & Heure encodée circulairement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 6 — Occupants et socio-économique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.tenure} & Binaire & Owner=1, Renter=0 \\
+\texttt{in.vacancy\_status} & Binaire & Occupied=1, Vacant=0 \\
+\rowcolor{rowgray}
+\texttt{in.household\_has\_tribal\_persons} & Binaire & Yes=1, No=0 \\
+\texttt{in.usage\_level} & Ordinal & Low=0, Medium=1, High=2 \\
+\rowcolor{rowgray}
+\texttt{in.federal\_poverty\_level} & Midpoint float & \texttt{"100-150\%"} $\to$ 1.25 \\
+\texttt{in.area\_median\_income} & Midpoint float & \texttt{"80-100\%"} $\to$ 0.90 \\
+\rowcolor{rowgray}
+\texttt{in.state\_metro\_median\_income} & Midpoint float & \texttt{"400\%+"} $\to$ 4.0 \\
+\texttt{in.units\_represented, in.representative\_income}
+  & Supprimés & Constante / Poids d'échantillonnage \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Distributions :}
+\texttt{in.tenure} — Owner : 307\,512 · Renter : 175\,822.\quad
+\texttt{in.usage\_level} — Low : 137\,495 · Medium : 274\,985 · High : 137\,491.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 7 — Véhicule électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_ownership} & Binaire & Yes=1, No=0 \\
+\texttt{in.electric\_vehicle\_outlet\_access} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_charger} & Ordinal & None=0, Level~1=1, Level~2=2 \\
+\texttt{in.electric\_vehicle\_charge\_at\_home} & Midpoint float & [0.095 – 1.0] \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_miles\_traveled} & Numérique miles/an & [1\,000 – 22\,500] \\
+\texttt{in.electric\_vehicle\_battery} & Supprimé & Haute cardinalité \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 8 — Énergie solaire et stockage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.pv\_orientation} utilise le même encodage circulaire que
+\texttt{in.orientation} (section~\ref{sec:geo}) ; les panneaux \texttt{None}
+reçoivent \texttt{NaN}.
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.has\_pv} & Binaire & Yes=1, No=0 \\
+\texttt{in.pv\_system\_size} & Float kWDC & \texttt{"None"} $\to$ 0.0, sinon [1–13] \\
+\rowcolor{rowgray}
+\texttt{in.pv\_orientation} & Circ.\ sin/cos & cf.\ rose des vents §\ref{sec:geo} \\
+\texttt{in.battery} & Supprimé & 100\,\% ``None'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 9 — Eau chaude sanitaire}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_efficiency} & UEF float
+  & HP: 3.45, Solar: 4.0, Gaz std: 0.59, Élec premium: 0.95 \\
+\texttt{in.water\_heater\_technology} & OHE
+  & heat\_pump, tankless, solar, indirect, storage \\
+\rowcolor{rowgray}
+\texttt{in.solar\_collector\_area} & Numérique m²
+  & \texttt{"40 sqft"} $\to$ 3.72\,m² \\
+\texttt{in.water\_heater\_orientation} & Degrés + sin/cos
+  & N=0°, E=90°, S=180°, W=270° \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_fuel} & OHE
+  & electricity, natural\_gas, propane, fuel\_oil, solar \\
+\texttt{in.water\_heater\_in\_unit} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_location} & Groupement + OHE
+  & conditioned / semi\_conditioned / unconditioned \\
+\bottomrule
+\end{longtable}
+
+\textbf{Groupes thermiques de localisation :}
+\begin{itemize}[noitemsep, topsep=2pt]
+  \item \textbf{conditioned} : Living Space, Conditioned Mechanical Room, Heated Basement
+  \item \textbf{semi\_conditioned} : Garage, Attic
+  \item \textbf{unconditioned} : Outside, Crawlspace, Unheated Basement
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 10 — Panneau électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{7cm}L{2.5cm}L{4.5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Type} & \textbf{Plage} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_panel\_service\_rating..a}
+  & Float32 & 60, 100, 150, 200, 400\,A \\
+\texttt{in.electric\_panel\_breaker\_space\_total\_count}
+  & Float32 & [8 – 60] emplacements \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 11 — Appareils électroménagers}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{4.0cm}L{4.2cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Détail} \\
+\midrule
+\endhead
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Lavage \& séchage}} \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_dryer}
+  & \texttt{\_efficiency}, \texttt{\_has}, \texttt{\_electric}, \texttt{\_gas}
+  & Élec=2.7, Gaz/Propane=2.39, None=0 \\
+\texttt{in.clothes\_washer}
+  & \texttt{\_efficiency} & EnergyStar=2.07, Std=0.95 \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_washer\_presence} & \texttt{\_has} & Yes=1, No=0 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Cuisine}} \\
+\texttt{in.cooking\_range}
+  & \texttt{cooking\_type\_*}
+  & OHE : induction, electric, gas, propane, none \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Froid}} \\
+\rowcolor{rowgray}
+\texttt{in.refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & Extraction facteur d'efficacité \\
+\texttt{in.misc\_extra\_refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & idem \\
+\rowcolor{rowgray}
+\texttt{in.misc\_freezer} & \texttt{\_ef} & idem \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Éclairage}} \\
+\texttt{in.lighting}
+  & \texttt{\_efficiency} & Incandescent=1, CFL=2, LED=3 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Gaz domestique}} \\
+\rowcolor{rowgray}
+\texttt{in.misc\_gas\_fireplace/grill/lighting}
+  & \texttt{...\_present} & Binaire (1 si présent) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Piscine \& Spa}} \\
+\texttt{in.misc\_hot\_tub\_spa}
+  & \texttt{has\_hot\_tub}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool} & \texttt{has\_pool} & 1 si présent \\
+\texttt{in.misc\_pool\_heater}
+  & \texttt{pool\_heat\_pump}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool\_pump} & \texttt{\_hp}
+  & Chevaux-vapeur (float) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Divers}} \\
+\texttt{in.misc\_well\_pump} & \texttt{has\_well\_pump} & Binaire \\
+\rowcolor{rowgray}
+\texttt{in.ceiling\_fan}
+  & \texttt{has\_ceiling\_fan}, \texttt{\_used} & Binaires \\
+\texttt{in.dishwasher}
+  & \texttt{dishwasher\_kwh}, \texttt{has\_dishwasher}
+  & \texttt{"290 Rated kWh"} $\to$ 290.0 \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Récapitulatif des stratégies d'encodage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{L{4.5cm}C{2.8cm}L{6.7cm}}
+\toprule
+\textbf{Stratégie} & \textbf{Nb colonnes} & \textbf{Usage} \\
+\midrule
+\rowcolor{rowgray}
+Suppression & 50+ & Constantes, redondantes, hors-scope \\
+One-Hot Encoding & 10 groupes & Variables nominales sans ordre \\
+\rowcolor{rowgray}
+Encodage ordinal & 6 variables & Variables ordinales (niveau, type) \\
+Encodage circulaire sin/cos & 3 variables & Orientation, heure, angle \\
+\rowcolor{rowgray}
+Extraction numérique & 8 variables & R-value, EF, kWh, HP, m² \\
+Midpoint de plage & 5 variables & Revenus, pourcentages \\
+\rowcolor{rowgray}
+Split par seuil & 1 variable & HVAC heating (AFUE vs HSPF) \\
+Binaire (Yes/No) & 12 variables & Présence d'équipement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\textbf{Remarque générale :} Toutes les transformations respectent
+la sémantique physique des variables (R-values, UEF, SEER, HSPF).
+Les variables binaires utilisent le type \texttt{int8} pour minimiser
+l'empreinte mémoire.
+
+\end{document}
+\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{float}
+\usetikzlibrary{arrows.meta, calc, backgrounds}
+\tcbuselibrary{skins}
+
+\geometry{margin=2.5cm}
+
+%% ── Palette de couleurs ──────────────────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31,73,125}
+\definecolor{rowgray}{RGB}{242,242,242}
+\definecolor{lightblue}{RGB}{217,229,244}
+\definecolor{accentorange}{RGB}{204,102,0}
+\definecolor{accentgreen}{RGB}{0,140,70}
+\definecolor{accentred}{RGB}{180,30,30}
+
+%% ── En-tête / pied de page ───────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{headerblue}{\small Rapport d'Encodage — FlexiMax}}
+\lhead{\small \leftmark}
+\rfoot{\thepage}
+
+%% ── Formatage des titres ─────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headerblue!80}}{}{0em}{}
+
+%% ── Types de colonnes personnalisés ──────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+%% ── Barre de R-value (largeur proportionnelle, max=3 cm) ─────────────────────
+%%   #1 = fraction décimale dans [0,1]
+\newcommand{\rvaluebar}[1]{%
+  \begin{tikzpicture}[baseline=-0.3ex]
+    \fill[accentorange!75] (0,-0.10) rectangle ({#1*3.0cm}, 0.10);
+    \draw[gray!40, thin]   (0,-0.10) rectangle (3.0cm,      0.10);
+  \end{tikzpicture}%
+}
+
+%% ── Boîte de formule ─────────────────────────────────────────────────────────
+\tcbset{formulebox/.style={
+  enhanced, colback=headerblue!6, colframe=headerblue!50,
+  boxrule=0.5pt, arc=3pt, top=3pt, bottom=3pt, left=6pt, right=6pt,
+  fonttitle=\bfseries\small\color{headerblue}
+}}
+
+%% ── Commande : rose des vents ────────────────────────────────────────────────
+%% Usage : \compassrose   (réutilisé sections 5 et 8)
+\newcommand{\compassrose}{%
+\begin{tikzpicture}[scale=1.65, >=Stealth]
+  % Fond et cercle
+  \fill[headerblue!5] (0,0) circle (1cm);
+  \draw[headerblue!55, thick] (0,0) circle (1cm);
+  % Guides diagonaux légers
+  \draw[gray!18, thin] (-0.707,-0.707)--(0.707,0.707);
+  \draw[gray!18, thin] ( 0.707,-0.707)--(-0.707,0.707);
+  % Axes (x = sin, y = cos)
+  \draw[->, gray!45] (-1.28,0) -- (1.36,0)
+        node[right, font=\tiny, color=gray!70] {$\sin(\theta)$};
+  \draw[->, gray!45] (0,-1.28) -- (0,1.38)
+        node[above, font=\tiny, color=gray!70] {$\cos(\theta)$};
+  % 8 points : coordonnée = (sin θ, cos θ) en convention compas
+  \foreach \nom/\sx/\cy/\anch in {%
+    N/  0.000/ 1.000/above,
+    NE/ 0.707/ 0.707/above right,
+    E/  1.000/ 0.000/right,
+    SE/ 0.707/-0.707/below right,
+    S/  0.000/-1.000/below,
+    SW/-0.707/-0.707/below left,
+    W/ -1.000/ 0.000/left,
+    NW/-0.707/ 0.707/above left}
+  {
+    \fill[headerblue] (\sx,\cy) circle (2pt);
+    \node[\anch, font=\scriptsize\bfseries, color=headerblue, inner sep=2.5pt]
+         at (\sx,\cy) {\nom};
+  }
+  % Mise en évidence de l'exemple « South »
+  \fill[accentorange] (0,-1) circle (2.8pt);
+  \draw[accentorange!80, ->] (0.52,-0.80) -- (0.06,-0.97);
+  \node[right, font=\tiny, color=accentorange] at (0.52,-0.78)
+       {S : $\sin{=}0,\;\cos{=}{-1}$};
+\end{tikzpicture}%
+}
+
+%% ── Table sin/cos des 8 orientations ─────────────────────────────────────────
+\newcommand{\sincostabl}{%
+\renewcommand{\arraystretch}{1.18}%
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Dir.} & $\boldsymbol\theta$\textbf{°} &
+$\boldsymbol{\sin\theta}$ & $\boldsymbol{\cos\theta}$ \\
+\midrule
+\rowcolor{rowgray} N  &   0 & $0$     & $+1$    \\
+NE                    &  45 & $+0.71$ & $+0.71$ \\
+\rowcolor{rowgray} E  &  90 & $+1$    & $0$     \\
+SE                    & 135 & $+0.71$ & $-0.71$ \\
+\rowcolor{accentorange!22} S  & 180 & $0$ & $-1$ \\
+SW                    & 225 & $-0.71$ & $-0.71$ \\
+\rowcolor{rowgray} W  & 270 & $-1$    & $0$     \\
+NW                    & 315 & $-0.71$ & $+0.71$ \\
+\bottomrule
+\end{tabular}%
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ═════════════════════════════════════════════════════════════════════════════
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{1.8cm}
+
+  \begin{tikzpicture}
+    \fill[headerblue] (0,0) rectangle (15.5cm, 1.3cm);
+    \node[white, font=\LARGE\bfseries] at (7.75cm, 0.65cm)
+         {Rapport d'Encodage des Variables};
+  \end{tikzpicture}
+
+  \vspace{0.45cm}
+  {\large\color{gray} Projet FlexiMax — Préparation des Features\par}
+  \vspace{1.8cm}
+
+  \begin{tabular}{@{}ll@{}}
+    \textbf{Fichier d'entrée}     & \texttt{metadata\_features.parquet} \\[5pt]
+    \textbf{Fichier de sortie}    & \texttt{features\_encodees.parquet} \\[5pt]
+    \textbf{Dimensions initiales} & 549\,971 lignes $\times$ 394 colonnes \\[5pt]
+    \textbf{Dimensions finales}   & 549\,971 lignes $\times$ 415+ colonnes \\[5pt]
+    \textbf{Date}                 & Juin 2026 \\
+  \end{tabular}
+
+  \vspace{1.8cm}
+  \rule{15.5cm}{0.4pt}
+  \vspace{0.4cm}
+
+  {\normalsize Ce document décrit l'ensemble des transformations, encodages\\
+  et suppressions appliqués aux variables brutes du dataset ResStock.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Vue d'ensemble}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Le pipeline d'encodage transforme les variables catégorielles et textuelles
+brutes en représentations numériques exploitables par les modèles de machine
+learning. Chaque groupe fait l'objet d'une stratégie adaptée à sa sémantique.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Étape} & \textbf{Colonnes} & \textbf{Shape} \\
+\midrule
+\rowcolor{rowgray} Données brutes & 394 & $549\,971 \times 394$ \\
+Après suppression & 349 & $549\,971 \times 349$ \\
+\rowcolor{rowgray} Après encodage complet & 415+ & $549\,971 \times 415+$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Suppression des colonnes inutiles}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Colonnes constantes (\texttt{nunique} $\leq 1$)}
+20 colonnes à valeur unique supprimées automatiquement — aucune information
+discriminante.
+
+\subsection{Colonnes redondantes ou hors-scope}
+
+\begin{center}
+\begin{tabular}{L{7cm}L{7cm}}
+\toprule
+\textbf{Colonne supprimée} & \textbf{Raison} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.building\_america\_climate\_zone} & Redondant avec ASHRAE \\
+\texttt{in.cec\_climate\_zone} & Redondant avec ASHRAE \\
+\rowcolor{rowgray}
+\texttt{in.census\_division}, \texttt{in.census\_division\_recs} & Géographique haute cardinalité \\
+\texttt{in.county}, \texttt{in.puma}, \texttt{in.city}, \texttt{in.state} & Géographique haute cardinalité \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type\_and\_fuel} & Redondant avec colonnes séparées \\
+\texttt{in.upgrade\_name} & Non pertinent \\
+\rowcolor{rowgray}
+\texttt{in.hot\_water\_distribution} & Non pertinent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Imputation par groupe}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Les 34 colonnes numériques sont imputées par la \textbf{médiane par zone
+climatique ASHRAE}, ce qui préserve les spécificités régionales
+(climat, altitude, usage énergétique).
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\rowcolor{rowgray} Variable de groupement
+  & \texttt{in.ashrae\_iecc\_climate\_zone\_2004} \\
+Méthode & Médiane par groupe, puis médiane globale \\
+\rowcolor{rowgray} Colonnes imputées & 34 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 1 — Zone climatique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.ashrae\_iecc\_climate\_zone\_2004} : \textbf{One-Hot Encoding}
+(\texttt{drop\_first}) $\to$ 16 colonnes binaires \texttt{climate\_*}
+(17 zones de \texttt{1A} à \texttt{8AK}).
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Valeur brute} & \textbf{Colonne créée} \\
+\midrule
+\rowcolor{rowgray} \texttt{"3B"} & \texttt{climate\_3B = 1} \\
+\texttt{"5A"} & \texttt{climate\_5A = 1} \\
+\rowcolor{rowgray} autres zones & \texttt{climate\_* = 0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 2 — Géométrie du bâtiment}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Encodage circulaire de l'orientation}
+
+L'orientation est un angle discret (8 directions cardinales).
+L'encodage sin/cos préserve la \textbf{continuité cyclique} : Nord et NNW
+restent proches dans l'espace des features.
+
+\begin{tcolorbox}[formulebox, title={Formule}]
+\[
+  \textit{orientation\_sin} = \sin\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr),
+  \qquad
+  \textit{orientation\_cos} = \cos\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr)
+\]
+$\theta$ = angle compas (Nord = 0°, Est = 90°, Sud = 180°, Ouest = 270°)
+\end{tcolorbox}
+
+\bigskip
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+  \centering
+  \compassrose
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.50\textwidth}
+  \centering
+  \sincostabl
+\end{minipage}
+
+\medskip
+\noindent\small\textit{Le cercle ci-dessus place chaque direction au point
+$(\sin\theta,\;\cos\theta)$.
+La direction \textbf{South} (exemple du rapport) donne $\sin=0$, $\cos=-1$.}
+
+\subsection{Surfaces vitrées par façade (\texttt{in.window\_areas})}
+
+La chaîne \texttt{"F15 B15 L15 R15"} est décomposée en 4 colonnes
+numériques (pourcentage de surface vitrée par orientation) :
+
+\begin{center}
+\begin{tikzpicture}[scale=1.1, >=Stealth]
+  % Contour bâtiment
+  \fill[headerblue!10] (0,0) rectangle (4,2.5);
+  \draw[thick, headerblue] (0,0) rectangle (4,2.5);
+  \node[font=\small, color=headerblue!70] at (2,1.25) {Bâtiment};
+  % Flèche Nord
+  \draw[->, thick, gray!60] (4.7,0.7) -- (4.7,1.5);
+  \node[above, font=\tiny, color=gray!60] at (4.7,1.5) {N};
+  % Façade Front (bas)
+  \draw[accentorange, line width=3pt] (0.7,0) -- (3.3,0);
+  \node[below, font=\tiny\bfseries, color=accentorange] at (2,-0.08)
+       {\texttt{window\_front\_pct}};
+  % Back (haut)
+  \draw[accentorange, line width=3pt] (0.7,2.5) -- (3.3,2.5);
+  \node[above, font=\tiny\bfseries, color=accentorange] at (2,2.58)
+       {\texttt{window\_back\_pct}};
+  % Left (gauche)
+  \draw[headerblue!70, line width=3pt] (0,0.8) -- (0,1.7);
+  \node[left, font=\tiny\bfseries, color=headerblue!70, align=right]
+       at (-0.08,1.25) {\texttt{window\_}\\\texttt{left\_pct}};
+  % Right (droite)
+  \draw[headerblue!70, line width=3pt] (4,0.8) -- (4,1.7);
+  \node[right, font=\tiny\bfseries, color=headerblue!70, align=left]
+       at (4.08,1.25) {\texttt{window\_}\\\texttt{right\_pct}};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Résumé du groupe Géométrie}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.orientation} & Circ.\ sin/cos & \texttt{"South"} $\to$ sin=0, cos=$-$1 \\
+\texttt{in.window\_areas} & Extraction F/B/L/R & 4 colonnes \% \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_number\_units\_*} & Midpoint & \texttt{"3-4"} $\to$ 3.5 \\
+\texttt{in.geometry\_building\_level\_mf} & Ordinal & Bottom=0, Middle=1, Top=2 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_horizontal\_location\_*} & Fusion + OHE & \texttt{"Middle"} $\to$ \texttt{horiz\_Middle=1} \\
+\texttt{in.geometry\_attic\_type} & Ordinal thermique & None=0, Vented=1, Unvented=2, Finished=3 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_foundation\_type} & Ordinal thermique & Ambient=0 \dots Heated Basement=4 \\
+\texttt{in.geometry\_garage} & Ordinal & None=0, 1~Car=1, 2~Car=2, 3~Car=3 \\
+\rowcolor{rowgray}
+\texttt{in.neighbors} & Distance ft + flag & dist=15, both=1 \\
+\texttt{in.corridor} & Binaire & Not Applicable=0, Double-Loaded=1 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_wall\_exterior\_finish} & Matériau OHE + clarté & \texttt{wall\_finish\_brick=1, dark=0} \\
+\texttt{in.geometry\_wall\_type} & OHE & \texttt{wall\_type\_Wood Stud=1} \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_type\_recs} & OHE & Single-Family Detached \\
+\texttt{in.sqft..ft2}, \texttt{in.door\_area} & Supprimés & Redondant / Constante \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 3 — Enveloppe thermique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Matériaux de toiture — Résistance thermique (valeur R)}
+
+La valeur R (m²·K/W) quantifie la \textbf{résistance au flux de chaleur} :
+plus elle est élevée, meilleure est l'isolation.
+Elle est utilisée directement comme feature numérique float.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{L{3.5cm}C{2.4cm}L{5.5cm}L{2.8cm}}
+\toprule
+\textbf{Matériau} & \textbf{R (m²·K/W)} & \textbf{Isolation relative} & \textbf{Caractéristique} \\
+\midrule
+\rowcolor{rowgray}
+Ardoise \small(Slate)      & 0.05 & \rvaluebar{0.05} & Pierre dense \\
+Métal \small(Metal)        & 0.17 & \rvaluebar{0.17} & Haute conductivité \\
+\rowcolor{rowgray}
+Bardeaux \small(Asphalt)   & 0.44 & \rvaluebar{0.44} & Standard résidentiel \\
+Tuile \small(Clay Tile)    & 0.80 & \rvaluebar{0.80} & Bonne inertie thermique \\
+\rowcolor{rowgray}
+Bois \small(Wood Shingles) & 1.00 & \rvaluebar{1.00} & Meilleur isolant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Décomposition des fenêtres (\texttt{in.windows})}
+
+\begin{tcolorbox}[formulebox, title={Exemple : \texttt{"Double, Low-E, Non-metal"}}]
+\begin{tabular}{@{}llll@{}}
+\texttt{window\_panes = 2} &
+\texttt{window\_low\_e = 1} &
+\texttt{window\_metal\_frame = 0} &
+\texttt{window\_storm = 0}
+\end{tabular}
+\end{tcolorbox}
+
+\begin{center}
+\begin{tabular}{L{3.5cm}L{1.8cm}L{2.5cm}L{5.5cm}}
+\toprule
+\textbf{Feature créée} & \textbf{Type} & \textbf{Valeurs} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{window\_panes}        & Ordinal & 1, 2, 3 & Single / Double / Triple vitrage \\
+\texttt{window\_low\_e}       & Binaire & 0, 1    & Revêtement Low-E \\
+\rowcolor{rowgray}
+\texttt{window\_metal\_frame} & Binaire & 0, 1    & Cadre métallique \\
+\texttt{window\_storm}        & Binaire & 0, 1    & Double fenêtre tempête \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Autres variables de l'enveloppe}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Remarque} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.ground\_thermal\_conductivity} & Float & [0.5 – 2.6] W/m·K \\
+\texttt{in.interior\_shading} & Supprimé & Constante \\
+\rowcolor{rowgray}
+\texttt{in.overhangs}, \texttt{in.eaves} & Supprimés & Constantes \\
+\texttt{in.doors}, \texttt{in.radiant\_barrier} & Supprimés & Constantes \\
+\rowcolor{rowgray}
+\texttt{in.infiltration} & Supprimé & Redondant avec \texttt{air\_leakage\_to\_outside\_ach50} \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 4 — Systèmes HVAC}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Séparation AFUE / HSPF pour le chauffage}
+
+La colonne \texttt{in.hvac\_heating\_efficiency} mélange deux métriques
+physiquement incomparables, séparées par un seuil à $> 1{,}0$ :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.15]
+  % Bloc AFUE
+  \fill[headerblue!20] (0,-0.32) rectangle (3.2, 0.32);
+  \draw[headerblue!55, thick] (0,-0.32) rectangle (3.2, 0.32);
+  \node[font=\small\bfseries, color=headerblue] at (1.6,0) {AFUE};
+  \node[below, font=\tiny, color=headerblue!80] at (0,-0.32) {0.60};
+  \node[below, font=\tiny, color=headerblue!80] at (3.2,-0.32) {1.0};
+  \draw (0,-0.32)--(0,-0.46) (3.2,-0.32)--(3.2,-0.46);
+
+  % Ligne de seuil
+  \draw[accentred, thick, dashed] (3.2,-0.58) -- (3.2, 0.62);
+  \node[above, font=\tiny\bfseries, color=accentred] at (3.2, 0.64)
+       {seuil $> 1$};
+
+  % Bloc HSPF
+  \fill[accentgreen!18] (3.3,-0.32) rectangle (9.2, 0.32);
+  \draw[accentgreen!55, thick] (3.3,-0.32) rectangle (9.2, 0.32);
+  \node[font=\small\bfseries, color=accentgreen] at (6.25,0)
+       {HSPF \small (pompe à chaleur)};
+  \node[below, font=\tiny, color=accentgreen!80] at (3.3,-0.32) {6.2};
+  \node[below, font=\tiny, color=accentgreen!80] at (9.2,-0.32) {14.0};
+  \draw (3.3,-0.32)--(3.3,-0.46) (9.2,-0.32)--(9.2,-0.46);
+
+  % Étiquettes au-dessus
+  \node[above, font=\tiny, color=headerblue!80] at (1.6,0.32)
+       {Combustible / Résistance élec.};
+  \node[above, font=\tiny, color=accentgreen!80] at (6.25,0.32)
+       {PAC air-air (ASHP)};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[formulebox, title={Règle de séparation}]
+\texttt{hvac\_efficiency\_HSPF} $\leftarrow$ valeur si valeur $> 1.0$ \quad
+(pompe à chaleur)\\
+\texttt{hvac\_efficiency\_AFUE} $\leftarrow$ valeur sinon \quad
+(combustible ou résistance)
+\end{tcolorbox}
+
+\subsection{Résumé groupe HVAC}
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type} & OHE & Fuel Furnace, ASHP, \dots \\
+\texttt{in.hvac\_cooling\_type} & OHE & Central AC, None, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_heating\_efficiency} & Split AFUE/HSPF & voir ci-dessus \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_cooling\_efficiency} & SEER/EER float & [8.0 – 15.0] \\
+\texttt{in.hvac\_cooling\_partial\_space\_conditioning} & \% float [0–1] & \texttt{"40\%"} $\to$ 0.40 \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_efficiency} & AFUE float & [0.76 – 0.925] \\
+\texttt{in.heating\_fuel} & OHE & Natural Gas, Propane, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_has\_shared\_system} & OHE & None, Shared Heating, \dots \\
+\texttt{in.hvac\_secondary\_heating\_type} & OHE & Boiler, Electric Baseboard, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_shared\_efficiencies} & OHE & — \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 5 — Périodes d'offset des consignes}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.8cm}L{5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\multirow{3}{5.2cm}{\texttt{in.cooling\_setpoint\_offset\_period}}
+  & \texttt{cool\_direction} & Setup=$+1$, Setback=$-1$, None=$0$ \\
+  & \texttt{cool\_period\_type} & Day=1, Night=2, Both=3 \\
+\rowcolor{rowgray}
+  & \texttt{cool\_start\_sin/cos} & Heure encodée circulairement \\
+\multirow{2}{5.2cm}{\texttt{in.heating\_setpoint\_offset\_period}}
+  & \texttt{heat\_period\_type} & idem \\
+  & \texttt{heat\_start\_sin/cos} & Heure encodée circulairement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 6 — Occupants et socio-économique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.tenure} & Binaire & Owner=1, Renter=0 \\
+\texttt{in.vacancy\_status} & Binaire & Occupied=1, Vacant=0 \\
+\rowcolor{rowgray}
+\texttt{in.household\_has\_tribal\_persons} & Binaire & Yes=1, No=0 \\
+\texttt{in.usage\_level} & Ordinal & Low=0, Medium=1, High=2 \\
+\rowcolor{rowgray}
+\texttt{in.federal\_poverty\_level} & Midpoint float & \texttt{"100-150\%"} $\to$ 1.25 \\
+\texttt{in.area\_median\_income} & Midpoint float & \texttt{"80-100\%"} $\to$ 0.90 \\
+\rowcolor{rowgray}
+\texttt{in.state\_metro\_median\_income} & Midpoint float & \texttt{"400\%+"} $\to$ 4.0 \\
+\texttt{in.units\_represented, in.representative\_income}
+  & Supprimés & Constante / Poids d'échantillonnage \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Distributions :}
+\texttt{in.tenure} — Owner : 307\,512 · Renter : 175\,822.\quad
+\texttt{in.usage\_level} — Low : 137\,495 · Medium : 274\,985 · High : 137\,491.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 7 — Véhicule électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_ownership} & Binaire & Yes=1, No=0 \\
+\texttt{in.electric\_vehicle\_outlet\_access} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_charger} & Ordinal & None=0, Level~1=1, Level~2=2 \\
+\texttt{in.electric\_vehicle\_charge\_at\_home} & Midpoint float & [0.095 – 1.0] \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_miles\_traveled} & Numérique miles/an & [1\,000 – 22\,500] \\
+\texttt{in.electric\_vehicle\_battery} & Supprimé & Haute cardinalité \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 8 — Énergie solaire et stockage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.pv\_orientation} utilise le même encodage circulaire que
+\texttt{in.orientation} (section~\ref{sec:geo}) ; les panneaux \texttt{None}
+reçoivent \texttt{NaN}.
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.has\_pv} & Binaire & Yes=1, No=0 \\
+\texttt{in.pv\_system\_size} & Float kWDC & \texttt{"None"} $\to$ 0.0, sinon [1–13] \\
+\rowcolor{rowgray}
+\texttt{in.pv\_orientation} & Circ.\ sin/cos & cf.\ rose des vents §\ref{sec:geo} \\
+\texttt{in.battery} & Supprimé & 100\,\% ``None'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 9 — Eau chaude sanitaire}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_efficiency} & UEF float
+  & HP: 3.45, Solar: 4.0, Gaz std: 0.59, Élec premium: 0.95 \\
+\texttt{in.water\_heater\_technology} & OHE
+  & heat\_pump, tankless, solar, indirect, storage \\
+\rowcolor{rowgray}
+\texttt{in.solar\_collector\_area} & Numérique m²
+  & \texttt{"40 sqft"} $\to$ 3.72\,m² \\
+\texttt{in.water\_heater\_orientation} & Degrés + sin/cos
+  & N=0°, E=90°, S=180°, W=270° \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_fuel} & OHE
+  & electricity, natural\_gas, propane, fuel\_oil, solar \\
+\texttt{in.water\_heater\_in\_unit} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_location} & Groupement + OHE
+  & conditioned / semi\_conditioned / unconditioned \\
+\bottomrule
+\end{longtable}
+
+\textbf{Groupes thermiques de localisation :}
+\begin{itemize}[noitemsep, topsep=2pt]
+  \item \textbf{conditioned} : Living Space, Conditioned Mechanical Room, Heated Basement
+  \item \textbf{semi\_conditioned} : Garage, Attic
+  \item \textbf{unconditioned} : Outside, Crawlspace, Unheated Basement
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 10 — Panneau électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{7cm}L{2.5cm}L{4.5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Type} & \textbf{Plage} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_panel\_service\_rating..a}
+  & Float32 & 60, 100, 150, 200, 400\,A \\
+\texttt{in.electric\_panel\_breaker\_space\_total\_count}
+  & Float32 & [8 – 60] emplacements \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 11 — Appareils électroménagers}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{4.0cm}L{4.2cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Détail} \\
+\midrule
+\endhead
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Lavage \& séchage}} \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_dryer}
+  & \texttt{\_efficiency}, \texttt{\_has}, \texttt{\_electric}, \texttt{\_gas}
+  & Élec=2.7, Gaz/Propane=2.39, None=0 \\
+\texttt{in.clothes\_washer}
+  & \texttt{\_efficiency} & EnergyStar=2.07, Std=0.95 \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_washer\_presence} & \texttt{\_has} & Yes=1, No=0 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Cuisine}} \\
+\texttt{in.cooking\_range}
+  & \texttt{cooking\_type\_*}
+  & OHE : induction, electric, gas, propane, none \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Froid}} \\
+\rowcolor{rowgray}
+\texttt{in.refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & Extraction facteur d'efficacité \\
+\texttt{in.misc\_extra\_refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & idem \\
+\rowcolor{rowgray}
+\texttt{in.misc\_freezer} & \texttt{\_ef} & idem \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Éclairage}} \\
+\texttt{in.lighting}
+  & \texttt{\_efficiency} & Incandescent=1, CFL=2, LED=3 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Gaz domestique}} \\
+\rowcolor{rowgray}
+\texttt{in.misc\_gas\_fireplace/grill/lighting}
+  & \texttt{...\_present} & Binaire (1 si présent) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Piscine \& Spa}} \\
+\texttt{in.misc\_hot\_tub\_spa}
+  & \texttt{has\_hot\_tub}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool} & \texttt{has\_pool} & 1 si présent \\
+\texttt{in.misc\_pool\_heater}
+  & \texttt{pool\_heat\_pump}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool\_pump} & \texttt{\_hp}
+  & Chevaux-vapeur (float) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Divers}} \\
+\texttt{in.misc\_well\_pump} & \texttt{has\_well\_pump} & Binaire \\
+\rowcolor{rowgray}
+\texttt{in.ceiling\_fan}
+  & \texttt{has\_ceiling\_fan}, \texttt{\_used} & Binaires \\
+\texttt{in.dishwasher}
+  & \texttt{dishwasher\_kwh}, \texttt{has\_dishwasher}
+  & \texttt{"290 Rated kWh"} $\to$ 290.0 \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Récapitulatif des stratégies d'encodage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{L{4.5cm}C{2.8cm}L{6.7cm}}
+\toprule
+\textbf{Stratégie} & \textbf{Nb colonnes} & \textbf{Usage} \\
+\midrule
+\rowcolor{rowgray}
+Suppression & 50+ & Constantes, redondantes, hors-scope \\
+One-Hot Encoding & 10 groupes & Variables nominales sans ordre \\
+\rowcolor{rowgray}
+Encodage ordinal & 6 variables & Variables ordinales (niveau, type) \\
+Encodage circulaire sin/cos & 3 variables & Orientation, heure, angle \\
+\rowcolor{rowgray}
+Extraction numérique & 8 variables & R-value, EF, kWh, HP, m² \\
+Midpoint de plage & 5 variables & Revenus, pourcentages \\
+\rowcolor{rowgray}
+Split par seuil & 1 variable & HVAC heating (AFUE vs HSPF) \\
+Binaire (Yes/No) & 12 variables & Présence d'équipement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\textbf{Remarque générale :} Toutes les transformations respectent
+la sémantique physique des variables (R-values, UEF, SEER, HSPF).
+Les variables binaires utilisent le type \texttt{int8} pour minimiser
+l'empreinte mémoire.
+
+\end{document}
+\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{float}
+\usetikzlibrary{arrows.meta, calc, backgrounds}
+\tcbuselibrary{skins}
+
+\geometry{margin=2.5cm}
+
+%% ── Palette de couleurs ──────────────────────────────────────────────────────
+\definecolor{headerblue}{RGB}{31,73,125}
+\definecolor{rowgray}{RGB}{242,242,242}
+\definecolor{lightblue}{RGB}{217,229,244}
+\definecolor{accentorange}{RGB}{204,102,0}
+\definecolor{accentgreen}{RGB}{0,140,70}
+\definecolor{accentred}{RGB}{180,30,30}
+
+%% ── En-tête / pied de page ───────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{headerblue}{\small Rapport d'Encodage — FlexiMax}}
+\lhead{\small \leftmark}
+\rfoot{\thepage}
+
+%% ── Formatage des titres ─────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{headerblue}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headerblue!80}}{}{0em}{}
+
+%% ── Types de colonnes personnalisés ──────────────────────────────────────────
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+%% ── Barre de R-value (largeur proportionnelle, max=3 cm) ─────────────────────
+%%   #1 = fraction décimale dans [0,1]
+\newcommand{\rvaluebar}[1]{%
+  \begin{tikzpicture}[baseline=-0.3ex]
+    \fill[accentorange!75] (0,-0.10) rectangle ({#1*3.0cm}, 0.10);
+    \draw[gray!40, thin]   (0,-0.10) rectangle (3.0cm,      0.10);
+  \end{tikzpicture}%
+}
+
+%% ── Boîte de formule ─────────────────────────────────────────────────────────
+\tcbset{formulebox/.style={
+  enhanced, colback=headerblue!6, colframe=headerblue!50,
+  boxrule=0.5pt, arc=3pt, top=3pt, bottom=3pt, left=6pt, right=6pt,
+  fonttitle=\bfseries\small\color{headerblue}
+}}
+
+%% ── Commande : rose des vents ────────────────────────────────────────────────
+%% Usage : \compassrose   (réutilisé sections 5 et 8)
+\newcommand{\compassrose}{%
+\begin{tikzpicture}[scale=1.65, >=Stealth]
+  % Fond et cercle
+  \fill[headerblue!5] (0,0) circle (1cm);
+  \draw[headerblue!55, thick] (0,0) circle (1cm);
+  % Guides diagonaux légers
+  \draw[gray!18, thin] (-0.707,-0.707)--(0.707,0.707);
+  \draw[gray!18, thin] ( 0.707,-0.707)--(-0.707,0.707);
+  % Axes (x = sin, y = cos)
+  \draw[->, gray!45] (-1.28,0) -- (1.36,0)
+        node[right, font=\tiny, color=gray!70] {$\sin(\theta)$};
+  \draw[->, gray!45] (0,-1.28) -- (0,1.38)
+        node[above, font=\tiny, color=gray!70] {$\cos(\theta)$};
+  % 8 points : coordonnée = (sin θ, cos θ) en convention compas
+  \foreach \nom/\sx/\cy/\anch in {%
+    N/  0.000/ 1.000/above,
+    NE/ 0.707/ 0.707/above right,
+    E/  1.000/ 0.000/right,
+    SE/ 0.707/-0.707/below right,
+    S/  0.000/-1.000/below,
+    SW/-0.707/-0.707/below left,
+    W/ -1.000/ 0.000/left,
+    NW/-0.707/ 0.707/above left}
+  {
+    \fill[headerblue] (\sx,\cy) circle (2pt);
+    \node[\anch, font=\scriptsize\bfseries, color=headerblue, inner sep=2.5pt]
+         at (\sx,\cy) {\nom};
+  }
+  % Mise en évidence de l'exemple « South »
+  \fill[accentorange] (0,-1) circle (2.8pt);
+  \draw[accentorange!80, ->] (0.52,-0.80) -- (0.06,-0.97);
+  \node[right, font=\tiny, color=accentorange] at (0.52,-0.78)
+       {S : $\sin{=}0,\;\cos{=}{-1}$};
+\end{tikzpicture}%
+}
+
+%% ── Table sin/cos des 8 orientations ─────────────────────────────────────────
+\newcommand{\sincostabl}{%
+\renewcommand{\arraystretch}{1.18}%
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{Dir.} & $\boldsymbol\theta$\textbf{°} &
+$\boldsymbol{\sin\theta}$ & $\boldsymbol{\cos\theta}$ \\
+\midrule
+\rowcolor{rowgray} N  &   0 & $0$     & $+1$    \\
+NE                    &  45 & $+0.71$ & $+0.71$ \\
+\rowcolor{rowgray} E  &  90 & $+1$    & $0$     \\
+SE                    & 135 & $+0.71$ & $-0.71$ \\
+\rowcolor{accentorange!22} S  & 180 & $0$ & $-1$ \\
+SW                    & 225 & $-0.71$ & $-0.71$ \\
+\rowcolor{rowgray} W  & 270 & $-1$    & $0$     \\
+NW                    & 315 & $-0.71$ & $+0.71$ \\
+\bottomrule
+\end{tabular}%
+}
+
+% ═════════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ═════════════════════════════════════════════════════════════════════════════
+
+% ─── PAGE DE TITRE ───────────────────────────────────────────────────────────
+\begin{titlepage}
+  \centering
+  \vspace*{1.8cm}
+
+  \begin{tikzpicture}
+    \fill[headerblue] (0,0) rectangle (15.5cm, 1.3cm);
+    \node[white, font=\LARGE\bfseries] at (7.75cm, 0.65cm)
+         {Rapport d'Encodage des Variables};
+  \end{tikzpicture}
+
+  \vspace{0.45cm}
+  {\large\color{gray} Projet FlexiMax — Préparation des Features\par}
+  \vspace{1.8cm}
+
+  \begin{tabular}{@{}ll@{}}
+    \textbf{Fichier d'entrée}     & \texttt{metadata\_features.parquet} \\[5pt]
+    \textbf{Fichier de sortie}    & \texttt{features\_encodees.parquet} \\[5pt]
+    \textbf{Dimensions initiales} & 549\,971 lignes $\times$ 394 colonnes \\[5pt]
+    \textbf{Dimensions finales}   & 549\,971 lignes $\times$ 415+ colonnes \\[5pt]
+    \textbf{Date}                 & Juin 2026 \\
+  \end{tabular}
+
+  \vspace{1.8cm}
+  \rule{15.5cm}{0.4pt}
+  \vspace{0.4cm}
+
+  {\normalsize Ce document décrit l'ensemble des transformations, encodages\\
+  et suppressions appliqués aux variables brutes du dataset ResStock.}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Vue d'ensemble}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Le pipeline d'encodage transforme les variables catégorielles et textuelles
+brutes en représentations numériques exploitables par les modèles de machine
+learning. Chaque groupe fait l'objet d'une stratégie adaptée à sa sémantique.
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Étape} & \textbf{Colonnes} & \textbf{Shape} \\
+\midrule
+\rowcolor{rowgray} Données brutes & 394 & $549\,971 \times 394$ \\
+Après suppression & 349 & $549\,971 \times 349$ \\
+\rowcolor{rowgray} Après encodage complet & 415+ & $549\,971 \times 415+$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Suppression des colonnes inutiles}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Colonnes constantes (\texttt{nunique} $\leq 1$)}
+20 colonnes à valeur unique supprimées automatiquement — aucune information
+discriminante.
+
+\subsection{Colonnes redondantes ou hors-scope}
+
+\begin{center}
+\begin{tabular}{L{7cm}L{7cm}}
+\toprule
+\textbf{Colonne supprimée} & \textbf{Raison} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.building\_america\_climate\_zone} & Redondant avec ASHRAE \\
+\texttt{in.cec\_climate\_zone} & Redondant avec ASHRAE \\
+\rowcolor{rowgray}
+\texttt{in.census\_division}, \texttt{in.census\_division\_recs} & Géographique haute cardinalité \\
+\texttt{in.county}, \texttt{in.puma}, \texttt{in.city}, \texttt{in.state} & Géographique haute cardinalité \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type\_and\_fuel} & Redondant avec colonnes séparées \\
+\texttt{in.upgrade\_name} & Non pertinent \\
+\rowcolor{rowgray}
+\texttt{in.hot\_water\_distribution} & Non pertinent \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Imputation par groupe}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Les 34 colonnes numériques sont imputées par la \textbf{médiane par zone
+climatique ASHRAE}, ce qui préserve les spécificités régionales
+(climat, altitude, usage énergétique).
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Paramètre} & \textbf{Valeur} \\
+\midrule
+\rowcolor{rowgray} Variable de groupement
+  & \texttt{in.ashrae\_iecc\_climate\_zone\_2004} \\
+Méthode & Médiane par groupe, puis médiane globale \\
+\rowcolor{rowgray} Colonnes imputées & 34 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 1 — Zone climatique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.ashrae\_iecc\_climate\_zone\_2004} : \textbf{One-Hot Encoding}
+(\texttt{drop\_first}) $\to$ 16 colonnes binaires \texttt{climate\_*}
+(17 zones de \texttt{1A} à \texttt{8AK}).
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Valeur brute} & \textbf{Colonne créée} \\
+\midrule
+\rowcolor{rowgray} \texttt{"3B"} & \texttt{climate\_3B = 1} \\
+\texttt{"5A"} & \texttt{climate\_5A = 1} \\
+\rowcolor{rowgray} autres zones & \texttt{climate\_* = 0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 2 — Géométrie du bâtiment}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Encodage circulaire de l'orientation}
+
+L'orientation est un angle discret (8 directions cardinales).
+L'encodage sin/cos préserve la \textbf{continuité cyclique} : Nord et NNW
+restent proches dans l'espace des features.
+
+\begin{tcolorbox}[formulebox, title={Formule}]
+\[
+  \textit{orientation\_sin} = \sin\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr),
+  \qquad
+  \textit{orientation\_cos} = \cos\!\Bigl(\frac{2\pi\,\theta}{360}\Bigr)
+\]
+$\theta$ = angle compas (Nord = 0°, Est = 90°, Sud = 180°, Ouest = 270°)
+\end{tcolorbox}
+
+\bigskip
+\noindent
+\begin{minipage}[c]{0.46\textwidth}
+  \centering
+  \compassrose
+\end{minipage}%
+\hfill
+\begin{minipage}[c]{0.50\textwidth}
+  \centering
+  \sincostabl
+\end{minipage}
+
+\medskip
+\noindent\small\textit{Le cercle ci-dessus place chaque direction au point
+$(\sin\theta,\;\cos\theta)$.
+La direction \textbf{South} (exemple du rapport) donne $\sin=0$, $\cos=-1$.}
+
+\subsection{Surfaces vitrées par façade (\texttt{in.window\_areas})}
+
+La chaîne \texttt{"F15 B15 L15 R15"} est décomposée en 4 colonnes
+numériques (pourcentage de surface vitrée par orientation) :
+
+\begin{center}
+\begin{tikzpicture}[scale=1.1, >=Stealth]
+  % Contour bâtiment
+  \fill[headerblue!10] (0,0) rectangle (4,2.5);
+  \draw[thick, headerblue] (0,0) rectangle (4,2.5);
+  \node[font=\small, color=headerblue!70] at (2,1.25) {Bâtiment};
+  % Flèche Nord
+  \draw[->, thick, gray!60] (4.7,0.7) -- (4.7,1.5);
+  \node[above, font=\tiny, color=gray!60] at (4.7,1.5) {N};
+  % Façade Front (bas)
+  \draw[accentorange, line width=3pt] (0.7,0) -- (3.3,0);
+  \node[below, font=\tiny\bfseries, color=accentorange] at (2,-0.08)
+       {\texttt{window\_front\_pct}};
+  % Back (haut)
+  \draw[accentorange, line width=3pt] (0.7,2.5) -- (3.3,2.5);
+  \node[above, font=\tiny\bfseries, color=accentorange] at (2,2.58)
+       {\texttt{window\_back\_pct}};
+  % Left (gauche)
+  \draw[headerblue!70, line width=3pt] (0,0.8) -- (0,1.7);
+  \node[left, font=\tiny\bfseries, color=headerblue!70, align=right]
+       at (-0.08,1.25) {\texttt{window\_}\\\texttt{left\_pct}};
+  % Right (droite)
+  \draw[headerblue!70, line width=3pt] (4,0.8) -- (4,1.7);
+  \node[right, font=\tiny\bfseries, color=headerblue!70, align=left]
+       at (4.08,1.25) {\texttt{window\_}\\\texttt{right\_pct}};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Résumé du groupe Géométrie}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.orientation} & Circ.\ sin/cos & \texttt{"South"} $\to$ sin=0, cos=$-$1 \\
+\texttt{in.window\_areas} & Extraction F/B/L/R & 4 colonnes \% \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_number\_units\_*} & Midpoint & \texttt{"3-4"} $\to$ 3.5 \\
+\texttt{in.geometry\_building\_level\_mf} & Ordinal & Bottom=0, Middle=1, Top=2 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_horizontal\_location\_*} & Fusion + OHE & \texttt{"Middle"} $\to$ \texttt{horiz\_Middle=1} \\
+\texttt{in.geometry\_attic\_type} & Ordinal thermique & None=0, Vented=1, Unvented=2, Finished=3 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_foundation\_type} & Ordinal thermique & Ambient=0 \dots Heated Basement=4 \\
+\texttt{in.geometry\_garage} & Ordinal & None=0, 1~Car=1, 2~Car=2, 3~Car=3 \\
+\rowcolor{rowgray}
+\texttt{in.neighbors} & Distance ft + flag & dist=15, both=1 \\
+\texttt{in.corridor} & Binaire & Not Applicable=0, Double-Loaded=1 \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_wall\_exterior\_finish} & Matériau OHE + clarté & \texttt{wall\_finish\_brick=1, dark=0} \\
+\texttt{in.geometry\_wall\_type} & OHE & \texttt{wall\_type\_Wood Stud=1} \\
+\rowcolor{rowgray}
+\texttt{in.geometry\_building\_type\_recs} & OHE & Single-Family Detached \\
+\texttt{in.sqft..ft2}, \texttt{in.door\_area} & Supprimés & Redondant / Constante \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 3 — Enveloppe thermique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Matériaux de toiture — Résistance thermique (valeur R)}
+
+La valeur R (m²·K/W) quantifie la \textbf{résistance au flux de chaleur} :
+plus elle est élevée, meilleure est l'isolation.
+Elle est utilisée directement comme feature numérique float.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.45}
+\begin{tabular}{L{3.5cm}C{2.4cm}L{5.5cm}L{2.8cm}}
+\toprule
+\textbf{Matériau} & \textbf{R (m²·K/W)} & \textbf{Isolation relative} & \textbf{Caractéristique} \\
+\midrule
+\rowcolor{rowgray}
+Ardoise \small(Slate)      & 0.05 & \rvaluebar{0.05} & Pierre dense \\
+Métal \small(Metal)        & 0.17 & \rvaluebar{0.17} & Haute conductivité \\
+\rowcolor{rowgray}
+Bardeaux \small(Asphalt)   & 0.44 & \rvaluebar{0.44} & Standard résidentiel \\
+Tuile \small(Clay Tile)    & 0.80 & \rvaluebar{0.80} & Bonne inertie thermique \\
+\rowcolor{rowgray}
+Bois \small(Wood Shingles) & 1.00 & \rvaluebar{1.00} & Meilleur isolant \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Décomposition des fenêtres (\texttt{in.windows})}
+
+\begin{tcolorbox}[formulebox, title={Exemple : \texttt{"Double, Low-E, Non-metal"}}]
+\begin{tabular}{@{}llll@{}}
+\texttt{window\_panes = 2} &
+\texttt{window\_low\_e = 1} &
+\texttt{window\_metal\_frame = 0} &
+\texttt{window\_storm = 0}
+\end{tabular}
+\end{tcolorbox}
+
+\begin{center}
+\begin{tabular}{L{3.5cm}L{1.8cm}L{2.5cm}L{5.5cm}}
+\toprule
+\textbf{Feature créée} & \textbf{Type} & \textbf{Valeurs} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{window\_panes}        & Ordinal & 1, 2, 3 & Single / Double / Triple vitrage \\
+\texttt{window\_low\_e}       & Binaire & 0, 1    & Revêtement Low-E \\
+\rowcolor{rowgray}
+\texttt{window\_metal\_frame} & Binaire & 0, 1    & Cadre métallique \\
+\texttt{window\_storm}        & Binaire & 0, 1    & Double fenêtre tempête \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Autres variables de l'enveloppe}
+
+\begin{longtable}{L{5.2cm}L{3cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Remarque} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.ground\_thermal\_conductivity} & Float & [0.5 – 2.6] W/m·K \\
+\texttt{in.interior\_shading} & Supprimé & Constante \\
+\rowcolor{rowgray}
+\texttt{in.overhangs}, \texttt{in.eaves} & Supprimés & Constantes \\
+\texttt{in.doors}, \texttt{in.radiant\_barrier} & Supprimés & Constantes \\
+\rowcolor{rowgray}
+\texttt{in.infiltration} & Supprimé & Redondant avec \texttt{air\_leakage\_to\_outside\_ach50} \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 4 — Systèmes HVAC}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Séparation AFUE / HSPF pour le chauffage}
+
+La colonne \texttt{in.hvac\_heating\_efficiency} mélange deux métriques
+physiquement incomparables, séparées par un seuil à $> 1{,}0$ :
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth, scale=1.15]
+  % Bloc AFUE
+  \fill[headerblue!20] (0,-0.32) rectangle (3.2, 0.32);
+  \draw[headerblue!55, thick] (0,-0.32) rectangle (3.2, 0.32);
+  \node[font=\small\bfseries, color=headerblue] at (1.6,0) {AFUE};
+  \node[below, font=\tiny, color=headerblue!80] at (0,-0.32) {0.60};
+  \node[below, font=\tiny, color=headerblue!80] at (3.2,-0.32) {1.0};
+  \draw (0,-0.32)--(0,-0.46) (3.2,-0.32)--(3.2,-0.46);
+
+  % Ligne de seuil
+  \draw[accentred, thick, dashed] (3.2,-0.58) -- (3.2, 0.62);
+  \node[above, font=\tiny\bfseries, color=accentred] at (3.2, 0.64)
+       {seuil $> 1$};
+
+  % Bloc HSPF
+  \fill[accentgreen!18] (3.3,-0.32) rectangle (9.2, 0.32);
+  \draw[accentgreen!55, thick] (3.3,-0.32) rectangle (9.2, 0.32);
+  \node[font=\small\bfseries, color=accentgreen] at (6.25,0)
+       {HSPF \small (pompe à chaleur)};
+  \node[below, font=\tiny, color=accentgreen!80] at (3.3,-0.32) {6.2};
+  \node[below, font=\tiny, color=accentgreen!80] at (9.2,-0.32) {14.0};
+  \draw (3.3,-0.32)--(3.3,-0.46) (9.2,-0.32)--(9.2,-0.46);
+
+  % Étiquettes au-dessus
+  \node[above, font=\tiny, color=headerblue!80] at (1.6,0.32)
+       {Combustible / Résistance élec.};
+  \node[above, font=\tiny, color=accentgreen!80] at (6.25,0.32)
+       {PAC air-air (ASHP)};
+\end{tikzpicture}
+\end{center}
+
+\begin{tcolorbox}[formulebox, title={Règle de séparation}]
+\texttt{hvac\_efficiency\_HSPF} $\leftarrow$ valeur si valeur $> 1.0$ \quad
+(pompe à chaleur)\\
+\texttt{hvac\_efficiency\_AFUE} $\leftarrow$ valeur sinon \quad
+(combustible ou résistance)
+\end{tcolorbox}
+
+\subsection{Résumé groupe HVAC}
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_type} & OHE & Fuel Furnace, ASHP, \dots \\
+\texttt{in.hvac\_cooling\_type} & OHE & Central AC, None, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_heating\_efficiency} & Split AFUE/HSPF & voir ci-dessus \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_cooling\_efficiency} & SEER/EER float & [8.0 – 15.0] \\
+\texttt{in.hvac\_cooling\_partial\_space\_conditioning} & \% float [0–1] & \texttt{"40\%"} $\to$ 0.40 \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_efficiency} & AFUE float & [0.76 – 0.925] \\
+\texttt{in.heating\_fuel} & OHE & Natural Gas, Propane, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_has\_shared\_system} & OHE & None, Shared Heating, \dots \\
+\texttt{in.hvac\_secondary\_heating\_type} & OHE & Boiler, Electric Baseboard, \dots \\
+\rowcolor{rowgray}
+\texttt{in.hvac\_secondary\_heating\_fuel} & OHE & Natural Gas, Electricity, \dots \\
+\texttt{in.hvac\_shared\_efficiencies} & OHE & — \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 5 — Périodes d'offset des consignes}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.8cm}L{5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Description} \\
+\midrule
+\rowcolor{rowgray}
+\multirow{3}{5.2cm}{\texttt{in.cooling\_setpoint\_offset\_period}}
+  & \texttt{cool\_direction} & Setup=$+1$, Setback=$-1$, None=$0$ \\
+  & \texttt{cool\_period\_type} & Day=1, Night=2, Both=3 \\
+\rowcolor{rowgray}
+  & \texttt{cool\_start\_sin/cos} & Heure encodée circulairement \\
+\multirow{2}{5.2cm}{\texttt{in.heating\_setpoint\_offset\_period}}
+  & \texttt{heat\_period\_type} & idem \\
+  & \texttt{heat\_start\_sin/cos} & Heure encodée circulairement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 6 — Occupants et socio-économique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.tenure} & Binaire & Owner=1, Renter=0 \\
+\texttt{in.vacancy\_status} & Binaire & Occupied=1, Vacant=0 \\
+\rowcolor{rowgray}
+\texttt{in.household\_has\_tribal\_persons} & Binaire & Yes=1, No=0 \\
+\texttt{in.usage\_level} & Ordinal & Low=0, Medium=1, High=2 \\
+\rowcolor{rowgray}
+\texttt{in.federal\_poverty\_level} & Midpoint float & \texttt{"100-150\%"} $\to$ 1.25 \\
+\texttt{in.area\_median\_income} & Midpoint float & \texttt{"80-100\%"} $\to$ 0.90 \\
+\rowcolor{rowgray}
+\texttt{in.state\_metro\_median\_income} & Midpoint float & \texttt{"400\%+"} $\to$ 4.0 \\
+\texttt{in.units\_represented, in.representative\_income}
+  & Supprimés & Constante / Poids d'échantillonnage \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Distributions :}
+\texttt{in.tenure} — Owner : 307\,512 · Renter : 175\,822.\quad
+\texttt{in.usage\_level} — Low : 137\,495 · Medium : 274\,985 · High : 137\,491.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 7 — Véhicule électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_ownership} & Binaire & Yes=1, No=0 \\
+\texttt{in.electric\_vehicle\_outlet\_access} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_charger} & Ordinal & None=0, Level~1=1, Level~2=2 \\
+\texttt{in.electric\_vehicle\_charge\_at\_home} & Midpoint float & [0.095 – 1.0] \\
+\rowcolor{rowgray}
+\texttt{in.electric\_vehicle\_miles\_traveled} & Numérique miles/an & [1\,000 – 22\,500] \\
+\texttt{in.electric\_vehicle\_battery} & Supprimé & Haute cardinalité \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 8 — Énergie solaire et stockage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\texttt{in.pv\_orientation} utilise le même encodage circulaire que
+\texttt{in.orientation} (section~\ref{sec:geo}) ; les panneaux \texttt{None}
+reçoivent \texttt{NaN}.
+
+\begin{center}
+\begin{tabular}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.has\_pv} & Binaire & Yes=1, No=0 \\
+\texttt{in.pv\_system\_size} & Float kWDC & \texttt{"None"} $\to$ 0.0, sinon [1–13] \\
+\rowcolor{rowgray}
+\texttt{in.pv\_orientation} & Circ.\ sin/cos & cf.\ rose des vents §\ref{sec:geo} \\
+\texttt{in.battery} & Supprimé & 100\,\% ``None'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 9 — Eau chaude sanitaire}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{5.2cm}L{3.5cm}L{5.3cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Stratégie} & \textbf{Valeurs / Exemple} \\
+\midrule
+\endhead
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_efficiency} & UEF float
+  & HP: 3.45, Solar: 4.0, Gaz std: 0.59, Élec premium: 0.95 \\
+\texttt{in.water\_heater\_technology} & OHE
+  & heat\_pump, tankless, solar, indirect, storage \\
+\rowcolor{rowgray}
+\texttt{in.solar\_collector\_area} & Numérique m²
+  & \texttt{"40 sqft"} $\to$ 3.72\,m² \\
+\texttt{in.water\_heater\_orientation} & Degrés + sin/cos
+  & N=0°, E=90°, S=180°, W=270° \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_fuel} & OHE
+  & electricity, natural\_gas, propane, fuel\_oil, solar \\
+\texttt{in.water\_heater\_in\_unit} & Binaire & Yes=1, No=0 \\
+\rowcolor{rowgray}
+\texttt{in.water\_heater\_location} & Groupement + OHE
+  & conditioned / semi\_conditioned / unconditioned \\
+\bottomrule
+\end{longtable}
+
+\textbf{Groupes thermiques de localisation :}
+\begin{itemize}[noitemsep, topsep=2pt]
+  \item \textbf{conditioned} : Living Space, Conditioned Mechanical Room, Heated Basement
+  \item \textbf{semi\_conditioned} : Garage, Attic
+  \item \textbf{unconditioned} : Outside, Crawlspace, Unheated Basement
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 10 — Panneau électrique}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\begin{tabular}{L{7cm}L{2.5cm}L{4.5cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Type} & \textbf{Plage} \\
+\midrule
+\rowcolor{rowgray}
+\texttt{in.electric\_panel\_service\_rating..a}
+  & Float32 & 60, 100, 150, 200, 400\,A \\
+\texttt{in.electric\_panel\_breaker\_space\_total\_count}
+  & Float32 & [8 – 60] emplacements \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Groupe 11 — Appareils électroménagers}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{longtable}{L{4.0cm}L{4.2cm}L{5.8cm}}
+\toprule
+\textbf{Colonne originale} & \textbf{Colonnes créées} & \textbf{Détail} \\
+\midrule
+\endhead
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Lavage \& séchage}} \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_dryer}
+  & \texttt{\_efficiency}, \texttt{\_has}, \texttt{\_electric}, \texttt{\_gas}
+  & Élec=2.7, Gaz/Propane=2.39, None=0 \\
+\texttt{in.clothes\_washer}
+  & \texttt{\_efficiency} & EnergyStar=2.07, Std=0.95 \\
+\rowcolor{rowgray}
+\texttt{in.clothes\_washer\_presence} & \texttt{\_has} & Yes=1, No=0 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Cuisine}} \\
+\texttt{in.cooking\_range}
+  & \texttt{cooking\_type\_*}
+  & OHE : induction, electric, gas, propane, none \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Froid}} \\
+\rowcolor{rowgray}
+\texttt{in.refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & Extraction facteur d'efficacité \\
+\texttt{in.misc\_extra\_refrigerator}
+  & \texttt{\_ef}, \texttt{\_has} & idem \\
+\rowcolor{rowgray}
+\texttt{in.misc\_freezer} & \texttt{\_ef} & idem \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Éclairage}} \\
+\texttt{in.lighting}
+  & \texttt{\_efficiency} & Incandescent=1, CFL=2, LED=3 \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Gaz domestique}} \\
+\rowcolor{rowgray}
+\texttt{in.misc\_gas\_fireplace/grill/lighting}
+  & \texttt{...\_present} & Binaire (1 si présent) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Piscine \& Spa}} \\
+\texttt{in.misc\_hot\_tub\_spa}
+  & \texttt{has\_hot\_tub}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool} & \texttt{has\_pool} & 1 si présent \\
+\texttt{in.misc\_pool\_heater}
+  & \texttt{pool\_heat\_pump}, \texttt{\_electric}, \texttt{\_gas}
+  & Binaires \\
+\rowcolor{rowgray}
+\texttt{in.misc\_pool\_pump} & \texttt{\_hp}
+  & Chevaux-vapeur (float) \\
+
+\rowcolor{lightblue!55}
+\multicolumn{3}{l}{\textbf{Divers}} \\
+\texttt{in.misc\_well\_pump} & \texttt{has\_well\_pump} & Binaire \\
+\rowcolor{rowgray}
+\texttt{in.ceiling\_fan}
+  & \texttt{has\_ceiling\_fan}, \texttt{\_used} & Binaires \\
+\texttt{in.dishwasher}
+  & \texttt{dishwasher\_kwh}, \texttt{has\_dishwasher}
+  & \texttt{"290 Rated kWh"} $\to$ 290.0 \\
+\bottomrule
+\end{longtable}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Récapitulatif des stratégies d'encodage}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{center}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{L{4.5cm}C{2.8cm}L{6.7cm}}
+\toprule
+\textbf{Stratégie} & \textbf{Nb colonnes} & \textbf{Usage} \\
+\midrule
+\rowcolor{rowgray}
+Suppression & 50+ & Constantes, redondantes, hors-scope \\
+One-Hot Encoding & 10 groupes & Variables nominales sans ordre \\
+\rowcolor{rowgray}
+Encodage ordinal & 6 variables & Variables ordinales (niveau, type) \\
+Encodage circulaire sin/cos & 3 variables & Orientation, heure, angle \\
+\rowcolor{rowgray}
+Extraction numérique & 8 variables & R-value, EF, kWh, HP, m² \\
+Midpoint de plage & 5 variables & Revenus, pourcentages \\
+\rowcolor{rowgray}
+Split par seuil & 1 variable & HVAC heating (AFUE vs HSPF) \\
+Binaire (Yes/No) & 12 variables & Présence d'équipement \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\textbf{Remarque générale :} Toutes les transformations respectent
+la sémantique physique des variables (R-values, UEF, SEER, HSPF).
+Les variables binaires utilisent le type \texttt{int8} pour minimiser
+l'empreinte mémoire.
+
+\end{document}
+v
+\end{tabular}
+\end{center}
+
+\vspace{0.6cm}
+\noindent\textbf{Remarque générale :} Toutes les transformations respectent
+la sémantique physique des variables (R-values, UEF, SEER, HSPF).
+Les variables binaires utilisent le type \texttt{int8} pour minimiser
+l'empreinte mémoire.
+
+\end{document}
