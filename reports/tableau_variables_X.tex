@@ -1,0 +1,1032 @@
+% =============================================================
+%  Tableau des variables de X.parquet — FlexiMax
+%  Compiler avec pdflatex (deux passes pour longtable)
+% =============================================================
+\documentclass[a4paper,landscape]{article}
+
+\usepackage[margin=1.2cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+
+% ── Couleurs de fond par groupe ───────────────────────────────
+\definecolor{csocio}{RGB}{255,210,210}    % Socio-Éco
+\definecolor{coccup}{RGB}{210,225,255}    % Occupants
+\definecolor{cmeteo}{RGB}{210,245,215}    % Météo
+\definecolor{cenvel}{RGB}{255,252,210}    % Enveloppe
+\definecolor{csyste}{RGB}{235,210,255}    % Systèmes
+\definecolor{cusage}{RGB}{255,228,180}    % Usages électriques
+\definecolor{cblanc}{RGB}{200,245,245}    % Blanc/Brun
+
+% ── Couleurs d'en-tête de groupe (plus sombres) ──────────────
+\definecolor{hsocio}{RGB}{210,110,110}
+\definecolor{hoccup}{RGB}{100,140,210}
+\definecolor{hmeteo}{RGB}{100,185,120}
+\definecolor{henvel}{RGB}{200,185,60}
+\definecolor{hsyste}{RGB}{160,100,210}
+\definecolor{husage}{RGB}{210,155,60}
+\definecolor{hblanc}{RGB}{60,185,185}
+
+% ── Mise en page du tableau ───────────────────────────────────
+\setlength{\extrarowheight}{3pt}
+\renewcommand{\arraystretch}{1.15}
+
+% Commande pour noms de colonnes en monospace avec _ correct
+\newcommand{\var}[1]{\texttt{\small #1}}
+
+\begin{document}
+\footnotesize
+
+\begin{center}
+{\Large\bfseries Description des variables — \texttt{X.parquet}}\\[4pt]
+{\small 107 variables · organisées selon la classification métier}
+\end{center}
+
+\vspace{4pt}
+
+\begin{longtable}{%
+  >{\raggedright}p{4.6cm}%   Variable
+  >{\raggedright}p{6.0cm}%   Description
+  >{\raggedright}p{3.2cm}%   Avant
+  >{\raggedright}p{2.8cm}%   Après
+  >{\raggedright}p{4.8cm}%   Encodage
+  >{\centering\arraybackslash}p{2.0cm}%  Groupe
+}
+\toprule
+\textbf{Variable} &
+\textbf{Description} &
+\textbf{Avant (exemple)} &
+\textbf{Après (exemple)} &
+\textbf{Encodage appliqué} &
+\textbf{Groupe} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{Variable} &
+\textbf{Description} &
+\textbf{Avant (exemple)} &
+\textbf{Après (exemple)} &
+\textbf{Encodage appliqué} &
+\textbf{Groupe} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{6}{r}{\small\itshape Suite page suivante\ldots}\\
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+% =====================================================================
+% GROUPE 1 — SOCIO-ÉCONOMIQUES
+% =====================================================================
+\rowcolor{hsocio}
+\multicolumn{6}{l}{%
+  \bfseries\normalsize\color{white}\quad 1 \quad Variables Socio-Économiques%
+}\\[1pt]
+
+\rowcolor{csocio}
+\var{in.income} &
+Revenu annuel du ménage (tranche) &
+\texttt{50000-59999} &
+\texttt{54\,999.5} &
+Midpoint de l'intervalle (\$) &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.federal\_poverty\_level} &
+Ratio revenu du ménage / seuil de pauvreté fédéral &
+\texttt{200-300\%} &
+\texttt{2.5} &
+Midpoint de l'intervalle → ratio décimal &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.area\_median\_income} &
+Ratio du revenu ménage au revenu médian de la zone &
+\texttt{0.9} &
+\texttt{0.9} &
+Déjà numérique (ratio, inchangé) &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.state\_metro\_median\_income} &
+Ratio du revenu médian état/métropole (contexte géographique) &
+\texttt{1.1} &
+\texttt{1.1} &
+Déjà numérique (ratio, inchangé) &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.tenure} &
+Statut d'occupation : propriétaire ou locataire &
+\texttt{Owner} &
+\texttt{1} &
+Binaire : Owner=1, Renter=0 &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.household\_has\_tribal\_persons} &
+Ménage comportant des membres d'une tribu amérindienne &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.aiannh\_area} &
+Logement situé dans une zone tribale reconnue (AIANNH) &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.electric\_panel\_service\_rating..a} &
+Puissance nominale du tableau électrique principal (ampères) &
+\texttt{125 A} &
+\texttt{125.0} &
+Numérique (inchangé, en A) &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.electric\_panel\_breaker\_space\_total\_count} &
+Nombre d'emplacements disponibles pour disjoncteurs &
+\texttt{25} &
+\texttt{25.0} &
+Numérique (inchangé, count) &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.has\_pv} &
+Présence d'un système photovoltaïque &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.pv\_system\_size} &
+Puissance installée du système PV (kW DC) &
+\texttt{None} &
+\texttt{0.0} &
+Extraction numérique (kW) ; None→0 &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.electric\_vehicle\_charge\_at\_home} &
+Probabilité que le VE soit rechargé à domicile &
+\texttt{0.9} &
+\texttt{0.9} &
+Numérique (probabilité 0–1, inchangé) &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.electric\_vehicle\_charger} &
+Niveau du chargeur VE installé à domicile &
+\texttt{None} &
+\texttt{0} &
+Label : None=0, Level~1=1, Level~2=2 &
+Socio-Éco \\
+
+\rowcolor{csocio}
+\var{in.electric\_vehicle\_miles\_traveled} &
+Kilométrage annuel parcouru en véhicule électrique &
+\texttt{9000} &
+\texttt{9000.0} &
+Numérique (miles/an, inchangé) &
+Socio-Éco \\
+
+% =====================================================================
+% GROUPE 2 — OCCUPANTS
+% =====================================================================
+\rowcolor{hoccup}
+\multicolumn{6}{l}{%
+  \bfseries\normalsize\color{white}\quad 2 \quad Variables Occupants%
+}\\[1pt]
+
+\rowcolor{coccup}
+\var{in.occupants} &
+Nombre d'occupants du logement &
+\texttt{3} &
+\texttt{3.0} &
+Numérique (inchangé) &
+Occupants \\
+
+\rowcolor{coccup}
+\var{in.bedrooms} &
+Nombre de chambres (proxy de la taille du foyer) &
+\texttt{4} &
+\texttt{4} &
+Numérique (inchangé) &
+Occupants \\
+
+\rowcolor{coccup}
+\var{in.vacancy\_status} &
+Logement occupé ou vacant &
+\texttt{Occupied} &
+\texttt{1} &
+Binaire : Occupied=1, Vacant=0 &
+Occupants \\
+
+\rowcolor{coccup}
+\var{in.usage\_level} &
+Niveau global d'utilisation (multiplie tous les usages) &
+\texttt{Medium} &
+\texttt{1} &
+Label ordinal : Low=0, Medium=1, High=2 &
+Occupants \\
+
+\rowcolor{coccup}
+\var{in.corridor} &
+Présence d'un couloir commun (immeuble collectif) &
+\texttt{0} &
+\texttt{0} &
+Binaire (déjà encodé) &
+Occupants \\
+
+\rowcolor{coccup}
+\var{in.hot\_water\_fixtures} &
+Coefficient d'utilisation des équipements ECS (1.0 = standard) &
+\texttt{1.1} &
+\texttt{1.1} &
+Numérique (ratio, inchangé) &
+Occupants \\
+
+% =====================================================================
+% GROUPE 3 — MÉTÉO
+% =====================================================================
+\rowcolor{hmeteo}
+\multicolumn{6}{l}{%
+  \bfseries\normalsize\color{white}\quad 3 \quad Variables Météo et Conditions Extérieures%
+}\\[1pt]
+
+\rowcolor{cmeteo}
+\var{in.weather\_file\_latitude} &
+Latitude géographique du fichier météo TMY (proxy zone solaire) &
+\texttt{34.75} &
+\texttt{34.75} &
+Numérique (degrés décimaux, inchangé) &
+Météo \\
+
+\rowcolor{cmeteo}
+\var{in.weather\_file\_longitude} &
+Longitude géographique du fichier météo TMY &
+\texttt{-87.61} &
+\texttt{-87.61} &
+Numérique (degrés décimaux, inchangé) &
+Météo \\
+
+% =====================================================================
+% GROUPE 4 — ENVELOPPE THERMIQUE
+% =====================================================================
+\rowcolor{henvel}
+\multicolumn{6}{l}{%
+  \bfseries\normalsize\color{white}\quad 4 \quad Enveloppe Thermique%
+}\\[1pt]
+
+% --- 4.1 Isolation ---
+\rowcolor{henvel!50}
+\multicolumn{6}{l}{\quad\itshape 4.1 \; Isolation}\\
+
+\rowcolor{cenvel}
+\var{in.insulation\_ceiling} &
+R assemblage du plafond/combles (isolant + plâtre + lame d'air, Table~53) &
+\texttt{R-30} &
+\texttt{31.6} &
+Lookup Table~53 : R nominale → R assemblage (h·ft²·°F/Btu) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.insulation\_wall} &
+R assemblage des murs extérieurs (ossature + ponts thermiques + isolant, Table~45) &
+\texttt{Wood Stud, R-15} &
+\texttt{12.1} &
+Lookup Table~45 : type mur + R nominale → R assemblage &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.insulation\_roof} &
+R assemblage de la toiture (finie ou non, Table~47) &
+\texttt{Finished, R-19} &
+\texttt{21.2} &
+Lookup Table~47 : fini/non fini + R nominale → R assemblage &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.insulation\_floor} &
+R assemblage du plancher sur fondation (Table~55) &
+\texttt{Ceiling R-19} &
+\texttt{22.6} &
+Lookup Table~55 : R nominale → R assemblage plancher &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.insulation\_foundation\_wall} &
+R nominale de l'isolation des murs de fondation (dalle béton, Table~59) &
+\texttt{Wall R-10, Exterior} &
+\texttt{10.0} &
+Extraction R nominale ; R assemblage calculé par EnergyPlus (auto) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.slab\_perimeter\_r} &
+R nominale de l'isolation périphérique verticale de la dalle (Table~57) &
+\texttt{2ft R10 Perimeter, Vertical} &
+\texttt{10.0} &
+Décomposition dalle : extraction $R$ périmètre vertical &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.slab\_under\_r} &
+R nominale de l'isolation horizontale sous la dalle (Table~57) &
+\texttt{2ft R10 Under, Horizontal} &
+\texttt{10.0} &
+Décomposition dalle : extraction $R$ sous-dalle horizontal &
+Enveloppe \\
+
+% --- 4.2 Étanchéité, Vitrage, Géométrie ---
+\rowcolor{henvel!50}
+\multicolumn{6}{l}{\quad\itshape 4.2 \; Étanchéité, Vitrage et Géométrie}\\
+
+\rowcolor{cenvel}
+\var{in.air\_leakage\_to\_outside\_ach50} &
+Infiltration d'air mesurée à 50~Pa (renouvellements/heure) &
+\texttt{7.0} &
+\texttt{7.0} &
+Numérique (ACH50, inchangé) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.window\_ufactor} &
+Coefficient U du vitrage (transmission thermique, W/m²K) &
+\texttt{U-1.16} &
+\texttt{1.16} &
+Extraction numérique depuis chaîne &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.window\_shgc} &
+Facteur solaire du vitrage — SHGC (0=opaque, 1=transparent) &
+\texttt{SHGC 0.76} &
+\texttt{0.76} &
+Extraction numérique depuis chaîne &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.window\_front} &
+Surface vitrée de la façade principale (ft²) &
+\texttt{12 ft²} &
+\texttt{12.0} &
+Numérique (ft², inchangé) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.geometry\_floor\_area} &
+Surface habitable du logement (m²) &
+\texttt{1000-1499 sqft} &
+\texttt{116.1} &
+Midpoint intervalle (sqft) converti en m² &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.geometry\_stories} &
+Nombre d'étages du bâtiment &
+\texttt{1} &
+\texttt{1} &
+Numérique (inchangé) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.geometry\_attic\_type} &
+Type de combles (absent, ventilé, non ventilé, aménagé) &
+\texttt{Vented Attic} &
+\texttt{1} &
+Label : None=0, Ventilé=1, Non ventilé=2, Aménagé=3 &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.geometry\_foundation\_type} &
+Type de fondation (dalle, vide sanitaire, sous-sol…) &
+\texttt{Slab} &
+\texttt{2} &
+Label ordinal selon impact thermique &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.geometry\_garage} &
+Présence et taille du garage &
+\texttt{None} &
+\texttt{0} &
+Label : None=0, 1~car=1, 2~car=2, 3~car=3 &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.vintage} &
+Âge du bâtiment en années (depuis 2023) &
+\texttt{1990s} &
+\texttt{29} &
+Midpoint de la décennie → âge en années &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.roof\_material} &
+Absorptance solaire du matériau de toiture (0=réfléchissant) &
+\texttt{Composition Shingles} &
+\texttt{0.44} &
+Extraction absorptance solaire (table ResStock) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.orientation\_sin} &
+Composante sinus de l'orientation principale du bâtiment &
+\texttt{Northwest} &
+\texttt{-0.707} &
+Encodage circulaire : $\sin(2\pi\theta/360°)$ &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.orientation\_cos} &
+Composante cosinus de l'orientation principale du bâtiment &
+\texttt{Northwest} &
+\texttt{0.707} &
+Encodage circulaire : $\cos(2\pi\theta/360°)$ &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_exterior\_finish\_r} &
+Résistance thermique de la finition extérieure des murs &
+\texttt{Brick, Medium/Dark} &
+\texttt{0.7} &
+Extraction R-value selon matériau &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_finish\_dark} &
+Finition mur de couleur foncée (absorptance élevée) &
+\texttt{Brick, Medium/Dark} &
+\texttt{1} &
+OHE binaire (couleur de finition) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_finish\_brick} &
+Finition mur en brique &
+\texttt{Brick, Medium/Dark} &
+\texttt{1} &
+OHE binaire (type de finition) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_finish\_none} &
+Pas de finition extérieure spécifique &
+\texttt{Wood, Light} &
+\texttt{0} &
+OHE binaire (type de finition) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_finish\_shingle} &
+Finition mur en bardeau &
+\texttt{Vinyl, Light} &
+\texttt{0} &
+OHE binaire (type de finition) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_finish\_stucco} &
+Finition mur en stuc &
+\texttt{Vinyl, Light} &
+\texttt{0} &
+OHE binaire (type de finition) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_finish\_vinyl} &
+Finition mur en vinyle &
+\texttt{Vinyl, Light} &
+\texttt{1} &
+OHE binaire (type de finition) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.wall\_finish\_wood} &
+Finition mur en bois &
+\texttt{Wood, Medium/Dark} &
+\texttt{1} &
+OHE binaire (type de finition) &
+Enveloppe \\
+
+% --- 4.3 Voisinage ---
+\rowcolor{henvel!50}
+\multicolumn{6}{l}{\quad\itshape 4.3 \; Note sur \texttt{in.neighbors}}\\
+
+\rowcolor{cenvel}
+\var{in.horiz\_loc\_Middle} &
+Bâtiment en position centrale dans une rangée (mitoyenneté double) &
+\texttt{Middle} &
+\texttt{1} &
+OHE binaire (position horizontale) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.horiz\_loc\_Right} &
+Bâtiment en position droite dans une rangée &
+\texttt{Left} &
+\texttt{0} &
+OHE binaire (position horizontale) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.neighbor\_distance\_ft} &
+Distance au voisin le plus proche (pieds) &
+\texttt{15 ft} &
+\texttt{15.0} &
+Extraction numérique (pieds) &
+Enveloppe \\
+
+\rowcolor{cenvel}
+\var{in.neighbor\_both\_sides} &
+Voisins présents des deux côtés (mitoyenneté totale) &
+\texttt{Left/Right at 15ft} &
+\texttt{1.0} &
+Binaire dérivé de la chaîne originale &
+Enveloppe \\
+
+% =====================================================================
+% GROUPE 5 — SYSTÈMES ÉNERGÉTIQUES
+% =====================================================================
+\rowcolor{hsyste}
+\multicolumn{6}{l}{%
+  \bfseries\normalsize\color{white}\quad 5 \quad Systèmes Énergétiques%
+}\\[1pt]
+
+% --- 5.2 HVAC ---
+\rowcolor{hsyste!40}
+\multicolumn{6}{l}{\quad\itshape 5.2 \; Chauffage et Climatisation (HVAC)}\\
+
+\rowcolor{csyste}
+\var{in.hvac\_has\_ducts} &
+Présence d'un réseau de gaines de distribution d'air &
+\texttt{Yes} &
+\texttt{1} &
+Binaire : Yes=1, No=0 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.duct\_leakage} &
+Taux de fuite des gaines vers l'extérieur (fraction) &
+\texttt{10\% Leakage...} &
+\texttt{0.1} &
+Extraction du \% → ratio décimal &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.duct\_insulation} &
+R-value de l'isolation des gaines (0 = non isolé) &
+\texttt{..., R-8} &
+\texttt{8} &
+Extraction R-value ; Uninsulated→0 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.duct\_location\_int} &
+Emplacement physique des gaines (combles, sous-sol, etc.) &
+\texttt{Living Space} &
+\texttt{1} &
+Label : None=0, Living=1, Attic=2, Crawl=3, H.Bsmt=4, U.Bsmt=5, Garage=6 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.hvac\_cooling\_efficiency} &
+SEER de la climatisation (rendement saisonnier en refroidissement) &
+\texttt{AC, SEER 13} &
+\texttt{13.0} &
+Extraction valeur SEER depuis chaîne &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.hvac\_cooling\_partial\_space\_conditioning} &
+Fraction de la surface du logement conditionnée par la clim &
+\texttt{1.0} &
+\texttt{1.0} &
+Numérique (0–1, inchangé) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.hvac\_has\_zonal\_electric\_heating} &
+Présence d'un chauffage électrique zonal (radiateurs/plinthes) &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.cooling\_setpoint} &
+Consigne de température de climatisation (°C) &
+\texttt{75F} &
+\texttt{23.9} &
+Conversion °F→°C : $(F-32)\times 5/9$ &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.cooling\_setpoint\_has\_offset} &
+Thermostat de climatisation avec programmation horaire &
+\texttt{Yes} &
+\texttt{1} &
+Binaire : Yes=1, No=0 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.cooling\_setpoint\_offset\_magnitude} &
+Amplitude du décalage de consigne clim en période Off/Nuit &
+\texttt{-3°F offset} &
+\texttt{-16.7} &
+Valeur numérique extraite (°F) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.heating\_setpoint} &
+Consigne de température de chauffage (°C) &
+\texttt{68F} &
+\texttt{20.0} &
+Conversion °F→°C &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.heating\_setpoint\_has\_offset} &
+Thermostat de chauffage avec programmation horaire &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.heating\_setpoint\_offset\_magnitude} &
+Amplitude du décalage de consigne chauffage en période Off/Nuit &
+\texttt{-8°F offset} &
+\texttt{-17.8} &
+Valeur numérique extraite (°F) &
+Systèmes \\
+
+% --- 5.3 DHW ---
+\rowcolor{hsyste!40}
+\multicolumn{6}{l}{\quad\itshape 5.3 \; Eau Chaude Sanitaire (DHW)}\\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_efficiency} &
+Rendement du chauffe-eau (EF ou COP selon technologie) &
+\texttt{Electric Standard} &
+\texttt{0.92} &
+Extraction EF/COP par type depuis table de correspondance &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_in\_unit} &
+Chauffe-eau situé dans le logement (vs. équipement partagé) &
+\texttt{Yes} &
+\texttt{1} &
+Binaire : Yes=1, No=0 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_technology\_indirect} &
+Technologie : chauffe-eau indirect (via chaudière) (OHE) &
+\texttt{Indirect} &
+\texttt{1} &
+OHE binaire (technologie) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_technology\_storage} &
+Technologie : ballon de stockage classique (OHE) &
+\texttt{Storage} &
+\texttt{1} &
+OHE binaire (technologie) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_technology\_tankless} &
+Technologie : chauffe-eau instantané sans réservoir (OHE) &
+\texttt{Tankless Coil} &
+\texttt{1} &
+OHE binaire (technologie) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_fuel\_fuel\_oil} &
+Combustible : fioul domestique (OHE) &
+\texttt{Fuel Oil} &
+\texttt{1} &
+OHE binaire (combustible) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_fuel\_natural\_gas} &
+Combustible : gaz naturel (OHE) &
+\texttt{Natural Gas} &
+\texttt{1} &
+OHE binaire (combustible) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_fuel\_propane} &
+Combustible : propane (OHE) &
+\texttt{Propane} &
+\texttt{1} &
+OHE binaire (combustible) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_location\_semi\_conditioned} &
+Emplacement : espace semi-conditionné (ex. garage) (OHE) &
+\texttt{Garage} &
+\texttt{1} &
+OHE binaire (localisation) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.water\_heater\_location\_unconditioned} &
+Emplacement : espace non conditionné (combles, extérieur) (OHE) &
+\texttt{Attic} &
+\texttt{1} &
+OHE binaire (localisation) &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.dishwasher\_kwh} &
+Consommation annuelle du lave-vaisselle (kWh/an ; 0 si absent) &
+\texttt{290 kWh/an} &
+\texttt{290.0} &
+Numérique extrait ; absent→0 &
+Systèmes \\
+
+\rowcolor{csyste}
+\var{in.has\_dishwasher} &
+Présence d'un lave-vaisselle dans le logement &
+\texttt{Yes} &
+\texttt{1} &
+Binaire : Yes=1, No=0 &
+Systèmes \\
+
+% =====================================================================
+% GROUPE 6 — CLASSIFICATION DES USAGES ÉLECTRIQUES
+% =====================================================================
+\rowcolor{husage}
+\multicolumn{6}{l}{%
+  \bfseries\normalsize\color{white}\quad 6 \quad Classification des Usages Électriques%
+}\\[1pt]
+
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_efficiency} &
+Rendement du sèche-linge (CEF — facteur d'efficacité combiné) &
+\texttt{Electric} &
+\texttt{2.7} &
+CEF extrait par combustible (Elec=2.7, Gaz=2.39, None=0) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_has} &
+Présence d'un sèche-linge &
+\texttt{Electric} &
+\texttt{1} &
+Binaire : ≠None→1, None→0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_electric} &
+Sèche-linge à énergie électrique &
+\texttt{Electric} &
+\texttt{1} &
+OHE binaire (énergie) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_gas} &
+Sèche-linge au gaz naturel ou propane &
+\texttt{Electric} &
+\texttt{0} &
+OHE binaire (énergie) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.clothes\_washer\_efficiency} &
+Efficacité du lave-linge (IMEF — facteur d'efficacité modifié) &
+\texttt{Standard} &
+\texttt{0.95} &
+Extraction IMEF par classe (Standard, EnergyStar…) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.clothes\_washer\_has} &
+Présence d'un lave-linge &
+\texttt{Standard} &
+\texttt{1} &
+Binaire : ≠None→1, None→0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.refrigerator\_ef} &
+Facteur d'efficacité énergétique du réfrigérateur principal (EF) &
+\texttt{EF 15.9} &
+\texttt{15.9} &
+Extraction EF depuis chaîne &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.refrigerator\_has} &
+Présence d'un réfrigérateur &
+\texttt{EF 15.9} &
+\texttt{1} &
+Binaire : ≠None→1, None→0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.lighting\_efficiency} &
+Efficacité du système d'éclairage principal &
+\texttt{100\% CFL} &
+\texttt{2} &
+Label ordinal : Incandescent=1, CFL=2, LED=3 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.misc\_extra\_refrigerator\_ef} &
+EF du réfrigérateur ou congélateur supplémentaire &
+\texttt{EF 10.5} &
+\texttt{10.5} &
+Extraction EF ; absent→0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.misc\_extra\_refrigerator\_has} &
+Présence d'un second réfrigérateur ou congélateur &
+\texttt{EF 10.5} &
+\texttt{1} &
+Binaire : ≠None→1, None→0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.misc\_freezer\_ef} &
+EF du congélateur dédié &
+\texttt{EF 12.0} &
+\texttt{12.0} &
+Extraction EF ; absent→0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.misc\_gas\_fireplace\_present} &
+Présence d'une cheminée décorative au gaz &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.misc\_gas\_grill\_present} &
+Présence d'un barbecue au gaz raccordé &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.misc\_gas\_lighting\_present} &
+Présence d'un éclairage extérieur au gaz &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.has\_hot\_tub} &
+Présence d'un spa ou jacuzzi &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.hot\_tub\_electric} &
+Spa/jacuzzi à chauffage électrique &
+\texttt{Electric} &
+\texttt{1} &
+OHE binaire (énergie du spa) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.misc\_hot\_tub\_gas} &
+Spa/jacuzzi à chauffage gaz &
+\texttt{Gas} &
+\texttt{1} &
+OHE binaire (énergie du spa) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.has\_pool} &
+Présence d'une piscine &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.pool\_heater\_present} &
+Présence d'un système de chauffage de piscine &
+\texttt{No} &
+\texttt{0} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.pool\_heater\_electric} &
+Chauffage de piscine électrique (pompe à chaleur) &
+\texttt{Electric} &
+\texttt{1} &
+OHE binaire (énergie du chauffage piscine) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.pool\_heater\_gas} &
+Chauffage de piscine au gaz naturel &
+\texttt{Gas} &
+\texttt{1} &
+OHE binaire (énergie du chauffage piscine) &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.has\_well\_pump} &
+Présence d'une pompe de puits (eau potable autonome) &
+\texttt{Yes} &
+\texttt{1} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.has\_ceiling\_fan} &
+Présence d'un ventilateur de plafond &
+\texttt{Yes} &
+\texttt{1} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+\rowcolor{cusage}
+\var{in.ceiling\_fan\_used} &
+Ventilateur de plafond utilisé en saison chaude &
+\texttt{Yes} &
+\texttt{1} &
+Binaire : Yes=1, No=0 &
+Usages \\
+
+% =====================================================================
+% GROUPE 7 — PART DES USAGES BLANC ET BRUN
+% =====================================================================
+\rowcolor{hblanc}
+\multicolumn{6}{l}{%
+  \bfseries\normalsize\color{white}\quad 7 \quad Part des Usages Blanc et Brun%
+}\\[1pt]
+
+\rowcolor{cblanc}
+\var{in.plug\_loads} &
+Intensité relative des prises et petits électroménagers (ratio, 1.0 = standard) &
+\texttt{134\%} &
+\texttt{1.34} &
+Ratio : \% divisé par 100 &
+Blanc/Brun \\
+
+\rowcolor{cblanc}
+\var{in.plug\_load\_diversity} &
+Diversité temporelle d'utilisation des prises (étalement des pics) &
+\texttt{100\%} &
+\texttt{1.0} &
+Ratio : \% divisé par 100 &
+Blanc/Brun \\
+
+\rowcolor{cblanc}
+\var{in.clothes\_dryer\_usage\_level} &
+Multiplicateur d'usage du sèche-linge (1.0 = usage moyen) &
+\texttt{1.0} &
+\texttt{1.0} &
+Numérique (ratio, inchangé) &
+Blanc/Brun \\
+
+\rowcolor{cblanc}
+\var{in.refrigerator\_usage\_level} &
+Multiplicateur d'usage du réfrigérateur (1.0 = usage moyen) &
+\texttt{1.0} &
+\texttt{1.0} &
+Numérique (ratio, inchangé) &
+Blanc/Brun \\
+
+\end{longtable}
+
+\end{document}
