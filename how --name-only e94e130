@@ -1,0 +1,18 @@
+* [33me94e130[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m save model lightgbm
+[31m|[m * [33mf4979e4[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Entrainer le modèle LightGBM
+[31m|[m[31m/[m  
+*   [33m55a16e9[m Correction du découpage validation/test sans double stratification
+[33m|[m[34m\[m  
+[33m|[m *   [33m6f16733[m[33m ([m[1;32mfeat/assembly-r-clustering-stratifie[m[33m)[m merge: assembly R-values, clustering stratifie et tableau LaTeX variables
+[33m|[m [35m|[m[36m\[m  
+[33m|[m [35m|[m * [33m72b91f1[m[33m ([m[1;31morigin/feat/assembly-r-clustering-stratifie[m[33m)[m feat: assembly R-values, clustering stratifie et tableau LaTeX variables
+[33m|[m [35m|[m *   [33mde1a520[m[33m ([m[1;31morigin/feat/encodage-lgbm-baseline[m[33m)[m merge: integrer main + re-appliquer encodage colonnes string residuelles
+[33m|[m [35m|[m [1;31m|[m[1;32m\[m  
+[33m|[m [35m|[m * [1;32m|[m [33m99386dc[m feat: encodage colonnes string résiduelles et cellule de vérification
+[33m|[m [35m|[m * [1;32m|[m [33md5877d3[m feat: update encodage categoriel and add lgbm baseline
+[33m|[m [35m|[m [1;32m|[m [1;32m|[m * [33m03d50a0[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on main: cbb1fc4 save local changes
+[33m|[m [35m|[m[33m_[m[1;32m|[m[33m_[m[1;32m|[m[33m/[m[1;34m|[m 
+[33m|[m[33m/[m[35m|[m [1;32m|[m [1;32m|[m [1;34m|[m 
+[33m|[m [35m|[m [1;32m|[m [1;32m|[m * [33m8675935[m index on main: cbb1fc4 save local changes
+[33m|[m [35m|[m[33m_[m[1;32m|[m[33m_[m[1;32m|[m[33m/[m  
+[33m|[m[33m/[m[35m|[m [1;32m|[m [1;32m|[m   
