@@ -1,0 +1,66 @@
+[33mf4979e4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: commit: Entrainer le modèle LightGBM
+[33m55a16e9[m HEAD@{1}: commit (merge): Correction du découpage validation/test sans double stratification
+[33mcbb1fc4[m HEAD@{2}: checkout: moving from feat/assembly-r-clustering-stratifie to main
+[33m6f16733[m[33m ([m[1;32mfeat/assembly-r-clustering-stratifie[m[33m)[m HEAD@{3}: reset: moving to origin/main
+[33m72b91f1[m[33m ([m[1;31morigin/feat/assembly-r-clustering-stratifie[m[33m)[m HEAD@{4}: checkout: moving from main to feat/assembly-r-clustering-stratifie
+[33mcbb1fc4[m HEAD@{5}: reset: moving to HEAD
+[33mcbb1fc4[m HEAD@{6}: commit (merge): save local changes
+[33m7a82d0f[m HEAD@{7}: commit: bilan
+[33m2c6122e[m HEAD@{8}: pull: Fast-forward
+[33me045f6e[m HEAD@{9}: commit: la definition du modele MLP ,loss et optimiser ,chargement du data,et l'evaluation du modele
+[33m7d21d59[m HEAD@{10}: commit: split stratifier avec K=50
+[33m57be19b[m HEAD@{11}: commit: finalisation de l'encodage et le clustering
+[33m370b4ad[m HEAD@{12}: commit: la suppression des colonnes string ,vides, constantes, dupliquees
+[33me99827b[m HEAD@{13}: commit: analyse_exploratoires
+[33m474b48c[m HEAD@{14}: commit: La matrice de correlation entre les variables cibles
+[33mc252560[m HEAD@{15}: pull: Fast-forward
+[33m963392d[m HEAD@{16}: reset: moving to origin/main
+[33m9996c5a[m HEAD@{17}: commit: groupe appariels j'ai modifier les 2 fichier encodage_categoriel.ipynb + transformations_numeriques.ipynb
+[33mf56350a[m HEAD@{18}: commit: ajouter l'encodage de groupe eau chaude et la supression des colonne 'in.hot_water_distribution' et 'in.holiday_lightning'
+[33m7bb8acb[m HEAD@{19}: reset: moving to origin/main
+[33mc46ed25[m HEAD@{20}: commit: mes modifs
+[33m7bb8acb[m HEAD@{21}: pull: Fast-forward
+[33me149d3b[m HEAD@{22}: reset: moving to HEAD
+[33me149d3b[m HEAD@{23}: commit: supprimer featureengineering1.ipynb
+[33mfcc45b4[m HEAD@{24}: commit: l'isolation thermique des roofs
+[33m9e2f51e[m HEAD@{25}: commit: modifier les pourcentage , lenght(fonction)...
+[33mf1af34d[m HEAD@{26}: checkout: moving from visualOutFeature to main
+[33mb22eb4c[m[33m ([m[1;31morigin/visualOutFeature[m[33m, [m[1;32mvisualOutFeature[m[33m)[m HEAD@{27}: checkout: moving from main to visualOutFeature
+[33mf1af34d[m HEAD@{28}: commit: save pour ajouter a yes/no fonction
+[33mfcac81a[m HEAD@{29}: commit: ajouter à tansformation_numeriques.ipynb
+[33m75de2c8[m HEAD@{30}: checkout: moving from visualOutFeature to main
+[33mb22eb4c[m[33m ([m[1;31morigin/visualOutFeature[m[33m, [m[1;32mvisualOutFeature[m[33m)[m HEAD@{31}: commit: derniere etapes avant la fusion
+[33ma96a934[m HEAD@{32}: checkout: moving from main to visualOutFeature
+[33m75de2c8[m HEAD@{33}: pull: Fast-forward
+[33mfd328ba[m HEAD@{34}: pull: Fast-forward
+[33mbc516f6[m HEAD@{35}: checkout: moving from visualOutFeature to main
+[33ma96a934[m HEAD@{36}: commit: ccccccccccc
+[33m50c8c55[m HEAD@{37}: commit: modifs sur la fct offset_period qui fait la conversion du 'in.cooling_setpoint_offset_period' et in.heating_setpoint_offset_period'
+[33md29adca[m HEAD@{38}: commit: convertir la colonne in.corridor de type boolean
+[33m4bbf82c[m HEAD@{39}: commit: conversion de *_unavailable_days
+[33m287167d[m HEAD@{40}: commit: setpoint initiale
+[33m07a3ac2[m HEAD@{41}: commit: pourcentage et temperature et Hour
+[33mbce617e[m HEAD@{42}: checkout: moving from main to visualOutFeature
+[33mbc516f6[m HEAD@{43}: reset: moving to HEAD
+[33mbc516f6[m HEAD@{44}: commit: creation de repertoire deeplearning + MLP_model
+[33m5ac31bf[m HEAD@{45}: pull: Fast-forward
+[33m1f71b71[m HEAD@{46}: checkout: moving from visualOutFeature to main
+[33mbce617e[m HEAD@{47}: reset: moving to HEAD
+[33mbce617e[m HEAD@{48}: pull --rebase origin visualOutFeature (finish): returning to refs/heads/visualOutFeature
+[33mbce617e[m HEAD@{49}: pull --rebase origin visualOutFeature (pick): creation de metadata_features.parquet avec le code dans feature_ingineering.ipynb
+[33m3b86d42[m HEAD@{50}: pull --rebase origin visualOutFeature (start): checkout 3b86d423ce4445a801c62926b94bf2c4efb2d01f
+[33mdbeda73[m HEAD@{51}: commit: creation de metadata_features.parquet avec le code dans feature_ingineering.ipynb
+[33m519d51c[m HEAD@{52}: pull: Fast-forward
+[33me30b838[m HEAD@{53}: commit (merge): save
+[33m505fb0e[m HEAD@{54}: checkout: moving from main to visualOutFeature
+[33m1f71b71[m HEAD@{55}: pull: Fast-forward
+[33me623765[m HEAD@{56}: checkout: moving from visualOutFeature to main
+[33m505fb0e[m HEAD@{57}: pull: Fast-forward
+[33m2906f18[m HEAD@{58}: commit: save changes from the work pc
+[33m008b8f3[m HEAD@{59}: commit: stack chart
+[33m1bb094e[m HEAD@{60}: commit: stack chart
+[33m8b96a9b[m HEAD@{61}: commit: stack chart
+[33m778ffe7[m HEAD@{62}: pull: Fast-forward
+[33md09acd9[m HEAD@{63}: pull: Fast-forward
+[33m9533520[m HEAD@{64}: checkout: moving from main to visualOutFeature
+[33me623765[m HEAD@{65}: clone: from https://github.com/BOUBAKERAMDY/FlexiMax.git
