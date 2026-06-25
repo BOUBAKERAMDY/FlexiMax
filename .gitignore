@@ -14,3 +14,11 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Images générées par les notebooks — ne pas versionner
+notebooks/**/*.png
+notebooks/**/*.jpg
+reports/figures/*.png
+reports/figures/*.jpg
+*.png
+*.jpg
