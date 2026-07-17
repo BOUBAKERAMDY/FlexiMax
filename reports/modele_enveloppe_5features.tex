@@ -1,151 +1,120 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[10pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
-\usepackage[margin=2.2cm]{geometry}
+\usepackage[margin=1.6cm]{geometry}
 \usepackage{amsmath}
 \usepackage{xcolor}
 \usepackage{titlesec}
 \usepackage{parskip}
+\usepackage{array}
 
-\definecolor{bleu}{RGB}{31,78,121}
+% --- Palette : une couleur par feature ---
+\definecolor{c1}{RGB}{0,120,110}    % UA        - sarcelle
+\definecolor{c2}{RGB}{30,110,170}   % H_ve      - bleu
+\definecolor{c3}{RGB}{198,93,54}    % C         - corail
+\definecolor{c4}{RGB}{176,137,20}   % A_solaire - ambre
+\definecolor{c5}{RGB}{120,72,150}   % compacite - violet
+\definecolor{anthracite}{RGB}{70,70,70}
 
-\titleformat{\section}{\normalfont\large\bfseries\color{bleu}}{}{0pt}{}
-\titleformat{\subsection}{\normalfont\bfseries\color{bleu}}{}{0pt}{}
-\titlespacing{\subsection}{0pt}{8pt}{3pt}
+\titlespacing{\section}{0pt}{5pt}{2pt}
+\titleformat{\section}{\normalfont\large\bfseries}{}{0pt}{}
 
-\newcommand{\attr}[1]{\texttt{\small #1}}
+\newcommand{\feat}[2]{\section{\textcolor{#1}{#2}}}
+\newcommand{\ou}[1]{{\small\textcolor{anthracite}{\textit{où :} #1}}\par}
+\newcommand{\src}[1]{{\footnotesize\textcolor{anthracite}{\textbf{Sources :} \texttt{#1}}}\par}
+\newcommand{\attr}[1]{\texttt{#1}}
+
+\setlength{\parskip}{2pt}
 
 \begin{document}
 
 \begin{center}
-{\LARGE\bfseries\color{bleu} Modèle réduit d'enveloppe thermique}\\[2pt]
-{\large\bfseries\color{bleu} 5 features physiques}
+{\LARGE\bfseries\textcolor{c1}{Modèle réduit d'enveloppe thermique} — \textcolor{c3}{5 features physiques}}
 \end{center}
 
-\vspace{4pt}
+\vspace{-2pt}
+{\small Plutôt qu'une quarantaine d'attributs bruts ResStock (catégories américaines : «~Wood Stud R-15~»,
+zones ASHRAE\ldots), on agrège \textbf{cinq grandeurs physiques universelles} — transférables,
+interprétables et directement exploitables par un modèle RC. Elles décrivent les déperditions, les
+apports solaires, l'inertie et la forme du bâtiment.}
 
-Plutôt que d'injecter dans le modèle une quarantaine d'attributs bruts issus de ResStock
-(catégories propres au parc américain, comme «~Wood Stud R-15~» ou les zones climatiques ASHRAE),
-on les agrège en cinq grandeurs physiques universelles. Cette approche présente quatre avantages :
-les grandeurs obtenues sont transférables à des données réelles (notamment françaises), où l'on ne
-disposera jamais des mêmes catégories ; elles sont directement interprétables sur le plan thermique ;
-elles rendent le modèle plus robuste en réduisant le nombre de variables corrélées et le risque de
-sur-apprentissage ; enfin, elles constituent précisément les entrées d'un modèle réduit de type RC
-(résistance-capacité). Les cinq features décrivent les trois déperditions, les apports solaires,
-l'inertie et la forme du bâtiment.
+\vspace{2pt}
+\noindent\colorbox{black!5}{\begin{minipage}{0.985\textwidth}
+{\small\textbf{Notations générales :}
+$A$ = surface d'une paroi (m\textsuperscript{2}) \;\textbullet\;
+$R$ = résistance thermique (m\textsuperscript{2}K/W) \;\textbullet\;
+$U = 1/R$ = conductance (W/m\textsuperscript{2}K) \;\textbullet\;
+$V$ = volume chauffé (m\textsuperscript{3}) \;\textbullet\;
+$A_{\text{pl}}$ = surface de plancher (m\textsuperscript{2}).}
+\end{minipage}}
 
-\section{1.\quad UA — Coefficient de déperdition par transmission (W/K)}
-
-Le UA représente la quantité de chaleur qui traverse les parois de l'enveloppe — murs, toiture,
-plancher, fenêtres et portes — pour chaque degré d'écart de température entre l'intérieur et
-l'extérieur. Chaque paroi oppose une résistance thermique $R$ au passage de la chaleur ; son inverse
-$U = 1/R$ est la conductance surfacique. En multipliant la conductance de chaque paroi par sa surface,
-puis en additionnant l'ensemble (les parois sont des chemins de fuite en parallèle, ce qui autorise
-la somme), on obtient le coefficient global. Plus le UA est élevé, plus le bâtiment laisse fuir la
-chaleur : c'est la grandeur qui pèse le plus sur les besoins de chauffage. On ne retient que les
-parois donnant réellement sur l'extérieur, et la résistance de la partie haute est choisie selon la
-présence ou non de combles.
-
+\feat{c1}{1.\quad UA — Déperdition par transmission (W/K)}
+Chaleur traversant l'enveloppe (murs, toit, sol, fenêtres) par degré d'écart intérieur/extérieur.
+Chaque paroi est un chemin de fuite ; on somme les conductances $U\!\cdot\!A$ (parois en parallèle).
+Plus $UA$ est grand, plus le bâtiment fuit.
 \[
-UA = \frac{A_{\text{mur}}}{R_{\text{mur}}} + \frac{A_{\text{toit}}}{R_{\text{toit}}}
-   + \frac{A_{\text{sol}}}{R_{\text{sol}}} + U_{\text{fen}}\times A_{\text{fen}}
+UA = \tfrac{A_{\text{mur}}}{R_{\text{mur}}} + \tfrac{A_{\text{toit}}}{R_{\text{toit}}}
+   + \tfrac{A_{\text{sol}}}{R_{\text{sol}}} + U_{\text{fen}}\,A_{\text{fen}}
 \]
+\ou{$R_{\text{mur/toit/sol}}$ et $U_{\text{fen}}$ = isolation de chaque paroi ; toiture routée selon la présence de combles.}
+\src{in.insulation\_wall/roof/floor, in.window\_ufactor, out.params.*\_area, in.geometry\_attic\_type}
 
-\textbf{Attributs sources :} \attr{in.insulation\_wall}, \attr{in.insulation\_roof},
-\attr{in.insulation\_floor} et \attr{in.window\_ufactor} pour les résistances et conductances ;
-les surfaces proviennent de \attr{out.params} (\attr{wall\_area\_above\_grade\_exterior},
-\attr{roof\_area}, \attr{floor\_area\_lighting}, \attr{window\_area}) ; la toiture est routée
-selon \attr{in.geometry\_attic\_type}.
-
-\section{2.\quad H\textsubscript{ve} — Coefficient de déperdition par renouvellement d'air (W/K)}
-
-Un bâtiment n'est jamais parfaitement étanche : de l'air extérieur s'infiltre par les défauts
-d'étanchéité et par la ventilation, tandis que l'air intérieur, déjà réchauffé, s'échappe. Il faut
-donc dépenser de l'énergie pour réchauffer en continu cet air neuf entrant. Le H\textsubscript{ve}
-quantifie cette perte : elle est proportionnelle au débit d'air renouvelé et au volume chauffé.
-La constante $0{,}34$ correspond à la chaleur qu'emporte un mètre cube d'air par degré. Le taux de
-renouvellement réel n'est pas mesuré directement : on le déduit de la perméabilité à l'air testée
-sous pression (ACH50) en la divisant par un facteur d'environ 20, et le volume chauffé est estimé
-à partir de la surface de plancher et d'une hauteur sous plafond de 2,5 mètres.
-
+\feat{c2}{2.\quad H\textsubscript{ve} — Déperdition par renouvellement d'air (W/K)}
+L'air neuf entrant par les fuites doit être réchauffé en continu : perte proportionnelle au débit
+d'air et au volume.
 \[
-H_{ve} = 0{,}34 \times n \times V,
-\qquad n = \frac{\text{ACH50}}{20},
-\qquad V = A_{\text{plancher}} \times 2{,}5\ \text{m}
+H_{ve} = 0{,}34 \; n \; V, \qquad n = \tfrac{\text{ACH50}}{20}, \qquad V = A_{\text{pl}} \times 2{,}5
 \]
+\ou{$0{,}34$ = chaleur d'un m\textsuperscript{3} d'air par °C ; $n$ = renouvellement réel (/h) déduit de la perméabilité mesurée ACH50 ; hauteur sous plafond 2,5~m.}
+\src{in.air\_leakage\_to\_outside\_ach50, out.params.floor\_area\_lighting}
 
-\textbf{Attributs sources :} \attr{in.air\_leakage\_to\_outside\_ach50} pour la perméabilité ;
-\attr{out.params.floor\_area\_lighting} pour le volume.
-
-\section{3.\quad C — Inertie thermique (kJ/K)}
-
-L'inertie thermique mesure la capacité du bâtiment à emmagasiner de la chaleur dans la masse de ses
-parois : murs, planchers, cloisons. Un bâtiment lourd, en béton ou en brique, se réchauffe et se
-refroidit lentement ; il amortit les variations de température et retarde les pics, ce qui améliore
-le confort et lisse les besoins. Un bâtiment léger, à ossature bois, suit au contraire la météo de
-façon beaucoup plus directe. Physiquement, cette capacité vaut, pour chaque couche de matériau, sa
-densité multipliée par son épaisseur, sa chaleur spécifique et sa surface. Ces propriétés de masse
-n'étant présentes ni dans les features ni dans le guide d'encodage, on estime l'inertie par la
-méthode normalisée ISO 13790, qui associe à chaque classe de construction une capacité par mètre
-carré de plancher et ne compte que la masse réellement en échange avec l'air intérieur.
-
+\feat{c3}{3.\quad C — Inertie thermique (kJ/K)}
+Capacité à stocker la chaleur : un bâtiment lourd (béton, brique) amortit les variations, un léger
+(bois) suit la météo. Faute de données de masse, estimée par classe ISO 13790.
 \[
-C = C_{\text{classe}} \times A_{\text{plancher}},
-\qquad C_{\text{classe}} \in \{110,\ 165,\ 260,\ 370\}\ \text{kJ/m}^2\text{K}
+C = C_{\text{classe}} \times A_{\text{pl}}, \qquad
+C_{\text{classe}} \in \{110,\,165,\,260,\,370\}\ \text{kJ/m}^2\text{K}
 \]
+\ou{$C_{\text{classe}}$ = capacité par m\textsuperscript{2} selon le mur : bois\,$\to$\,léger (110), acier\,$\to$\,moyen (165), brique\,$\to$\,lourd (260), béton\,$\to$\,très lourd (370).}
+\src{in.geometry\_wall\_type, in.wall\_finish\_brick, out.params.floor\_area\_lighting}
 
-où la classe (léger, moyen, lourd, très lourd) est déduite du matériau du mur : bois $\rightarrow$ léger,
-acier $\rightarrow$ moyen, brique $\rightarrow$ lourd, béton $\rightarrow$ très lourd.
-
-\textbf{Attributs sources :} \attr{in.geometry\_wall\_type} et \attr{in.wall\_finish\_brick} pour
-la classe ; \attr{out.params.floor\_area\_lighting} pour la surface.
-
-\section{4.\quad A\textsubscript{solaire} — Surface solaire équivalente (m\textsuperscript{2})}
-
-Les apports solaires transmis par les fenêtres chauffent gratuitement le logement et réduisent
-d'autant les besoins de chauffage en hiver. Toutes les fenêtres ne laissent pas passer la même
-fraction du rayonnement : le facteur solaire (SHGC) exprime cette proportion, d'autant plus faible
-que le vitrage est performant. La surface solaire équivalente correspond à la surface d'un capteur
-parfait qui recevrait la même énergie ; elle vaut la surface vitrée multipliée par le facteur
-solaire et par un facteur de cadre d'environ $0{,}9$, puis pondérée par l'orientation de chaque façade,
-car une fenêtre au sud capte bien plus qu'une fenêtre au nord. L'orientation est reconstituée à
-partir de l'azimut du bâtiment et de la répartition des fenêtres sur les quatre façades.
-
+\feat{c4}{4.\quad A\textsubscript{solaire} — Surface solaire équivalente (m\textsuperscript{2})}
+Apports solaires gratuits par les vitrages. Équivalent d'un capteur parfait de même énergie, pondéré
+par l'orientation (le sud capte le plus).
 \[
-A_{\text{solaire}} = \text{SHGC} \times 0{,}9 \times
-\sum_{\text{façades}} A_{\text{façade}} \times w_{\text{orientation}},
-\qquad w_{\text{Sud}}=1{,}0,\ w_{\text{E/O}}=0{,}6,\ w_{\text{Nord}}=0{,}3
+A_{\text{solaire}} = \text{SHGC}\times 0{,}9 \times \sum_{\text{façades}} A_{\text{façade}}\; w
 \]
+\ou{SHGC = fraction de soleil transmise par le vitrage ; $0{,}9$ = facteur de cadre ; $w$ = poids d'orientation (Sud 1{,}0 ; E/O 0{,}6 ; Nord 0{,}3).}
+\src{in.window\_shgc, in.orientation\_sin/cos, in.window\_areas, out.params.window\_area}
 
-\textbf{Attributs sources :} \attr{in.window\_shgc} pour le facteur solaire ;
-\attr{in.orientation\_sin} et \attr{in.orientation\_cos} pour l'azimut ;
-\attr{in.window\_areas} pour la répartition par façade ;
-\attr{out.params.window\_area} pour la surface vitrée.
-
-\section{5.\quad Compacité — Coefficient de forme (m\textsuperscript{-1})}
-
-À volume chauffé égal, un bâtiment ramassé, proche du cube, présente beaucoup moins de surface en
-contact avec l'extérieur qu'un bâtiment étalé ou tout en longueur ; il perd donc moins de chaleur.
-La compacité rapporte la surface déperditive totale — l'ensemble des parois donnant sur l'extérieur —
-au volume chauffé. Une valeur faible traduit une forme économe, typique des immeubles et des grands
-bâtiments ; une valeur élevée signale une forme dispendieuse, comme une petite maison isolée ou un
-volume très allongé. Cette grandeur complète les déperditions en résumant, en un seul nombre,
-l'effet de la géométrie sur les pertes.
-
+\feat{c5}{5.\quad Compacité — Coefficient de forme (m\textsuperscript{-1})}
+À volume égal, une forme ramassée expose moins de surface qu'une forme étalée : elle perd moins.
+Faible = compact (immeuble) ; élevée = dispersé (petite maison).
 \[
-\text{compacité} = \frac{\text{surface déperditive}}{\text{volume}}
+\text{compacité} = \frac{\text{surface déperditive}}{V}
 \]
+\ou{surface déperditive = somme des parois donnant sur l'extérieur (murs, toit, sol, fenêtres, portes).}
+\src{out.params.*\_area, volume estimé $A_{\text{pl}}\times 2{,}5$}
 
-\textbf{Attributs sources :} les surfaces \attr{out.params} (murs, toit, fenêtres, portes) pour le
-numérateur ; le volume estimé ($A_{\text{plancher}} \times 2{,}5$~m) pour le dénominateur.
+\vspace{3pt}
+\noindent\colorbox{c1!8}{\begin{minipage}{0.985\textwidth}
+\textbf{\textcolor{c1}{Exemple global}} — un logement du jeu de données (murs peu isolés, simple vitrage) :
 
-\vspace{6pt}
+\smallskip
+{\small
+\begin{tabular}{@{}>{\bfseries}l l | >{\bfseries}l l@{}}
+\textcolor{c1}{UA} & $390$ W/K & \textcolor{c3}{C} & $11\,600$ kJ/K \\
+\textcolor{c2}{H\textsubscript{ve}} & $75$ W/K & \textcolor{c4}{A\textsubscript{solaire}} & $4{,}4$ m\textsuperscript{2} \\
+\multicolumn{2}{l|}{\textbf{Déperdition totale} $H = UA + H_{ve} = 465$ W/K} & \textcolor{c5}{compacité} & $0{,}85$ m\textsuperscript{-1} \\
+\end{tabular}}
 
-\textit{En synthèse, ces cinq nombres — trois déperditions (UA, H\textsubscript{ve}), les apports
-solaires (A\textsubscript{solaire}), l'inertie (C) et la forme (compacité) — résument l'enveloppe et
-la géométrie du bâtiment. Ils sont calculables sur l'ensemble des 550\,000 bâtiments et directement
-exploitables par un modèle RC ou par un modèle d'apprentissage allégé.}
+\smallskip
+{\small\textit{Lecture :} par 20~°C dedans et 0~°C dehors ($\Delta T=20$), les pertes valent
+$H\times\Delta T = 465\times20 \approx 9{,}3$~kW ; l'inertie $C$ stocke $\approx 3{,}2$~kWh par °C,
+ce qui lisse les variations ; l'\textcolor{c4}{$A_{\text{solaire}}$} et la \textcolor{c5}{compacité}
+modulent respectivement les apports gratuits et l'exposition de la forme.}
+\end{minipage}}
 
 \end{document}
