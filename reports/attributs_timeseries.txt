@@ -1,0 +1,232 @@
+============================================================
+Dimensions du dataset
+============================================================
+(35040, 192)
+
+============================================================
+Liste des colonnes
+============================================================
+  1. bldg_id
+  2. timestamp
+  3. in.sqft
+  4. out.electricity.ceiling_fan.energy_consumption..kwh
+  5. out.electricity.clothes_dryer.energy_consumption..kwh
+  6. out.electricity.clothes_washer.energy_consumption..kwh
+  7. out.electricity.cooling.energy_consumption..kwh
+  8. out.electricity.cooling_fans_pumps.energy_consumption..kwh
+  9. out.electricity.dishwasher.energy_consumption..kwh
+ 10. out.electricity.ev_charging.energy_consumption..kwh
+ 11. out.electricity.freezer.energy_consumption..kwh
+ 12. out.electricity.heating.energy_consumption..kwh
+ 13. out.electricity.heating_fans_pumps.energy_consumption..kwh
+ 14. out.electricity.heating_hp_bkup.energy_consumption..kwh
+ 15. out.electricity.heating_hp_bkup_fa.energy_consumption..kwh
+ 16. out.electricity.hot_water.energy_consumption..kwh
+ 17. out.electricity.hot_water_solar_th.energy_consumption..kwh
+ 18. out.electricity.lighting_exterior.energy_consumption..kwh
+ 19. out.electricity.lighting_garage.energy_consumption..kwh
+ 20. out.electricity.lighting_interior.energy_consumption..kwh
+ 21. out.electricity.mech_vent.energy_consumption..kwh
+ 22. out.electricity.net.energy_consumption..kwh
+ 23. out.electricity.permanent_spa_heat.energy_consumption..kwh
+ 24. out.electricity.permanent_spa_pump.energy_consumption..kwh
+ 25. out.electricity.plug_loads.energy_consumption..kwh
+ 26. out.electricity.pool_heater.energy_consumption..kwh
+ 27. out.electricity.pool_pump.energy_consumption..kwh
+ 28. out.electricity.pv.energy_consumption..kwh
+ 29. out.electricity.range_oven.energy_consumption..kwh
+ 30. out.electricity.refrigerator.energy_consumption..kwh
+ 31. out.electricity.television.energy_consumption..kwh
+ 32. out.electricity.total.energy_consumption..kwh
+ 33. out.electricity.well_pump.energy_consumption..kwh
+ 34. out.fuel_oil.heating.energy_consumption..kwh
+ 35. out.fuel_oil.hot_water.energy_consumption..kwh
+ 36. out.fuel_oil.total.energy_consumption..kwh
+ 37. out.natural_gas.clothes_dryer.energy_consumption..kwh
+ 38. out.natural_gas.fireplace.energy_consumption..kwh
+ 39. out.natural_gas.grill.energy_consumption..kwh
+ 40. out.natural_gas.heating.energy_consumption..kwh
+ 41. out.natural_gas.heating_hp_bkup.energy_consumption..kwh
+ 42. out.natural_gas.hot_water.energy_consumption..kwh
+ 43. out.natural_gas.lighting.energy_consumption..kwh
+ 44. out.natural_gas.permanent_spa_heat.energy_consumption..kwh
+ 45. out.natural_gas.pool_heater.energy_consumption..kwh
+ 46. out.natural_gas.range_oven.energy_consumption..kwh
+ 47. out.natural_gas.total.energy_consumption..kwh
+ 48. out.propane.clothes_dryer.energy_consumption..kwh
+ 49. out.propane.heating.energy_consumption..kwh
+ 50. out.propane.hot_water.energy_consumption..kwh
+ 51. out.propane.range_oven.energy_consumption..kwh
+ 52. out.propane.total.energy_consumption..kwh
+ 53. out.site_energy.net.energy_consumption..kwh
+ 54. out.site_energy.total.energy_consumption..kwh
+ 55. out.electricity.ceiling_fan.energy_consumption_intensity..kwh_per_ft2
+ 56. out.electricity.clothes_dryer.energy_consumption_intensity..kwh_per_ft2
+ 57. out.electricity.clothes_washer.energy_consumption_intensity..kwh_per_ft2
+ 58. out.electricity.cooling.energy_consumption_intensity..kwh_per_ft2
+ 59. out.electricity.cooling_fans_pumps.energy_consumption_intensity..kwh_per_ft2
+ 60. out.electricity.dishwasher.energy_consumption_intensity..kwh_per_ft2
+ 61. out.electricity.ev_charging.energy_consumption_intensity..kwh_per_ft2
+ 62. out.electricity.freezer.energy_consumption_intensity..kwh_per_ft2
+ 63. out.electricity.heating.energy_consumption_intensity..kwh_per_ft2
+ 64. out.electricity.heating_fans_pumps.energy_consumption_intensity..kwh_per_ft2
+ 65. out.electricity.heating_hp_bkup.energy_consumption_intensity..kwh_per_ft2
+ 66. out.electricity.heating_hp_bkup_fa.energy_consumption_intensity..kwh_per_ft2
+ 67. out.electricity.hot_water.energy_consumption_intensity..kwh_per_ft2
+ 68. out.electricity.hot_water_solar_th.energy_consumption_intensity..kwh_per_ft2
+ 69. out.electricity.lighting_exterior.energy_consumption_intensity..kwh_per_ft2
+ 70. out.electricity.lighting_garage.energy_consumption_intensity..kwh_per_ft2
+ 71. out.electricity.lighting_interior.energy_consumption_intensity..kwh_per_ft2
+ 72. out.electricity.mech_vent.energy_consumption_intensity..kwh_per_ft2
+ 73. out.electricity.net.energy_consumption_intensity..kwh_per_ft2
+ 74. out.electricity.permanent_spa_heat.energy_consumption_intensity..kwh_per_ft2
+ 75. out.electricity.permanent_spa_pump.energy_consumption_intensity..kwh_per_ft2
+ 76. out.electricity.plug_loads.energy_consumption_intensity..kwh_per_ft2
+ 77. out.electricity.pool_heater.energy_consumption_intensity..kwh_per_ft2
+ 78. out.electricity.pool_pump.energy_consumption_intensity..kwh_per_ft2
+ 79. out.electricity.pv.energy_consumption_intensity..kwh_per_ft2
+ 80. out.electricity.range_oven.energy_consumption_intensity..kwh_per_ft2
+ 81. out.electricity.refrigerator.energy_consumption_intensity..kwh_per_ft2
+ 82. out.electricity.television.energy_consumption_intensity..kwh_per_ft2
+ 83. out.electricity.total.energy_consumption_intensity..kwh_per_ft2
+ 84. out.electricity.well_pump.energy_consumption_intensity..kwh_per_ft2
+ 85. out.fuel_oil.heating.energy_consumption_intensity..kwh_per_ft2
+ 86. out.fuel_oil.hot_water.energy_consumption_intensity..kwh_per_ft2
+ 87. out.fuel_oil.total.energy_consumption_intensity..kwh_per_ft2
+ 88. out.natural_gas.clothes_dryer.energy_consumption_intensity..kwh_per_ft2
+ 89. out.natural_gas.fireplace.energy_consumption_intensity..kwh_per_ft2
+ 90. out.natural_gas.grill.energy_consumption_intensity..kwh_per_ft2
+ 91. out.natural_gas.heating.energy_consumption_intensity..kwh_per_ft2
+ 92. out.natural_gas.heating_hp_bkup.energy_consumption_intensity..kwh_per_ft2
+ 93. out.natural_gas.hot_water.energy_consumption_intensity..kwh_per_ft2
+ 94. out.natural_gas.lighting.energy_consumption_intensity..kwh_per_ft2
+ 95. out.natural_gas.permanent_spa_heat.energy_consumption_intensity..kwh_per_ft2
+ 96. out.natural_gas.pool_heater.energy_consumption_intensity..kwh_per_ft2
+ 97. out.natural_gas.range_oven.energy_consumption_intensity..kwh_per_ft2
+ 98. out.natural_gas.total.energy_consumption_intensity..kwh_per_ft2
+ 99. out.propane.clothes_dryer.energy_consumption_intensity..kwh_per_ft2
+100. out.propane.heating.energy_consumption_intensity..kwh_per_ft2
+101. out.propane.hot_water.energy_consumption_intensity..kwh_per_ft2
+102. out.propane.range_oven.energy_consumption_intensity..kwh_per_ft2
+103. out.propane.total.energy_consumption_intensity..kwh_per_ft2
+104. out.site_energy.net.energy_consumption_intensity..kwh_per_ft2
+105. out.site_energy.total.energy_consumption_intensity..kwh_per_ft2
+106. out.emissions.electricity.total.aer_highrecost_avg..co2e_kg
+107. out.emissions.electricity.total.aer_highrecostlowngprice_avg..co2e_kg
+108. out.emissions.electricity.total.aer_lowrecost_avg..co2e_kg
+109. out.emissions.electricity.total.aer_lowrecosthighngprice_avg..co2e_kg
+110. out.emissions.electricity.total.aer_midcase_avg..co2e_kg
+111. out.emissions.electricity.total.lrmer_highrecost_15..co2e_kg
+112. out.emissions.electricity.total.lrmer_highrecost_25..co2e_kg
+113. out.emissions.electricity.total.lrmer_highrecostlowngprice_15..co2e_kg
+114. out.emissions.electricity.total.lrmer_highrecostlowngprice_25..co2e_kg
+115. out.emissions.electricity.total.lrmer_lowrecost_15..co2e_kg
+116. out.emissions.electricity.total.lrmer_lowrecost_25..co2e_kg
+117. out.emissions.electricity.total.lrmer_lowrecosthighngprice_15..co2e_kg
+118. out.emissions.electricity.total.lrmer_lowrecosthighngprice_25..co2e_kg
+119. out.emissions.electricity.total.lrmer_midcase_15..co2e_kg
+120. out.emissions.electricity.total.lrmer_midcase_25..co2e_kg
+121. out.emissions.natural_gas.total..co2e_kg
+122. out.emissions.propane.total..co2e_kg
+123. out.emissions.fuel_oil.total..co2e_kg
+124. out.emissions.total.aer_highrecost_avg..co2e_kg
+125. out.emissions.total.aer_highrecostlowngprice_avg..co2e_kg
+126. out.emissions.total.aer_lowrecost_avg..co2e_kg
+127. out.emissions.total.aer_lowrecosthighngprice_avg..co2e_kg
+128. out.emissions.total.aer_midcase_avg..co2e_kg
+129. out.emissions.total.lrmer_highrecost_15..co2e_kg
+130. out.emissions.total.lrmer_highrecost_25..co2e_kg
+131. out.emissions.total.lrmer_highrecostlowngprice_15..co2e_kg
+132. out.emissions.total.lrmer_highrecostlowngprice_25..co2e_kg
+133. out.emissions.total.lrmer_lowrecost_15..co2e_kg
+134. out.emissions.total.lrmer_lowrecost_25..co2e_kg
+135. out.emissions.total.lrmer_lowrecosthighngprice_15..co2e_kg
+136. out.emissions.total.lrmer_lowrecosthighngprice_25..co2e_kg
+137. out.emissions.total.lrmer_midcase_15..co2e_kg
+138. out.emissions.total.lrmer_midcase_25..co2e_kg
+139. out.unmet_hours.cooling..hour
+140. out.unmet_hours.ev_driving..hour
+141. out.unmet_hours.heating..hour
+142. out.hot_water.clothes_washer..gal
+143. out.hot_water.dishwasher..gal
+144. out.hot_water.distribution_waste..gal
+145. out.hot_water.fixtures..gal
+146. out.load.cooling.energy_delivered..kbtu
+147. out.load.heating.energy_delivered..kbtu
+148. out.load.heating_heat_pump_backup..kbtu
+149. out.load.hot_water.energy_delivered..kbtu
+150. out.load.hot_water_solar_thermal..kbtu
+151. out.load.hot_water_tank_losses..kbtu
+152. out.indoor_airflow.infiltration..cfm
+153. out.indoor_airflow.mechanical_ventilation..cfm
+154. out.indoor_airflow.natural_ventilation..cfm
+155. out.indoor_dewpoint_temperature.conditioned_space..c
+156. out.indoor_humidity_ratio.conditioned_space..kgwater_per_kgdryair
+157. out.indoor_operative_temperature.conditioned_space..c
+158. out.indoor_radiant_temperature.conditioned_space..c
+159. out.indoor_relative_humidity.conditioned_space..percentage
+160. out.indoor_temperature.conditioned_space..c
+161. out.outdoor_air_drybulb_temp..c
+162. out.outdoor_air_relative_humidity..percentage
+163. out.outdoor_air_wetbulb_temp..c
+164. out.outdoor_humidity_ratio..kgwater_per_kgdryair
+165. out.people.sensible_heating_rate..watt
+166. out.people.total_heating_rate..watt
+167. out.weather.diffuse_solar_radiation..watt_per_m2
+168. out.weather.direct_normal_solar_radiation..watt_per_m2
+169. out.weather.wind_speed..meter_per_second
+170. out.schedules.ceiling_fan
+171. out.schedules.clothes_dryer
+172. out.schedules.clothes_washer
+173. out.schedules.cooking_range
+174. out.schedules.cooling_setpoint..c
+175. out.schedules.dishwasher
+176. out.schedules.electric_vehicle_charging
+177. out.schedules.electric_vehicle_discharging
+178. out.schedules.heating_setpoint..c
+179. out.schedules.hot_water_clothes_washer
+180. out.schedules.hot_water_dishwasher
+181. out.schedules.hot_water_fixtures
+182. out.schedules.lighting_garage
+183. out.schedules.lighting_interior
+184. out.schedules.no_space_cooling
+185. out.schedules.no_space_heating
+186. out.schedules.occupants
+187. out.schedules.peak_period
+188. out.schedules.plug_loads_other
+189. out.schedules.plug_loads_tv
+190. out.schedules.power_outage
+191. out.schedules.pre_peak_period
+192. out.schedules.vacancy
+
+============================================================
+Types des variables
+============================================================
+bldg_id                                                          uint32
+timestamp                                                datetime64[ms]
+in.sqft                                                         float32
+out.electricity.ceiling_fan.energy_consumption..kwh             float32
+out.electricity.clothes_dryer.energy_consumption..kwh           float32
+                                                              ...      
+out.schedules.plug_loads_other                                  float32
+out.schedules.plug_loads_tv                                     float32
+out.schedules.power_outage                                      float32
+out.schedules.pre_peak_period                                   float32
+out.schedules.vacancy                                           float32
+Length: 192, dtype: object
+
+============================================================
+Nombre de valeurs manquantes
+============================================================
+bldg_id                                                      0
+timestamp                                                    0
+in.sqft                                                      0
+out.electricity.ceiling_fan.energy_consumption..kwh          0
+out.electricity.clothes_dryer.energy_consumption..kwh        0
+                                                         ...  
+out.schedules.plug_loads_other                               0
+out.schedules.plug_loads_tv                                  0
+out.schedules.power_outage                                   0
+out.schedules.pre_peak_period                            35040
+out.schedules.vacancy                                        0
+Length: 192, dtype: int64
