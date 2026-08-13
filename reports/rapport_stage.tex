@@ -25,6 +25,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{textcomp}
 \usepackage{geometry}
 \usepackage{booktabs}
 \usepackage{array}
@@ -40,9 +41,25 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[hidelinks]{hyperref}
+\usepackage{pdflscape}
+\usepackage{colortbl}
+\usepackage{pifont}
+\usepackage{longtable}
 
 \geometry{margin=2.5cm}
-\graphicspath{{figures/}}
+\graphicspath{{figures/}{../figures/}}
+
+% ---------------------------------------------------------------------------
+% Mise en page compacte --- règle valable pour tout le rapport, y compris les
+% sections ajoutées par la suite (listes, tableaux, figures, boîtes).
+% ---------------------------------------------------------------------------
+\setlist{nosep, topsep=3pt, itemsep=2pt, parsep=0pt}
+\renewcommand{\arraystretch}{0.92}
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\belowcaptionskip}{2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
 
 % ---------------------------------------------------------------------------
 % Palette « énergie » FlexiMax
@@ -53,6 +70,33 @@
 \definecolor{energygrey}{RGB}{107,114,128}   % gris (texte secondaire)
 
 \newcommand{\code}[1]{\texttt{#1}}
+\providecommand{\degree}{}
+\renewcommand{\degree}{\textdegree}
+
+% ---------------------------------------------------------------------------
+% Couleurs et marqueurs --- tableau détaillé des attributs (\S\ref{sec:agregation-physique})
+% ---------------------------------------------------------------------------
+\definecolor{csocio}{RGB}{255,210,210}
+\definecolor{coccup}{RGB}{210,225,255}
+\definecolor{cmeteo}{RGB}{210,245,215}
+\definecolor{cenvel}{RGB}{255,252,210}
+\definecolor{csyste}{RGB}{235,210,255}
+\definecolor{cusage}{RGB}{255,228,180}
+\definecolor{cblanc}{RGB}{200,245,245}
+\definecolor{cagg}{RGB}{200,235,230}
+\definecolor{hsocio}{RGB}{210,110,110}
+\definecolor{hoccup}{RGB}{100,140,210}
+\definecolor{hmeteo}{RGB}{100,185,120}
+\definecolor{henvel}{RGB}{200,185,60}
+\definecolor{hsyste}{RGB}{160,100,210}
+\definecolor{husage}{RGB}{210,155,60}
+\definecolor{hblanc}{RGB}{60,185,185}
+\definecolor{hagg}{RGB}{40,150,135}
+
+\newcommand{\var}[1]{\texttt{\small #1}}
+\newcommand{\Sup}{\textcolor{red!75!black}{\ding{55}~\textbf{\footnotesize supprimé}}}
+\newcommand{\Keep}{\textcolor{green!50!black}{\ding{51}~\footnotesize conservé}}
+\newcommand{\Newagg}{\textcolor{hagg}{\ding{72}~\textbf{\footnotesize agrégat}}}
 
 % ---------------------------------------------------------------------------
 % Boîtes de guidage
@@ -62,8 +106,8 @@
   colback=energyaccent!8, colframe=energyaccent!85!black,
   coltitle=white, colbacktitle=energyaccent!85!black,
   fonttitle=\bfseries\small, title=#1,
-  boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
-  before skip=8pt, after skip=10pt
+  boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=6pt
 }
 
 \newtcolorbox{resultbox}[1][Résultat déjà disponible]{
@@ -71,15 +115,15 @@
   colback=energygreen!8, colframe=energygreen!60!black,
   coltitle=white, colbacktitle=energygreen!60!black,
   fonttitle=\bfseries\small, title=#1,
-  boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=4pt, bottom=4pt,
-  before skip=8pt, after skip=10pt
+  boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=6pt
 }
 
 \newtcolorbox{figplaceholder}[1][]{
   colback=black!3, colframe=energygrey!70!black,
   boxrule=0.6pt, arc=1pt, halign=center, valign=center,
   height=4cm, fontupper=\itshape\color{energygrey!30!black},
-  before skip=8pt, after skip=10pt, #1
+  before skip=4pt, after skip=6pt, #1
 }
 
 % ---------------------------------------------------------------------------
@@ -88,9 +132,9 @@
 \titleformat{\chapter}[display]
   {\normalfont\bfseries}
   {\filright\normalsize\color{energygrey}\MakeUppercase{\chaptertitlename}~\thechapter}
-  {6pt}
+  {4pt}
   {\filright\Huge\color{energydark}}
-  [\vspace{4pt}{\color{energyaccent}\titlerule[2.2pt]}\vspace{10pt}]
+  [\vspace{2pt}{\color{energyaccent}\titlerule[2.2pt]}\vspace{6pt}]
 
 \titleformat{\section}
   {\large\bfseries\color{energydark}}{\thesection}{0.6em}{}
@@ -197,137 +241,91 @@ recherche.
 \chapter*{Résumé}
 \addcontentsline{toc}{chapter}{Résumé}
 
-La transition énergétique résidentielle américaine pose une question simple en apparence, mais
-redoutablement complexe dans les faits : combien d'électricité un bâtiment va-t-il consommer, et
-pourquoi ? Ce stage, mené dans le cadre du programme FlexiMax (MINES Paris --- PSL / ARMINES,
-France 2030 / ADEME), part de ce constat pour construire, pas à pas, une chaîne complète de
-modélisation de la consommation énergétique résidentielle à partir des données de simulation
-ResStock (NREL) --- près de 550\,000 bâtiments, chacun décrit par plusieurs centaines de
-variables et une série temporelle horaire sur une année complète.
+Combien d'électricité un bâtiment résidentiel américain va-t-il consommer, et pourquoi ? Ce
+stage, mené dans le cadre du programme FlexiMax (MINES Paris --- PSL / ARMINES, France 2030 /
+ADEME), construit pas à pas une chaîne de modélisation de la consommation énergétique
+résidentielle à partir des données de simulation ResStock (NREL) --- près de 550\,000 bâtiments,
+chacun décrit par plusieurs centaines de variables et une série temporelle horaire sur un an.
 
-L'enquête commence par l'exploration : sous les 771 colonnes brutes du jeu de métadonnées se
-cachent des doublons, des artefacts de simulation et des variables réellement informatives. Une
-fois le bruit écarté (391 colonnes retenues), un même indice revient sans cesse au fil des
-analyses --- la zone climatique. Elle structure la consommation de chauffage et de climatisation,
-conditionne le potentiel de flexibilité des thermostats (seulement 43,8\,\% des bâtiments
-disposent d'un thermostat programmable pour le chauffage), et réapparaît plus tard comme le
-déterminant n°1 identifié par le modèle prédictif final. Ce fil conducteur --- la géographie
-climatique comme clé de lecture de la consommation --- traverse tout le rapport, depuis
-l'exploration des métadonnées, en passant par le clustering des profils journaliers, jusqu'à
-l'importance des variables du modèle LightGBM.
+L'exploration révèle que, sous les 771 colonnes brutes du jeu de métadonnées, se cachent des
+doublons et artefacts de simulation (391 colonnes retenues) ; un même facteur revient sans cesse
+--- la zone climatique. Elle structure la consommation de chauffage/climatisation, borne le
+potentiel de flexibilité des thermostats (43,8\,\% seulement des bâtiments disposent d'un
+thermostat programmable pour le chauffage), et réapparaîtra comme déterminant n°1 du modèle
+prédictif final. Ce fil conducteur --- la géographie climatique comme clé de lecture de la
+consommation --- traverse tout le rapport, de l'exploration au clustering des profils
+journaliers jusqu'à l'importance des variables du modèle LightGBM.
 
-Le récit se prolonge avec le choix, motivé par la cohérence du périmètre du stage, de recentrer
-l'analyse sur les bâtiments \textbf{tout-électriques}. Un pipeline de feature engineering
-transforme ensuite les variables catégorielles brutes de ResStock en un jeu exploitable, réduit à
-une trentaine de variables physiquement interprétables. Le clustering des profils de consommation
-journaliers révèle des « jours types » récurrents, distincts par leur forme et leur amplitude,
-avant qu'un modèle LightGBM entraîné sur les métadonnées n'atteigne un $R^2$ de 0,847 sur la
-consommation électrique (contre $-0,057$ pour une baseline naïve), avec un écart minime par
-rapport à un jeu de features réduit et interprétable. Enfin, une architecture hybride RNN/MLP
-explore deux problèmes complémentaires sur les séries temporelles horaires : prévoir la
-consommation à l'heure suivante, et extrapoler la consommation annuelle à partir de seulement
-90 jours d'observation.
+Pour la cohérence du périmètre, l'analyse se recentre ensuite sur les bâtiments
+\textbf{tout-électriques}. Un pipeline de feature engineering réduit les variables catégorielles
+brutes à une trentaine de features physiquement interprétables. Le clustering des profils
+journaliers révèle des « jours types » récurrents, avant qu'un modèle LightGBM n'atteigne un
+$R^2$ de 0,847 sur la consommation électrique (contre $-0,057$ pour une baseline naïve), avec un
+écart minime face à un jeu de features réduit. Une architecture hybride RNN/MLP explore enfin
+deux problèmes sur les séries horaires : prévoir la consommation à l'heure suivante, et
+extrapoler la consommation annuelle à partir de 90 jours d'observation.
 
-Au terme de ce parcours, le rapport livre moins une collection de modèles qu'une lecture
-cohérente de ce qui détermine la consommation électrique résidentielle --- et une chaîne de
-traitement reproductible pour l'étendre.
+Le rapport livre ainsi moins une collection de modèles qu'une lecture cohérente des déterminants
+de la consommation électrique résidentielle --- et une chaîne reproductible pour l'étendre.
 
 \section*{Abstract}
 
-The US residential energy transition raises a question that sounds simple but is anything but:
-how much electricity will a home draw, and why? This internship, carried out within the FlexiMax
-program (MINES Paris --- PSL / ARMINES, France 2030 / ADEME), starts from that question to build,
-step by step, a complete residential energy consumption modelling pipeline based on the ResStock
-simulation dataset (NREL) --- close to 550,000 buildings, each described by hundreds of
-attributes and a full year of hourly time series.
+How much electricity will a US home draw, and why? This internship, carried out within the
+FlexiMax program (MINES Paris --- PSL / ARMINES, France 2030 / ADEME), builds step by step a
+residential energy consumption modelling pipeline based on the ResStock simulation dataset
+(NREL) --- close to 550,000 buildings, each described by hundreds of attributes and a full year
+of hourly time series.
 
-The investigation begins with exploration: behind the 771 raw metadata columns lie duplicates,
-simulation artifacts, and genuinely informative variables. Once the noise is filtered out (391
-columns retained), one clue keeps resurfacing --- the climate zone. It shapes heating and
-cooling consumption, bounds the flexibility potential of thermostats (only 43.8\% of buildings
-have a programmable heating thermostat), and later re-emerges as the number-one determinant
-identified by the final predictive model. This thread --- climate geography as the key to
-reading consumption --- runs through the entire report, from metadata exploration, through
-daily-profile clustering, to LightGBM feature importance.
+Exploration shows that behind the 771 raw metadata columns lie duplicates and simulation
+artifacts (391 columns retained); one factor keeps resurfacing --- the climate zone. It shapes
+heating/cooling consumption, bounds thermostat flexibility potential (only 43.8\% of buildings
+have a programmable heating thermostat), and later re-emerges as the top determinant of the
+final predictive model. This thread --- climate geography as the key to reading consumption ---
+runs through the report, from metadata exploration to daily-profile clustering to LightGBM
+feature importance.
 
-The story continues with the decision, made to keep the internship's scope coherent, to focus
-the analysis on \textbf{all-electric} buildings. A feature engineering pipeline then turns
-ResStock's raw categorical variables into a usable set, reduced to about thirty physically
-interpretable features. Clustering the daily consumption profiles reveals recurring "typical
-days", distinct in shape and amplitude, before a LightGBM model trained on the metadata reaches
-an $R^2$ of 0.847 on electricity consumption (versus $-0.057$ for a naive baseline), with only a
-small gap compared to a reduced, interpretable feature set. Finally, a hybrid RNN/MLP architecture
-tackles two complementary problems on the hourly time series: forecasting next-hour consumption,
-and extrapolating annual consumption from just 90 days of observation.
+For scope coherence, the analysis then focuses on \textbf{all-electric} buildings. A feature
+engineering pipeline reduces ResStock's raw categorical variables to about thirty physically
+interpretable features. Clustering the daily profiles reveals recurring "typical days" before a
+LightGBM model reaches an $R^2$ of 0.847 on electricity consumption (versus $-0.057$ for a naive
+baseline), with only a small gap versus a reduced feature set. A hybrid RNN/MLP architecture
+finally tackles two problems on the hourly series: forecasting next-hour consumption, and
+extrapolating annual consumption from 90 days of observation.
 
-By the end of this journey, the report delivers less a collection of models than a coherent
-reading of what drives residential electricity consumption --- and a reproducible pipeline to
-extend it further.
+The report thus delivers less a collection of models than a coherent reading of what drives
+residential electricity consumption --- and a reproducible pipeline to extend it.
 
 \tableofcontents
 \listoffigures
 \listoftables
-\newpage
-
-% ============================================================================
-\chapter{Introduction}
-
-\begin{todobox}[À rédiger]
-\begin{itemize}
-  \item Contexte du stage : MINES Paris--PSL / ARMINES, programme France 2030 / ADEME.
-  \item Enjeu général : flexibilité énergétique résidentielle, pourquoi prédire la
-  consommation est une brique nécessaire (diagnostic, dimensionnement, pilotage).
-  \item Objectif retenu pour ce stage : prédire la consommation énergétique des bâtiments
-  (principalement électrique, périmètre restreint aux bâtiments \textbf{tout-électriques} --- cf.
-  décision de cadrage) à partir des métadonnées ResStock, des séries temporelles individuelles
-  et de la météo.
-  \item Annonce du plan : exploration/nettoyage (ch.~\ref{ch:exploration}), feature engineering
-  (ch.~\ref{ch:features}), clustering des profils de consommation (ch.~\ref{ch:clustering}),
-  modélisation LightGBM/MLP (ch.~\ref{ch:modelisation}), RNN/MLP hybride
-  (ch.~\ref{ch:rnn}), synthèse et perspectives.
-\end{itemize}
-\end{todobox}
-
 % ============================================================================
 \chapter{Contexte : le stage, FlexiMax et les données}
-
-\section{Le projet FlexiMax}
-\begin{todobox}[Source : README.md / CONTEXT\_PROJECT.md, à reformuler pour un lecteur externe]
-Présenter le projet FlexiMax, son inscription dans le programme France 2030 / ADEME, et
-préciser explicitement que l'objectif retenu est la \textbf{prédiction de consommation}
-(ne pas reprendre telle quelle la liste de missions du README --- elle mentionne aussi la
-flexibilité HVAC/upgrades dr\_001--dr\_005, hors périmètre confirmé de ce stage).
-\end{todobox}
+\label{ch:contexte}
 
 \section{Le jeu de données ResStock}
 \label{sec:jeu-donnees-resstock}
 Le jeu de données central de ce stage est \textbf{ResStock 2025 Release 1}, produit par le
-National Renewable Energy Laboratory (NREL) : une simulation détaillée, bâtiment par bâtiment,
-du parc résidentiel américain, construite à partir de modèles EnergyPlus calibrés sur les
-caractéristiques réelles du parc (recensement, enquêtes RECS, données de construction). Le
-fichier national \code{upgrade0.parquet} correspond au scénario \emph{baseline} (avant
-application d'upgrades) : 549\,971 bâtiments, chacun décrit à l'origine par 771 colonnes.
+National Renewable Energy Laboratory (NREL) : une simulation bâtiment par bâtiment du parc
+résidentiel américain, à partir de modèles EnergyPlus calibrés sur le parc réel (recensement,
+enquêtes RECS). Le fichier national \code{upgrade0.parquet} --- scénario \emph{baseline}, avant
+upgrades --- couvre 549\,971 bâtiments décrits par 771 colonnes.
 
-Ces colonnes se répartissent en deux grandes familles, une distinction qui structure tout le
-reste du rapport :
+Ces colonnes se répartissent en deux familles, une distinction qui structure tout le rapport :
 \begin{itemize}
-  \item les variables \textbf{\code{in.*}} (« inputs ») décrivent le bâtiment tel qu'il est
-  simulé : localisation, géométrie, enveloppe thermique, système HVAC, appareils, profil
-  socio-économique des occupants --- ce sont les variables exploitées comme \emph{features} par
-  les modèles prédictifs (chapitres~\ref{ch:exploration} à \ref{ch:modelisation}) ;
-  \item les variables \textbf{\code{out.*}} (« outputs ») sont les résultats de la simulation
-  EnergyPlus : consommations d'énergie par usage et par vecteur énergétique (électricité, gaz
-  naturel, propane, fioul), émissions de CO$_2$e, factures, dimensionnement des équipements,
-  heures d'inconfort thermique... Ce sont elles qui fournissent les \emph{cibles} des modèles
-  (\code{out.electricity.total.energy\_consumption..kwh} pour la consommation électrique
-  annuelle, par exemple), ainsi que plusieurs indicateurs utilisés comme grille de lecture
-  (décomposition par usage, cf. \S\ref{ch:exploration}).
+  \item les variables \textbf{\code{in.*}} (« inputs ») décrivent le bâtiment simulé :
+  localisation, géométrie, enveloppe thermique, système HVAC, appareils, profil socio-économique
+  --- ce sont les \emph{features} des modèles prédictifs ;
+  \item les variables \textbf{\code{out.*}} (« outputs ») sont les résultats de simulation
+  EnergyPlus : consommations par usage et vecteur énergétique (électricité, gaz naturel, propane,
+  fioul), émissions de CO$_2$e, factures, dimensionnement, heures d'inconfort... Elles fournissent
+  les \emph{cibles} des modèles (\code{out.electricity.total.energy\_consumption..kwh} pour la
+  consommation électrique annuelle) et plusieurs indicateurs de lecture (décomposition par usage,
+  cf. \S\ref{sec:visual-national}).
 \end{itemize}
 
 \begin{resultbox}[Répartition \code{in.*} / \code{out.*} --- Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb}]
-Après nettoyage (\S\ref{sec:nettoyage-metadata}), les 391 colonnes conservées se répartissent en
-165 variables \code{in.*}, 221 variables \code{out.*} et 5 colonnes d'identification/pondération
-(\code{bldg\_id}, \code{completed\_status}, \code{upgrade}, \code{weight}, \code{applicability}).
+Après nettoyage (\S\ref{sec:nettoyage-metadata}), les 391 colonnes se répartissent en 165
+\code{in.*}, 221 \code{out.*} et 5 colonnes d'identification/pondération.
 \begin{table}[H]
 \centering
 \caption{Structure du jeu de métadonnées nettoyé (391 colonnes, 549\,971 bâtiments).}
@@ -341,61 +339,69 @@ Identifiants et pondération (\code{bldg\_id}, \code{weight}...)  & 5 \\
 \bottomrule
 \end{tabular}
 \end{table}
+Ce ratio out/in (1,3 sortie par entrée) reflète la richesse des sorties EnergyPlus
+(décomposition fine par usage et vecteur) face à des entrées plus synthétiques : la difficulté
+du problème de prédiction ne vient donc pas d'un manque de cibles, mais du choix de la bonne
+cible parmi les \code{out.*} et des bonnes \emph{features} parmi les \code{in.*}.
 \end{resultbox}
 
-Au-delà des métadonnées, deux autres sources de données complètent le jeu ResStock : les séries
-temporelles individuelles par bâtiment (pas de temps 15~minutes, 35\,040 lignes par année,
-téléchargées à la demande depuis l'OEDI via \code{extraction\_timeseries\_oedi.ipynb}) et les
-données météo horaires associées à chaque zone climatique ASHRAE, utilisées par EnergyPlus pour
-produire les simulations. Le guide technique ResStock
-(\code{ResStockTechnicalReferenceGuide\_2025\_1.pdf}, disponible dans \code{reports/figures/})
-documente la définition exacte de chaque variable citée dans ce rapport.
+Deux autres sources complètent le jeu ResStock : les séries temporelles individuelles par
+bâtiment (pas 15~minutes, 35\,040 lignes/an, téléchargées depuis l'OEDI via
+\code{extraction\_timeseries\_oedi.ipynb}) et les données météo horaires par zone climatique
+ASHRAE utilisées par EnergyPlus. Le guide technique ResStock
+(\code{ResStockTechnicalReferenceGuide\_2025\_1.pdf}, dans \code{reports/figures/}) documente la
+définition exacte de chaque variable citée dans ce rapport.
 
-\section{Cadrage : périmètre tout-électrique}
-\label{sec:cadrage-tout-electrique}
-Le stage a d'abord visé cinq cibles héritées des sorties ResStock : la consommation
-d'électricité, de gaz naturel, de propane, de fioul, ainsi que les émissions de CO$_2$e associées
-(chapitre~\ref{ch:modelisation}). Or un bâtiment n'utilise jamais l'ensemble de ces vecteurs
-énergétiques à la fois --- il est chauffé à l'électricité, au gaz, au propane \emph{ou} au fioul
---- si bien que le gaz naturel, le propane et le fioul sont des cibles \emph{structurellement
-nulles} pour une large part du parc (tout bâtiment ne les utilisant pas). Cette hétérogénéité
-s'est traduite par de grandes erreurs de prédiction sur ces trois cibles : le $R^2$ de la
-baseline naïve est le plus dégradé pour le gaz naturel ($-0,253$, contre $-0,057$ pour
-l'électricité), et même le meilleur modèle entraîné (LightGBM) plafonne nettement plus bas sur le
-propane ($R^2=0,503$) et le fioul ($R^2=0,674$) que sur l'électricité ($R^2=0,847$) --- ce sont
-d'ailleurs les points faibles constants identifiés au chapitre~\ref{ch:modelisation}
-(cibles rares, \emph{zero-inflated}).
+\textbf{Un choix méthodologique à expliciter :} FlexiMax est un projet français (MINES Paris
+--- PSL / ARMINES, France 2030 / ADEME), mais aucune base résidentielle française de résolution
+et de richesse comparable à ResStock n'était disponible pour ce stage --- d'où le recours aux
+données américaines du NREL. Ce choix n'est pas neutre : le parc américain diffère du parc
+français sur plusieurs dimensions rencontrées au fil de l'analyse --- le mix énergétique du
+chauffage (part du gaz et du fioul bien plus importante aux États-Unis qu'en France), les
+habitudes de vie et d'occupation, la mobilité (le
+véhicule électrique et son infrastructure de recharge sont modélisés selon des usages
+nord-américains) et le parc d'équipements électroménagers (types, tailles, rendements). Les
+résultats de ce rapport décrivent donc le parc résidentiel \emph{américain} ; leur transposition
+au contexte français reste à valider dès que des données comparables seront disponibles.
 
-C'est ce constat, survenu en cours de stage lors des premiers essais de modélisation multi-cibles,
-qui a motivé le recentrage du périmètre sur les bâtiments \textbf{tout-électriques} (aucun
-chauffage/appareil au gaz, propane ou fioul) : l'électricité devient la cible
-principale/unique du reste du rapport, ce qui évite le problème des cibles \emph{zero-inflated}
-et simplifie l'interprétation des résultats. Ce choix est également cohérent avec l'échantillon
-de 100 bâtiments tout-électriques déjà préparé pour le clustering et le RNN/MLP
-(\code{data/raw/timeseries\_100\_all\_electric}).
+\section{Nettoyage des métadonnées}
+\label{sec:nettoyage-metadata}
+Avant toute exploration, encore faut-il s'assurer que les 771 colonnes brutes sont exploitables :
+\begin{resultbox}[Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb}]
+Le fichier national brut (\code{upgrade0.parquet}) contient 549\,971 bâtiments $\times$ 771
+colonnes. 380 colonnes sont supprimées selon 6 critères, pour 391 colonnes conservées :
+\begin{itemize}
+  \item \code{upgrade.*} (20 col.) --- toutes vides dans le scénario baseline (\code{upgrade=0}) ;
+  \item \code{calc.weighted.*} (172 col.) --- agrégats de pondération, non utiles bâtiment par
+  bâtiment ;
+  \item \code{out.*} \emph{savings/reduction} (164 col.) --- économies vs upgrade, toutes à 0 en
+  baseline ;
+  \item \code{in.simulation\_control.*} (6 col.) --- identiques pour tous les bâtiments ;
+  \item \code{in.utility\_bill.*} (8 col.) --- déjà présentes sous \code{out.utility\_bills.*} ;
+  \item doublons de colonnes « binned » moins précises que leur équivalent continu (10 col.).
+\end{itemize}
+Après nettoyage : 0 colonne entièrement vide, 0 colonne à plus de 50\% de valeurs manquantes.
+Ces suppressions ne traduisent pas un problème de qualité (aucune donnée aberrante ou incomplète)
+mais des artefacts de la méthodologie ResStock elle-même (répétition du scénario \emph{baseline}
+dans les colonnes \code{upgrade.*}/\emph{savings}, doublons d'agrégation) : le jeu nettoyé,
+exporté vers \code{data/processed/metadata\_clean.parquet}, est donc directement exploitable
+sans étape d'imputation.
+\end{resultbox}
 
-% ============================================================================
-\chapter{Exploration et nettoyage des données}
-\label{ch:exploration}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{diagramme_nettoyage.png}
+  \caption{Colonnes gardées vs supprimées par groupe (771 $\to$ 391 colonnes).}
+  \label{fig:nettoyage-diagramme}
+\end{figure}
 
-Ce chapitre réunit les notebooks des dossiers \code{01\_exploration}, \code{02\_nettoyage} et
-\code{03\_visualisation}. Son périmètre est celui des \textbf{métadonnées} ResStock : une ligne
-par bâtiment, décrivant ses caractéristiques (\code{in.*}) et les résultats agrégés de sa
-simulation (\code{out.*}) --- cf. \S\ref{sec:jeu-donnees-resstock} pour la structure du jeu de
-données. Les séries temporelles horaires (consommation par bâtiment, pas 15~minutes) n'y sont
-pas traitées :
-elles sont introduites séparément une fois le sous-échantillon de bâtiments tout-électriques
-constitué (\S\ref{sec:cadrage-tout-electrique}), et font l'objet des chapitres dédiés au
-clustering des profils journaliers (chapitre~\ref{ch:clustering}) et à la modélisation RNN/MLP
-(chapitre~\ref{ch:rnn}).
-
-\section{Vue d'ensemble des variables \code{in.*} et \code{out.*}}
+\section{Structure du jeu nettoyé : variables \code{in.*} et \code{out.*}}
 
 \subsection{Variables \code{in.*}}
 \begin{resultbox}[Source : \code{01\_exploration/exploration\_in\_groups.ipynb}]
-Sur les 391 colonnes du jeu de métadonnées nettoyé (cf. \S\ref{sec:nettoyage-metadata}), 165
-colonnes \code{in.*} décrivent le bâtiment et ses occupants. Elles ont été réparties en 11
-groupes métier (164 colonnes couvertes, seule \code{in.upgrade\_name} reste hors groupe) :
+Sur les 391 colonnes du jeu de métadonnées nettoyé, 165 colonnes \code{in.*} décrivent le
+bâtiment et ses occupants, réparties en 11 groupes métier (164 colonnes couvertes, seule
+\code{in.upgrade\_name} reste hors groupe) :
 \begin{table}[H]
 \centering
 \caption{Les 11 groupes de variables \code{in.*} (549\,971 bâtiments).}
@@ -418,27 +424,18 @@ Occupants et socio-économique & 13 & 0,9\% \\
 \bottomrule
 \end{tabular}
 \end{table}
-Le taux de valeurs manquantes est quasi nul partout : ResStock est une base \emph{simulée} (pas
-de non-réponse d'enquête), le seul groupe présentant un peu de valeurs manquantes étant celui des
-variables de revenu représentatif (groupe Occupants, 0,9\%). Le groupe HVAC est le plus riche
-(42 variables), suivi des appareils électroménagers (28) et de l'enveloppe thermique (17).
+Le taux de manquant quasi nul (base \emph{simulée}, pas de non-réponse d'enquête, seul le groupe
+Occupants en présente 0,9\%) évite tout travail d'imputation --- un confort rare face à des
+données réelles de consommation. La richesse du groupe HVAC (42 variables) en fait le principal
+réservoir de leviers de flexibilité pilotables (thermostats, systèmes), là où enveloppe et
+géométrie (17+20 variables) ne décrivent que des caractéristiques figées du bâti.
 \end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{groupe_geometrie_batiment.png}
-  \caption{Exemple de sortie d'exploration par groupe --- Géométrie du bâtiment (20 variables
-  au total, 3 variables représentatives affichées). Un graphique équivalent est généré pour
-  chacun des 11 groupes (\code{reports/figures/groupe\_*.png}).}
-  \label{fig:groupe-geometrie}
-\end{figure}
 
 \subsection{Variables \code{out.*}}
 \begin{resultbox}[Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb} --- calcul direct sur \code{metadata\_clean.parquet}]
-Les 221 colonnes \code{out.*} sont les résultats de la simulation EnergyPlus pour chaque
-bâtiment. Elles se répartissent en 14 groupes, dominés par la consommation électrique (60 col.)
-et par des paramètres physiques dérivés du bâtiment (57 col. --- surfaces, dimensionnement des
-équipements, contraintes de panneau électrique) :
+Les 221 colonnes \code{out.*} sont les résultats de simulation EnergyPlus, réparties en 14
+groupes, dominés par la consommation électrique (60 col.) et les paramètres physiques dérivés du
+bâtiment (57 col. --- surfaces, dimensionnement, contraintes de panneau électrique) :
 \begin{table}[H]
 \centering
 \caption{Les 14 groupes de variables \code{out.*} (549\,971 bâtiments).}
@@ -464,31 +461,36 @@ Taux d'effort énergétique (\code{energy\_burden})    & 1 & 12,1\% \\
 \bottomrule
 \end{tabular}
 \end{table}
-Comme pour les variables \code{in.*}, le taux de valeurs manquantes reste quasi nul : seule
-\code{out.energy\_burden..percentage} (taux d'effort énergétique, dérivé du revenu du ménage)
-présente un manquant notable (12,1\%), probablement pour les logements vacants ou sans revenu
-déclaré. Cinq cibles concentrent l'essentiel de l'attention du reste du rapport --- la
-consommation totale par vecteur énergétique (\code{out.electricity.total.energy\_consumption..kwh}
-et ses équivalents \code{natural\_gas}/\code{propane}/\code{fuel\_oil}) et les émissions
-associées (\code{out.emissions.total.*}), cf. chapitre~\ref{ch:modelisation}. Le détail de la
-décomposition de la consommation électrique par usage (chauffage, climatisation, eau chaude...)
-est présenté en \S\ref{sec:classification-metier} (Classification métier des variables).
+Seule \code{out.energy\_burden..percentage} présente un manquant notable (12,1\%, probablement
+logements vacants ou sans revenu déclaré). Cinq cibles candidates ressortent de ces 221 colonnes
+--- la consommation totale par vecteur énergétique et les émissions associées --- mais chaque
+vecteur a sa propre distribution et ses propres facteurs explicatifs : c'est cette hétérogénéité
+qui a justifié de n'en retenir qu'une seule, l'électricité, comme cible finale du rapport.
 \end{resultbox}
 
+Le jeu de données posé, une question se pose naturellement : parmi ces 165 variables
+\code{in.*}, lesquelles pèsent réellement sur la consommation ? L'exploration qui suit part du
+facteur le plus immédiat --- la géographie --- avant d'élargir progressivement aux
+caractéristiques du bâtiment lui-même (chapitre~\ref{ch:beyond-climate}).
+
+% ============================================================================
+\chapter{Le climat, premier déterminant de la consommation}
+\label{ch:exploration}
+
 \section{Localisation et zone climatique}
+\label{sec:localisation-climat}
 \begin{resultbox}[Source : \code{exploration\_localisation\_climat.ipynb}]
-La Californie (CA), le Texas (TX) et la Floride (FL) concentrent le plus de bâtiments simulés,
-mais ce sont des états au climat plus doux (CA en particulier) qui affichent les
-consommations moyennes les \emph{plus faibles} du top 20 (8\,030~kWh/an) --- à l'inverse, le
-Tennessee (TN, 15\,887~kWh/an), la Virginie (VA) et le Missouri (MO) dominent en consommation
-moyenne malgré un parc plus petit. Au niveau régional, le Sud (\emph{South}) regroupe à la fois
+La Californie, le Texas et la Floride concentrent le plus de bâtiments simulés, mais ce sont des
+états au climat plus doux (CA en particulier) qui affichent les consommations moyennes les
+\emph{plus faibles} du top 20 (8\,030~kWh/an) --- à l'inverse, le Tennessee (15\,887~kWh/an), la
+Virginie et le Missouri dominent malgré un parc plus petit. Au niveau régional, le Sud regroupe
 le plus de bâtiments (210\,283) et la consommation moyenne la plus élevée ($\sim$14\,400~kWh/an) ;
-le Nord-Est (\emph{Northeast}) est la région la moins consommatrice.
+le Nord-Est est la région la moins consommatrice.
 \end{resultbox}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.95\textwidth]{localisation_etats_conso.png}
+  \includegraphics[width=0.8\textwidth]{localisation_etats_conso.png}
   \caption{Top 20 états par nombre de bâtiments et par consommation électrique moyenne ;
   consommation moyenne par région Census.}
   \label{fig:localisation-etats}
@@ -501,21 +503,23 @@ le Nord-Est (\emph{Northeast}) est la région la moins consommatrice.
   \label{fig:localisation-carte}
 \end{figure}
 
-\begin{resultbox}[Zone climatique ASHRAE --- déterminant n°1 identifié au chapitre~\ref{ch:modelisation}]
-Les zones 5A (123\,952 bâtiments) et 4A (118\,416) dominent le parc ; les zones extrêmes
-(1A « très chaud », 7B/8AK « arctique ») sont marginales ($<$1\,000 bâtiments chacune). Le
-graphique chauffage vs climatisation confirme le gradient attendu (la 2B très chaude/humide
-consomme $\sim$6\,800~kWh/an de climatisation contre quasiment rien en chauffage, l'inverse pour
-les zones froides 6A/7A). Le panneau « pics de puissance été/hiver » --- lu directement comme un
-indicateur de \textbf{flexibilité FlexiMax} --- montre que les zones froides (2A, 3A) ont des pics
-hivernaux nettement supérieurs aux pics estivaux, l'inverse pour les zones chaudes (1A, 2B) :
-le potentiel de flexibilité (effacement, pilotage) n'est donc pas uniforme sur le territoire et
-dépend directement de la zone climatique.
+Le nombre de bâtiments simulés ne suit donc pas la consommation : c'est la zone climatique, pas
+la taille du parc, qui structure ces écarts.
+
+\begin{resultbox}[Zone climatique ASHRAE --- déterminant n°1 identifié par le modèle prédictif]
+Les zones 5A (123\,952 bâtiments) et 4A (118\,416) dominent le parc ; les zones extrêmes (1A «
+très chaud », 7B/8AK « arctique ») sont marginales ($<$1\,000 bâtiments). Le gradient
+chauffage/climatisation est net : la 2B très chaude/humide consomme $\sim$6\,800~kWh/an de
+climatisation contre quasiment rien en chauffage, l'inverse pour les zones froides 6A/7A. Le
+panneau « pics de puissance été/hiver » --- lu comme indicateur de \textbf{flexibilité FlexiMax}
+--- montre des pics hivernaux nettement supérieurs aux pics estivaux pour les zones froides (2A,
+3A), et l'inverse pour les zones chaudes (1A, 2B) : le potentiel de flexibilité n'est donc pas
+uniforme sur le territoire.
 \end{resultbox}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.98\textwidth]{zones_climatiques_synthese.png}
+  \includegraphics[width=0.82\textwidth]{zones_climatiques_synthese.png}
   \caption{Zones climatiques ASHRAE --- distribution, usage chauffage/climatisation et pics de
   puissance été/hiver (indicateur de flexibilité FlexiMax).}
   \label{fig:zones-synthese}
@@ -528,62 +532,83 @@ dépend directement de la zone climatique.
   \label{fig:zones-carte}
 \end{figure}
 
-\section{Enveloppe thermique}
-\begin{resultbox}[Source : \code{exploration\_enveloppe\_thermique.ipynb}]
-Pour le plafond et la toiture, la relation isolation $\to$ consommation suit la logique
-attendue : la consommation moyenne diminue globalement quand le R-value augmente (plafond non
-isolé $\approx$16\,500~kWh vs R-49 $\approx$13\,200~kWh). Pour les murs en revanche, la relation
-n'est \emph{pas} monotone (R-15 associé à une consommation plus élevée que R-11 ou R-19) : signe
-probable d'un facteur de confusion non contrôlé ici (la qualité d'isolation des murs est
-corrélée à la zone climatique et au type de bâtiment, eux-mêmes déterminants majeurs de la
-consommation --- cf. chapitre~\ref{ch:modelisation}). Une lecture « toutes choses égales par
-ailleurs » nécessiterait de contrôler ces facteurs (régression multivariée ou comparaison à zone
-climatique fixée).
+\section{Une dispersion que le climat seul n'explique pas}
+\label{sec:dispersion-intra-zone}
+Les moyennes par zone (\S\ref{sec:localisation-climat}) masquent la distribution complète : est-ce
+que deux bâtiments de la même zone climatique consomment vraiment de façon comparable ?
+\begin{resultbox}[Source : \code{visualisation\_metadata.ipynb} --- échantillon illustratif de 5\,000 bâtiments]
+Vue complémentaire, en distribution complète plutôt qu'en moyenne, de la consommation électrique
+par zone climatique : les zones les plus peuplées (4A, 5A) présentent aussi la plus grande
+dispersion et les valeurs extrêmes les plus hautes (jusqu'à $\sim$90\,000~kWh/an en zone 7A), ce
+que les moyennes seules (\S\ref{sec:localisation-climat}) ne laissaient pas apparaître. Cette
+dispersion intra-zone confirme que la zone climatique, quoique déterminante, n'explique pas tout
+: d'autres facteurs bâtimentaires et comportementaux restent nécessaires pour capturer les
+extrêmes.
 \end{resultbox}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.98\textwidth]{enveloppe_r_values.png}
+  \includegraphics[width=0.75\textwidth]{visualisation_conso_par_zone_boxplot.png}
+  \caption{Distribution (boxplot) de la consommation électrique totale par zone climatique
+  ASHRAE, échantillon de 5\,000 bâtiments.}
+  \label{fig:vismeta-boxplot}
+\end{figure}
+
+Reste donc à identifier ce qui, à zone climatique égale, distingue un bâtiment qui consomme peu
+d'un bâtiment qui consomme beaucoup : le bâti, les systèmes techniques et le comportement des
+occupants, explorés au chapitre~\ref{ch:beyond-climate}.
+
+% ============================================================================
+\chapter{Au-delà du climat : bâti, équipements et comportement}
+\label{ch:beyond-climate}
+
+Trois familles de déterminants restent à explorer --- l'enveloppe thermique, les systèmes
+techniques (HVAC, eau chaude), et le profil des occupants --- avant de les synthétiser en une
+classification métier et une lecture par usage et par vecteur énergétique.
+
+\section{Enveloppe thermique}
+Pour le plafond et la toiture (\code{exploration\_enveloppe\_thermique.ipynb}), la relation
+isolation $\to$ consommation suit la logique attendue : la consommation moyenne diminue quand le
+R-value augmente (plafond non isolé $\approx$16\,500~kWh vs R-49 $\approx$13\,200~kWh). Pour les
+murs en revanche, la relation n'est \emph{pas} monotone (R-15 associé à une consommation plus
+élevée que R-11 ou R-19) : signe probable d'un facteur de confusion non contrôlé (l'isolation des
+murs est corrélée à la zone climatique et au type de bâtiment). Une lecture « toutes choses
+égales par ailleurs » nécessiterait de contrôler ces facteurs (régression multivariée,
+comparaison à zone climatique fixée).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{enveloppe_r_values.png}
   \caption{Nombre de bâtiments et consommation moyenne par niveau d'isolation (R-value),
   plafond / toiture / murs.}
   \label{fig:enveloppe-rvalues}
 \end{figure}
 
-\begin{todobox}[Reste à faire]
-L'étanchéité à l'air (\code{in.air\_leakage\_to\_outside\_ach50}) n'a pas encore été analysée
-dans le notebook source (section présente mais vide) --- à compléter si le temps le permet, sinon
-signaler cette limite explicitement plutôt que de laisser un vide silencieux dans le rapport final.
-\end{todobox}
-
 \section{Système HVAC}
 \begin{resultbox}[Source : \code{exploration\_hvac.ipynb}]
-\textbf{Types de systèmes.} Le chauffage par pompe à chaleur gainée (\emph{Ducted Heat Pump}) est
-associé à la consommation électrique moyenne la plus élevée (15\,845~kWh/an), devant le chauffage
-gainé classique (11\,458) et le non gainé (9\,847). Côté climatisation, le \emph{Central AC}
-domine très largement en nombre (291\,239 bâtiments) devant le \emph{Room AC} (108\,992). Par
-combustible, les bâtiments chauffés à l'électricité affichent la consommation électrique moyenne
-la plus élevée (15\,564~kWh/an), loin devant le gaz naturel, le propane ou le fioul
-($\sim$9\,000~kWh/an) --- cohérent avec le choix de recentrer le stage sur les bâtiments
-tout-électriques (\S 2.3).
+\textbf{Types de systèmes.} La pompe à chaleur gainée (\emph{Ducted Heat Pump}) affiche la
+consommation électrique moyenne la plus élevée (15\,845~kWh/an), devant le chauffage gainé
+classique (11\,458) et non gainé (9\,847). Côté climatisation, le \emph{Central AC} domine en
+nombre (291\,239 bâtiments) devant le \emph{Room AC} (108\,992). Par combustible, le chauffage
+électrique a la consommation électrique moyenne la plus élevée (15\,564~kWh/an), loin devant
+gaz/propane/fioul ($\sim$9\,000~kWh/an).
 
-\textbf{Consignes de température (flexibilité FlexiMax).} Consigne médiane de 70\degree F
-(chauffage) et 72\degree F (climatisation). \textbf{43,8\%} des bâtiments ont un thermostat
-programmable avec décalage (offset) pour le chauffage, \textbf{35,8\%} pour la climatisation ---
-c'est-à-dire qu'une majorité de bâtiments n'a \emph{pas} de pilotage automatique du chauffage/
-climatisation, ce qui borne le potentiel de flexibilité immédiatement activable sans changement
-d'équipement.
+\textbf{Consignes de température (flexibilité FlexiMax).} Consigne médiane 70\degree F
+(chauffage), 72\degree F (climatisation). \textbf{43,8\%} des bâtiments ont un thermostat
+programmable pour le chauffage, \textbf{35,8\%} pour la climatisation : une majorité n'a donc
+\emph{pas} de pilotage automatique, ce qui borne le potentiel de flexibilité activable sans
+changement d'équipement.
 
 \textbf{Gaines (ducts).} 423\,599 bâtiments sur \(\sim\)550\,000 ont des gaines de distribution
 d'air, avec une consommation moyenne nettement supérieure (12\,772~kWh/an) à ceux qui n'en ont
-pas (8\,348~kWh/an) --- essentiellement un effet de taille/type de système (les gaines sont
-associées aux systèmes centraux, plus consommateurs). Les fuites de gaines (\% de leakage vers
-l'extérieur) sont associées à une surconsommation croissante avec le taux de fuite, à niveau
-d'isolation des gaines égal.
+pas (8\,348~kWh/an) --- surtout un effet de taille/type de système (gaines associées aux systèmes
+centraux, plus consommateurs). Les fuites de gaines sont associées à une surconsommation
+croissante avec le taux de fuite, à isolation égale.
 \end{resultbox}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.98\textwidth]{hvac_types_systemes.png}
+  \includegraphics[width=0.82\textwidth]{hvac_types_systemes.png}
   \caption{Types de chauffage/climatisation et consommation associée ; consommation moyenne par
   combustible de chauffage.}
   \label{fig:hvac-types}
@@ -591,7 +616,7 @@ d'isolation des gaines égal.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.98\textwidth]{hvac_setpoints_flexibilite.png}
+  \includegraphics[width=0.82\textwidth]{hvac_setpoints_flexibilite.png}
   \caption{Consignes de température et potentiel de flexibilité (part des bâtiments avec
   thermostat programmable).}
   \label{fig:hvac-setpoints}
@@ -599,99 +624,73 @@ d'isolation des gaines égal.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.98\textwidth]{hvac_gaines.png}
+  \includegraphics[width=0.82\textwidth]{hvac_gaines.png}
   \caption{Présence et localisation des gaines de distribution d'air ; impact des fuites sur la
   consommation.}
   \label{fig:hvac-gaines}
 \end{figure}
 
 \section{Occupants et profil socio-économique}
-\begin{resultbox}[Source : \code{exploration\_occupants.ipynb}]
-\textbf{Vintage.} Un paradoxe apparent se dégage de la frise décennale : plus un bâtiment est
-récent, plus sa consommation \emph{absolue} est élevée en moyenne (de 10\,013~kWh/an pour les
-bâtiments d'avant 1940 à 12\,659~kWh/an pour les bâtiments des années 2000), alors que
-l'\emph{intensité} de consommation (kWh/ft²) est minimale pour les bâtiments des années 2010
-(7,0~kWh/ft²) --- les constructions récentes sont plus efficaces énergétiquement par m², mais
-en moyenne plus grandes, ce qui inverse la tendance en valeur absolue.
-
-\textbf{Occupants.} Relation monotone croissante et quasi linéaire entre le nombre d'occupants et
-la consommation moyenne : de $\sim$4\,100~kWh/an pour un logement à 0 occupant (vacant) à
-$\sim$21\,700~kWh/an pour 9 occupants. Les foyers de 2 personnes sont les plus représentés
-(167\,006 bâtiments), suivis des foyers d'une personne (132\,575).
-\end{resultbox}
+Sur le \emph{vintage} du bâti (\code{exploration\_occupants.ipynb}), un paradoxe apparent :
+plus un bâtiment est récent, plus sa consommation \emph{absolue} est élevée (10\,013~kWh/an avant
+1940 à 12\,659~kWh/an années 2000), alors que l'\emph{intensité} (kWh/ft²) est minimale pour les
+années 2010 (7,0~kWh/ft²) --- les constructions récentes sont plus efficaces par m², mais en
+moyenne plus grandes. Côté occupants, la relation est quasi linéaire avec la consommation
+moyenne : de $\sim$4\,100~kWh/an à 0 occupant (vacant) à $\sim$21\,700~kWh/an à 9 occupants. Les
+foyers de 2 personnes dominent (167\,006 bâtiments), suivis des foyers d'une personne
+(132\,575).
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{vintage_timeline.png}
+  \includegraphics[width=0.75\textwidth]{vintage_timeline.png}
   \caption{Consommation moyenne et intensité (kWh/ft²) par décennie de construction.}
   \label{fig:vintage-timeline}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{occupants_distribution.png}
+  \includegraphics[width=0.78\textwidth]{occupants_distribution.png}
   \caption{Distribution du nombre d'occupants et consommation moyenne associée.}
   \label{fig:occupants-distrib}
 \end{figure}
 
-\section{Nettoyage des métadonnées}
-\label{sec:nettoyage-metadata}
-\begin{resultbox}[Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb}]
-Le fichier national brut (\code{upgrade0.parquet}) contient 549\,971 bâtiments $\times$ 771
-colonnes. 380 colonnes sont supprimées selon 6 critères, pour aboutir à 391 colonnes
-conservées :
-\begin{itemize}
-  \item \code{upgrade.*} (20 col.) --- toutes vides dans le scénario baseline (\code{upgrade=0}) ;
-  \item \code{calc.weighted.*} (172 col.) --- agrégats de pondération, non utiles bâtiment par
-  bâtiment ;
-  \item \code{out.*} \emph{savings/reduction} (164 col.) --- économies vs upgrade, toutes à 0 en
-  baseline ;
-  \item \code{in.simulation\_control.*} (6 col.) --- identiques pour tous les bâtiments ;
-  \item \code{in.utility\_bill.*} (8 col.) --- déjà présentes sous \code{out.utility\_bills.*} ;
-  \item doublons de colonnes « binned » moins précises que leur équivalent continu (10 col.).
-\end{itemize}
-Après nettoyage : 0 colonne entièrement vide, 0 colonne à plus de 50\% de valeurs manquantes.
-Fichier exporté vers \code{data/processed/metadata\_clean.parquet}.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.95\textwidth]{diagramme_nettoyage.png}
-  \caption{Colonnes gardées vs supprimées par groupe (771 $\to$ 391 colonnes).}
-  \label{fig:nettoyage-diagramme}
-\end{figure}
-
 \section{Classification métier des variables}
 \label{sec:classification-metier}
+Enveloppe, HVAC, occupants : ces familles étant explorées séparément, il reste à les mettre en
+regard des usages électriques eux-mêmes, et à juger lesquelles sont réellement pilotables.
 \begin{resultbox}[Source : \code{03\_visualisation/classification\_variables.ipynb}]
 Ce notebook croise les 165 variables \code{in.*} avec les usages électriques
-\code{out.electricity.*} pour produire une classification orientée « métier » plutôt que
-purement technique, utilisée comme grille de lecture pour la suite du rapport (feature
-engineering, clustering, modélisation) :
+\code{out.electricity.*} pour produire une classification « métier » (plutôt que technique),
+utilisée comme grille de lecture pour la suite du rapport :
 \begin{itemize}
-  \item \textbf{61} variables retenues pour l'analyse, \textbf{16} écartées (redondantes ou non
-  pilotables), \textbf{4} variables véhicule électrique traitées à part ;
-  \item Répartition par catégorie métier : Enveloppe (33\%), HVAC (16\%), Socio-économique
-  (11\%), Météo/zone climatique (10\%), Comportemental (9\%), Eau chaude/DHW (6\%), Occupants
-  (5\%), VE (5\%), Production PV (5\%) ;
-  \item Décomposition de la consommation électrique moyenne (11\,756~kWh/an) par usage :
-  climatisation (27,4\%), électronique « brun » (20,6\%), chauffage (19,3\%), électroménager
-  « blanc » (14,5\%), eau chaude (8,2\%), éclairage (7,5\%), divers (1,9\%) ;
-  \item Cas particulier \code{in.neighbors} : d'abord suspectée d'être un proxy météo, l'analyse
-  montre que c'est en réalité une variable d'\textbf{enveloppe thermique / mitoyenneté}
-  (67,7\% des bâtiments sont des maisons individuelles avec voisins à 15 pieds ; le reste sont
-  des logements collectifs avec 2 à 27 voisins) --- un bâtiment mitoyen perd moins de chaleur par
-  ses murs communs, d'où une corrélation négative attendue avec le chauffage ;
-  \item Véhicule électrique : seulement 1,1\% des ménages possèdent un VE, mais leur
-  consommation de recharge moyenne atteint 2\,082~kWh/an (contre 22~kWh/an en moyenne sur
-  l'ensemble du parc) --- un usage marginal en pénétration mais fortement pilotable, à traiter
-  séparément d'une analyse thermique du bâtiment.
+  \item \textbf{61} variables retenues (Enveloppe 33\%, HVAC 16\%, Socio-économique 11\%,
+  Météo/climat 10\%, Comportemental 9\%, Eau chaude 6\%, Occupants/VE/PV 5\% chacun),
+  \textbf{16} écartées (redondantes ou non pilotables) ;
+  \item Décomposition de la \emph{consommation électrique} moyenne (11\,756~kWh/an, tous usages
+  électriques confondus) : climatisation (27,4\%), électronique « brun » (20,6\%), chauffage
+  (19,3\%), électroménager « blanc » (14,5\%), eau chaude (8,2\%), éclairage (7,5\%), divers
+  (1,9\%) --- climatisation et chauffage électriques combinés (46,7\% \emph{de l'électricité})
+  restent le premier poste, mais l'écart avec l'« électronique brun » (non pilotable, 20,6\%)
+  borne le gain maximal atteignable par la seule flexibilité thermique. \emph{À ne pas confondre
+  avec la part du confort thermique tous vecteurs confondus (64,2\%, \S\ref{sec:visual-national})
+  : cette dernière inclut aussi le chauffage au gaz, propane et fioul, absent ici.} ;
+  \item Cas \code{in.neighbors} : suspectée proxy météo, c'est en réalité une variable
+  d'\textbf{enveloppe thermique / mitoyenneté} (67,7\% de maisons individuelles à 15 pieds, le
+  reste en logements collectifs) --- un bâtiment mitoyen perd moins de chaleur par ses murs
+  communs, d'où l'intérêt de la garder comme feature plutôt que de l'écarter comme redondante ;
+  \item VE : 1,1\% des ménages seulement, mais consommation de recharge moyenne de
+  2\,082~kWh/an (contre 22~kWh/an sur l'ensemble du parc) --- marginal en pénétration mais
+  fortement pilotable, à traiter séparément de l'analyse thermique.
 \end{itemize}
+Cette classification par catégorie, plutôt qu'une liste plate de 61 variables, servira de grille
+de lecture pour l'importance des variables du futur modèle prédictif : elle permettra de juger
+si un déterminant dominant relève du bâti, du climat ou du comportement, plutôt que d'interpréter
+chaque variable isolément.
 \end{resultbox}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.95\textwidth]{classification_usages_electriques.png}
+  \includegraphics[width=0.8\textwidth]{classification_usages_electriques.png}
   \caption{Décomposition de la consommation électrique moyenne par usage (chauffage,
   climatisation, eau chaude, électroménager « blanc », électronique « brun »...).}
   \label{fig:classif-usages}
@@ -731,404 +730,639 @@ FACTEURS EXPLICATIFS
 \end{footnotesize}
 \end{resultbox}
 
-\section{Visualisation du sous-ensemble national}
-\begin{resultbox}[Source : \code{visualisation\_metadata.ipynb} --- échantillon illustratif de 5\,000 bâtiments]
-Vue complémentaire, en distribution complète plutôt qu'en moyenne, de la consommation électrique
-par zone climatique : les zones les plus peuplées (4A, 5A) présentent aussi la plus grande
-dispersion et les valeurs extrêmes les plus hautes (jusqu'à $\sim$90\,000~kWh/an pour quelques
-bâtiments outliers en zone 7A), ce que les moyennes seules (\S 3.2) ne laissaient pas apparaître.
+\section{Décomposition nationale par usage et par vecteur énergétique}
+\label{sec:visual-national}
+La classification précédente porte sur l'électricité seule. Élargie à \emph{tous} les vecteurs
+énergétiques (gaz, propane, fioul inclus), la même décomposition par usage change-t-elle
+d'équilibre ?
+\begin{resultbox}[{Source : \code{03\_visualisation/visual.ipynb} --- \code{upgrade0.parquet}, ménages pondérés}]
+Sur le parc entier (549\,971 bâtiments pondérés), le confort thermique (chauffage + climatisation,
+\emph{tous vecteurs}) concentre \textbf{64,2\%} de la consommation totale, loin devant l'eau chaude
+sanitaire (12,0\%) et le divertissement/loisirs (11,3\%). Ce chiffre est plus élevé que les 46,7\%
+mesurés pour l'électricité seule (\S\ref{sec:classification-metier}) : l'écart est le gaz, le
+propane et le fioul consacrés au chauffage, invisibles dans une lecture électricité-only. Par
+vecteur, l'électricité (1\,641,5~TWh) et le gaz naturel (1\,479,1~TWh) sont proches en volume
+national, très loin devant le fioul (178,8~TWh) et le propane (154,1~TWh). La décomposition par
+groupe montre où se concentre ce gaz : quasi exclusivement sur le confort thermique et, dans une
+moindre mesure, l'eau chaude sanitaire et l'alimentation --- tous les autres usages
+(divertissement, éclairage, VE, infrastructure, PV) sont déjà quasi 100\% électriques. Cette
+proximité électricité/gaz, concentrée sur les usages thermiques, confirme à l'échelle nationale
+l'intérêt du recentrage tout-électrique du périmètre.
 \end{resultbox}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.85\textwidth]{visualisation_conso_par_zone_boxplot.png}
-  \caption{Distribution (boxplot) de la consommation électrique totale par zone climatique
-  ASHRAE, échantillon de 5\,000 bâtiments.}
-  \label{fig:vismeta-boxplot}
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{viz2_camembert_groupes.png}
+    \caption{Par usage fonctionnel.}
+    \label{fig:viz-camembert}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{viz4_barres_empilees.png}
+    \caption{Par groupe et par vecteur énergétique.}
+    \label{fig:viz-energie}
+  \end{subfigure}
+  \caption{Répartition de la consommation nationale totale (tous vecteurs, ménages pondérés).}
+  \label{fig:viz-repartition-nationale}
+\end{figure}
+
+\begin{resultbox}[Corrélations entre usages --- \code{03\_visualisation/visual.ipynb}]
+Deux logiques se distinguent. Un \textbf{cluster « comportemental »} (eau chaude sanitaire,
+hygiène/nettoyage, divertissement) est fortement corrélé en interne ($\rho=0,50$ à $0,62$) : ces
+usages suivent l'intensité d'occupation du logement. Le \textbf{confort thermique}, pourtant
+premier poste (64,2\%), n'est que faiblement corrélé aux autres ($\rho=0,21$ à $0,35$) --- sa
+variance dépend du bâti et du climat, pas du comportement, cohérent avec le rôle de la zone
+climatique comme déterminant n°1 (\S\ref{sec:localisation-climat}). VE et PV sont quasi
+indépendants de tout le reste ($|\rho|<0,05$) : des choix d'équipement, pas de comportement.
+\emph{Utilité :} un seul proxy d'occupation suffira à résumer le cluster comportemental en
+feature engineering (\S\ref{sec:principe-encodage}), alors que confort thermique, VE et PV
+garderont chacun leurs propres variables et leviers de flexibilité dédiés.
+\end{resultbox}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{viz6_heatmap_correlation.png}
+  \caption{Corrélation de Pearson entre les consommations par groupe fonctionnel.}
+  \label{fig:viz-correlation}
+\end{figure}
+
+\begin{resultbox}[Taux d'effort énergétique et confort --- \code{03\_visualisation/visual.ipynb}]
+Le taux d'effort énergétique (\code{out.energy\_burden}) a une moyenne (7,3\%) au-dessus du seuil
+de précarité usuel (6\%), mais une médiane (4,1\%) en dessous : une majorité de ménages peu
+exposés, et une traîne à droite marquée (jusqu'à plus de 40\%) qui tire la moyenne vers le haut
+--- signe d'une poche de précarité énergétique minoritaire mais significative, plutôt que d'un
+problème généralisé à tout le parc. Les heures d'inconfort thermique suivent la même asymétrie :
+l'immense majorité des bâtiments reste sous 200~h/an d'inconfort (chauffage ou climatisation
+non satisfaits), avec une traîne rare mais sévère jusqu'à 5\,000--6\,000~h/an --- deux
+indicateurs distincts (budget contraint vs. confort non atteint) qui pourraient toucher en
+partie les mêmes ménages vulnérables, une hypothèse à vérifier par croisement direct.
+
+\emph{Utilité :} \code{energy\_burden} et \code{unmet\_hours} identifient un sous-ensemble de
+ménages où toute mesure de flexibilité (effacement, décalage de consigne) devra être dimensionnée
+avec prudence --- dégrader encore le confort d'un ménage déjà précaire irait à l'encontre de
+l'objectif social de FlexiMax. Ce sont aussi des critères de segmentation utiles pour cibler en
+priorité les ménages qui bénéficieraient le plus d'une intervention.
+\end{resultbox}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{viz7_energy_burden.png}
+  \caption{Distribution du taux d'effort énergétique (part du revenu consacrée à l'énergie).}
+  \label{fig:viz-burden}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{viz9_unmet_hours.png}
+  \caption{Distribution des heures d'inconfort thermique (chauffage / climatisation).}
+  \label{fig:viz-unmethours}
 \end{figure}
 
 % ============================================================================
-\chapter{Feature engineering}
+\chapter{De la donnée brute à la feature physique}
 \label{ch:features}
 
-\section{Transformations numériques}
-\begin{todobox}[Source : \code{04\_features/transformations\_numeriques.ipynb}]
-Ne pas détailler les 17 étapes une à une : choisir 3--4 exemples représentatifs et les
-présenter sous forme de tableau « brut $\to$ transformé », p.ex. :
-\begin{itemize}
-  \item Isolation : \code{"R-11"} $\to$ 11.0
-  \item Surface : \code{"1000-1499"} $\to$ 116.1~m² (midpoint ft²$\to$m²)
-  \item Consignes de température : \code{"68F"} $\to$ 20.0\,°C
-  \item Efficacité HVAC : \code{"AFUE, 80\%"} $\to$ 0.80, \code{"SEER, 13"} $\to$ 13.0
-  \item Vintage $\to$ âge du bâtiment : \code{"1980s"} $\to$ 44~ans
-\end{itemize}
-Sortie : \code{metadata\_features.parquet}.
-\end{todobox}
+Ce chapitre transforme les variables \code{in.*} encodées jusqu'ici en catégories ResStock en un
+jeu de features numériques, à partir des notebooks \code{transformations\_numeriques.ipynb} et
+\code{encodage\_categoriel.ipynb}.
 
-\section{Encodage catégoriel}
-\begin{todobox}[Source : \code{encodage\_categoriel.ipynb}]
-Stratégie d'encodage par groupe (zone climatique, géométrie, enveloppe, HVAC, occupants,
-véhicule électrique, solaire/stockage, eau chaude, panneau électrique, appareils) et
-imputation par groupe (zone climatique) pour les valeurs manquantes. Sortie :
-\code{features\_encodees.parquet}.
-\end{todobox}
+\section{Principe d'encodage}
+\label{sec:principe-encodage}
+\begin{resultbox}[Source : \code{transformations\_numeriques.ipynb} + \code{encodage\_categoriel.ipynb}]
+Chaque variable \code{in.*} est encodée selon sa nature : valeur numérique conservée telle
+quelle, table de correspondance officielle du \emph{ResStock Technical Reference Guide} (isolation,
+vitrage), extraction de la valeur numérique dans une chaîne composite (ex. cote SEER, EF, IMEF,
+CEF), encodage binaire ou one-hot pour les catégories nominales sans ordre, et encodage circulaire
+(sinus/cosinus) pour l'orientation --- une variable cyclique (0°=360°) qu'un simple entier
+briserait artificiellement en deux extrêmes opposés.
 
-\section{Feature engineering physique}
-\begin{todobox}[Source : \code{physical\_feature\_engineering.ipynb}]
-Présenter la construction du jeu de $\sim$30 features physiquement interprétables (indice
-d'enveloppe thermique, intensité d'occupation, indice de gain solaire, intensité ECS...) ---
-c'est ce jeu qui est comparé au jeu complet (« Global ») dans le chapitre modélisation
-(\S\ref{sec:global-vs-physique}). Mentionner le bug \code{in.insulation\_slab} corrigé
-(colonne éclatée en \code{in.slab\_perimeter\_r}/\code{in.slab\_under\_r} par le collègue) si
-pertinent pour la partie méthodo.
-\end{todobox}
+Cas notable : l'isolation est encodée par sa \textbf{valeur R d'assemblage} (celle réellement
+utilisée par EnergyPlus, incluant les ponts thermiques de l'ossature, Table~45 du guide) plutôt
+que sa valeur R \textbf{nominale} (celle affichée sur le produit) --- l'écart croît avec la
+conductivité de la structure porteuse : un mur à ossature bois isolé R-11 (nominal) descend à
+10,3 en valeur d'assemblage, R-15 à 12,1. Un encodage sur la seule valeur nominale surestimerait
+donc la performance thermique réelle des parois.
 
-\section{Préparation finale}
-\begin{todobox}[Source : \code{preparation\_finale.ipynb}]
-Sélection des cibles, gestion des NaN résiduels, séparation X/y, sauvegarde
-\code{X.parquet}/\code{y.parquet}. Rappeler ici les 5 cibles historiques
-(\code{out.electricity}, \code{out.natural\_gas}, \code{out.fuel\_oil}, \code{out.propane},
-\code{out.emissions}) et préciser que le périmètre \emph{actuel} du stage se recentre sur
-l'électricité (bâtiments tout-électriques).
-\end{todobox}
+Sept variables sont supprimées car constantes sur tout le parc (\code{in.interior\_shading},
+\code{overhangs}, \code{eaves}, \code{doors}, \code{radiant\_barrier}, \code{infiltration},
+\code{door\_area}) : une variance nulle ne porte aucune information exploitable, quel que soit
+l'encodage choisi.
+
+\begin{table}[H]
+\centering
+\caption{Les 108 attributs \code{in.*} encodés dans \code{X.parquet}, par groupe métier.}
+\label{tab:encodage-groupes}
+\begin{tabular}{@{}p{4.4cm}r p{8.9cm}@{}}
+\toprule
+Groupe & Var. & Encodage principal appliqué \\
+\midrule
+1 Socio-économique         & 7  & Midpoint d'intervalle (\$), ratio, binaire \\
+2 Occupants                 & 5  & Numérique, binaire, label ordinal \\
+3 Météo                      & 2  & Numérique (latitude/longitude, inchangé) \\
+4 Enveloppe thermique        & 33 & Lookup R d'assemblage, OHE finitions, circulaire orientation \\
+5 Systèmes HVAC/DHW          & 25 & Conversion \degree F$\to$\degree C, extraction SEER/EF, OHE techno./combustible \\
+6 Usages électriques         & 25 & Extraction CEF/EF, binaire présence, OHE énergie \\
+7 Blanc/Brun                  & 4  & Ratio (\%$\to$décimal), numérique \\
+8 Infrastructure électrique   & 2  & Numérique (A, count --- inchangé) \\
+9 Photovoltaïque (PV)         & 2  & Binaire, extraction puissance (kW) \\
+10 Mobilité (VE)               & 3  & Numérique, label niveau de chargeur \\
+\midrule
+\textbf{Total} & \textbf{108} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+Le groupe Enveloppe (33 variables, 31\% du total) domine largement : c'est ce volume, et sa
+spécificité au parc états-unien (catégories ResStock plutôt que grandeurs physiques directes),
+qui motive l'agrégation du \S\ref{sec:agregation-physique}.
+\end{resultbox}
+
+\section{Agrégation physique de l'enveloppe}
+\label{sec:agregation-physique}
+\begin{resultbox}[{Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} --- sous-ensemble tout-électrique plain-pied, 64\,062 logements}]
+Pour une variante physiquement interprétable du modèle prédictif (\code{05\_deeplearning}), un
+sous-ensemble filtré (maisons individuelles à un niveau, chauffage électrique, sans VE ni piscine
+ni PV --- une restriction plus étroite que le recentrage tout-électrique du rapport) recalcule,
+à partir des colonnes \code{out.params.*} et des variables encodées au \S\ref{sec:principe-encodage},
+30 attributs bruts d'enveloppe en \textbf{5 grandeurs physiques universelles} :
+\begin{table}[H]
+\centering
+\caption{Les 5 agrégats physiques (modèle RC) remplaçant 30 attributs bruts d'enveloppe.}
+\label{tab:agregats-physiques}
+\begin{tabular}{lp{5.6cm}p{5.4cm}}
+\toprule
+Agrégat & Formule (résumée) & Rôle physique \\
+\midrule
+$UA$ (W/K) & $\sum_i U(R_i)A_i + U_\mathrm{fen}A_\mathrm{fen} + 1{,}14\,A_\mathrm{porte}$ &
+Pertes par transmission (murs, toit, plancher, fenêtres, portes) \\
+$H_{ve}$ (W/K) & $0{,}34\,(\mathrm{ACH50}/20)\,V$ &
+Pertes par renouvellement d'air / infiltration \\
+$C$ (kJ/K) & $C_\mathrm{classe}\times A_\mathrm{pl}$, classes ISO~13790 $\in\{110,165,260,370\}$ &
+Inertie thermique, selon matériau structurel \\
+$A_\mathrm{solaire}$ (m$^2$) & $\mathrm{SHGC}\times 0{,}9\times\sum A_\mathrm{fen}\times
+p(\theta)$, Sud$>$Est/Ouest$>$Nord & Gains solaires équivalents \\
+compacité (m$^{-1}$) & $(A_\mathrm{mur}\!+\!A_\mathrm{toit}\!+\!A_\mathrm{pl}\!+\!A_\mathrm{fen}\!+
+\!A_\mathrm{porte})/V$ & Coefficient de forme (compacité du bâti) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Bilan :} 108 attributs bruts $\to$ 83 features (5 agrégats physiques + 78 conservés tels
+quels). Seul le bloc enveloppe (30 attributs) est fondu dans les agrégats ; le reste --- HVAC,
+gaines, eau chaude, occupants, socio-économique, usages électriques --- est conservé sans
+élagage supplémentaire à ce stade. Réduire une trentaine de catégories propres au parc
+états-unien à cinq grandeurs physiques sert un double objectif : la \textbf{transférabilité}
+--- ces grandeurs ont un sens hors ResStock, sur un parc de logements différent --- et
+l'\textbf{interprétabilité}, en vue d'un modèle thermique de type RC (résistance-capacité)
+plutôt qu'une boîte noire sur 108 colonnes hétérogènes. L'importance de ces agrégats dans le
+modèle prédictif est vérifiée au chapitre~\ref{ch:modelisation}.
+\end{resultbox}
+
+\begin{landscape}
+{\footnotesize
+\setlength{\extrarowheight}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4pt}
+
+\begin{center}
+{\Large\bfseries Description des variables --- \texttt{X.parquet} (statut réel : supprimé / conservé)}\\[4pt]
+{\small Modèle réduit \og physique \fg{} --- subset filtré (64\,062 logements : maisons plain-pied, chauffage électrique, sans VE/piscine/PV).}
+\end{center}
+
+\vspace{2pt}
+
+\begin{center}
+\small
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{lll}
+\Newagg & = agrégat physique ajouté &
+\Sup \; = attribut supprimé \\
+\Keep   & = attribut conservé & \\
+\end{tabular}\\[3pt]
+{\footnotesize \textbf{Bilan : 108 attributs $\rightarrow$ 83 features} (5 agrégats physiques + 78 conservés).
+Suppressions : \emph{(a) fondus dans les agrégats} --- enveloppe (30) + gaines (4) ; \emph{(b) élagués}
+(importance nulle / redondance) --- socio-éco (5), chauffe-eau (8), usages (20).}
+\end{center}
+
+\vspace{4pt}
+
+\begin{longtable}{%
+  >{\raggedright}p{4.6cm}%
+  >{\raggedright}p{4.9cm}%
+  >{\raggedright}p{2.5cm}%
+  >{\raggedright}p{2.2cm}%
+  >{\raggedright}p{3.8cm}%
+  >{\centering}p{1.5cm}%
+  >{\centering\arraybackslash}p{2.2cm}%
+}
+\toprule
+\textbf{Variable} & \textbf{Description} & \textbf{Avant (ex.)} & \textbf{Après (ex.)} &
+\textbf{Encodage appliqué} & \textbf{Groupe} & \textbf{Statut} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Variable} & \textbf{Description} & \textbf{Avant (ex.)} & \textbf{Après (ex.)} &
+\textbf{Encodage appliqué} & \textbf{Groupe} & \textbf{Statut} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r}{\small\itshape Suite page suivante\ldots}\\
+\endfoot
+\bottomrule
+\endlastfoot
+
+% ===== GROUPE 0 --- AGRÉGATS PHYSIQUES =====
+\rowcolor{hagg}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 0 \quad Agrégats physiques --- modèle RC (remplacent le bloc enveloppe)}\\[1pt]
+
+\rowcolor{cagg}
+\var{UA} & Déperdition par transmission des parois (W/K) & \texttt{$\sim$30 attributs} & \texttt{$\approx$390 W/K} &
+$\sum_i U(R_i)\,A_i + U_\mathrm{fen}A_\mathrm{fen} + 1{,}14\,A_\mathrm{porte}$ & RC & \Newagg \\
+\rowcolor{cagg}
+\var{H\_ve} & Déperdition par renouvellement d'air (W/K) & \texttt{ACH50} & \texttt{$\approx$75 W/K} &
+$0{,}34\,(\mathrm{ACH50}/20)\,V$ & RC & \Newagg \\
+\rowcolor{cagg}
+\var{C} & Inertie thermique --- stockage (kJ/K) & \texttt{type mur} & \texttt{$\approx$11\,600 kJ/K} &
+$C_\mathrm{classe}\!\times\!A_\mathrm{pl}$ (ISO 13790) & RC & \Newagg \\
+\rowcolor{cagg}
+\var{A\_solaire} & Surface solaire équivalente (m²) & \texttt{SHGC+orient.} & \texttt{$\approx$8 m²} &
+$\mathrm{SHGC}\!\cdot\!0{,}9\!\cdot\!A_\mathrm{fen}\!\cdot\!\sum \frac{d_k}{\sum d}p(\theta_k)$ & RC & \Newagg \\
+\rowcolor{cagg}
+\var{compacite} & Coefficient de forme (m$^{-1}$) & \texttt{surfaces} & \texttt{$\approx$0,85} &
+$(\sum A_\mathrm{parois})/V$ & RC & \Newagg \\
+
+% ===== GROUPE 1 --- SOCIO-ÉCONOMIQUES =====
+\rowcolor{hsocio}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 1 \quad Variables Socio-Économiques}\\[1pt]
+
+\rowcolor{csocio}
+\var{in.income} & Revenu annuel du ménage (tranche) & \texttt{50000-59999} & \texttt{54\,999.5} & Midpoint (\$) & Socio-Éco & \Keep \\
+\rowcolor{csocio}
+\var{in.federal\_poverty\_level} & Ratio revenu / seuil de pauvreté fédéral & \texttt{200-300\%} & \texttt{2.5} & Midpoint → ratio & Socio-Éco & \Keep \\
+\rowcolor{csocio}
+\var{in.area\_median\_income} & Ratio revenu ménage / médian de la zone & \texttt{0.9} & \texttt{0.9} & Numérique & Socio-Éco & \Keep \\
+\rowcolor{csocio}
+\var{in.state\_metro\_median\_income} & Ratio revenu médian état/métropole & \texttt{1.1} & \texttt{1.1} & Numérique & Socio-Éco & \Keep \\
+\rowcolor{csocio}
+\var{in.tenure} & Statut d'occupation (propriétaire/locataire) & \texttt{Owner} & \texttt{1} & Binaire & Socio-Éco & \Keep \\
+\rowcolor{csocio}
+\var{in.household\_has\_tribal\_persons} & Membres d'une tribu amérindienne & \texttt{No} & \texttt{0} & Binaire & Socio-Éco & \Keep \\
+\rowcolor{csocio}
+\var{in.aiannh\_area} & Zone tribale reconnue (AIANNH) & \texttt{No} & \texttt{0} & Binaire & Socio-Éco & \Keep \\
+
+% ===== GROUPE 2 --- OCCUPANTS =====
+\rowcolor{hoccup}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 2 \quad Variables Occupants}\\[1pt]
+
+\rowcolor{coccup}
+\var{in.occupants} & Nombre d'occupants & \texttt{3} & \texttt{3.0} & Numérique & Occupants & \Keep \\
+\rowcolor{coccup}
+\var{in.bedrooms} & Nombre de chambres & \texttt{4} & \texttt{4} & Numérique & Occupants & \Keep \\
+\rowcolor{coccup}
+\var{in.vacancy\_status} & Logement occupé ou vacant & \texttt{Occupied} & \texttt{1} & Binaire & Occupants & \Keep \\
+\rowcolor{coccup}
+\var{in.usage\_level} & Niveau global d'utilisation & \texttt{Medium} & \texttt{1} & Label ordinal & Occupants & \Keep \\
+\rowcolor{coccup}
+\var{in.hot\_water\_fixtures} & Coefficient d'utilisation ECS & \texttt{1.1} & \texttt{1.1} & Numérique & Occupants & \Keep \\
+
+% ===== GROUPE 3 --- MÉTÉO =====
+\rowcolor{hmeteo}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 3 \quad Variables Météo}\\[1pt]
+
+\rowcolor{cmeteo}
+\var{in.weather\_file\_latitude} & Latitude du fichier météo TMY & \texttt{34.75} & \texttt{34.75} & Numérique & Météo & \Keep \\
+\rowcolor{cmeteo}
+\var{in.weather\_file\_longitude} & Longitude du fichier météo TMY & \texttt{-87.61} & \texttt{-87.61} & Numérique & Météo & \Keep \\
+
+% ===== GROUPE 4 --- ENVELOPPE THERMIQUE =====
+\rowcolor{henvel}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 4 \quad Enveloppe Thermique \; \mdseries\itshape(fondue dans les agrégats UA / H\_ve / C / A\_solaire / compacité)}\\[1pt]
+
+\rowcolor{henvel!50}\multicolumn{7}{l}{\quad\itshape 4.1 \; Isolation}\\
+\rowcolor{cenvel}
+\var{in.insulation\_ceiling} & R assemblage plafond/combles & \texttt{R-30} & \texttt{31.6} & Lookup R nominale → assemblage & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.insulation\_wall} & R assemblage murs extérieurs & \texttt{Wood Stud, R-15} & \texttt{12.1} & Lookup type + R & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.insulation\_roof} & R assemblage toiture & \texttt{Finished, R-19} & \texttt{21.2} & Lookup fini + R & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.insulation\_floor} & R assemblage plancher & \texttt{Ceiling R-19} & \texttt{22.6} & Lookup R & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.insulation\_foundation\_wall} & R isolation murs de fondation & \texttt{Wall R-10} & \texttt{10.0} & Extraction R & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.slab\_perimeter\_r} & R isolation périphérique dalle & \texttt{2ft R10 Perim.} & \texttt{10.0} & Extraction R & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.slab\_under\_r} & R isolation sous dalle & \texttt{2ft R10 Under} & \texttt{10.0} & Extraction R & Enveloppe & \Sup \\
+
+\rowcolor{henvel!50}\multicolumn{7}{l}{\quad\itshape 4.2 \; Étanchéité, Vitrage et Géométrie}\\
+\rowcolor{cenvel}
+\var{in.air\_leakage\_to\_outside\_ach50} & Infiltration à 50 Pa (ACH50) & \texttt{7.0} & \texttt{7.0} & Numérique & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.window\_ufactor} & Coefficient U du vitrage & \texttt{U-1.16} & \texttt{1.16} & Extraction & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.window\_shgc} & Facteur solaire du vitrage (SHGC) & \texttt{SHGC 0.76} & \texttt{0.76} & Extraction & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.window\_front} & Surface vitrée façade principale (ft²) & \texttt{12 ft²} & \texttt{12.0} & Numérique & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.geometry\_floor\_area} & Surface habitable (m²) & \texttt{1000-1499} & \texttt{116.1} & Midpoint → m² & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.geometry\_stories} & Nombre d'étages & \texttt{1} & \texttt{1} & Numérique & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.geometry\_attic\_type} & Type de combles & \texttt{Vented Attic} & \texttt{1} & Label ordinal & Enveloppe & \Keep \\
+\rowcolor{cenvel}
+\var{in.geometry\_foundation\_type} & Type de fondation & \texttt{Slab} & \texttt{2} & Label ordinal & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.geometry\_garage} & Présence et taille du garage & \texttt{None} & \texttt{0} & Label & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.vintage} & Âge du bâtiment (années) & \texttt{1990s} & \texttt{29} & Midpoint décennie & Enveloppe & \Keep \\
+\rowcolor{cenvel}
+\var{in.roof\_material} & Absorptance solaire toiture & \texttt{Comp. Shingles} & \texttt{0.44} & Extraction & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.orientation\_sin} & Sinus de l'orientation & \texttt{Northwest} & \texttt{-0.707} & Encodage circulaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.orientation\_cos} & Cosinus de l'orientation & \texttt{Northwest} & \texttt{0.707} & Encodage circulaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_exterior\_finish\_r} & R de la finition extérieure & \texttt{Brick} & \texttt{0.7} & Extraction R & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_finish\_dark} & Finition de couleur foncée & \texttt{Brick, Dark} & \texttt{1} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_finish\_brick} & Finition en brique & \texttt{Brick} & \texttt{1} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_finish\_none} & Pas de finition spécifique & \texttt{Wood} & \texttt{0} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_finish\_shingle} & Finition en bardeau & \texttt{Vinyl} & \texttt{0} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_finish\_stucco} & Finition en stuc & \texttt{Vinyl} & \texttt{0} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_finish\_vinyl} & Finition en vinyle & \texttt{Vinyl} & \texttt{1} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.wall\_finish\_wood} & Finition en bois & \texttt{Wood} & \texttt{1} & OHE binaire & Enveloppe & \Sup \\
+
+\rowcolor{henvel!50}\multicolumn{7}{l}{\quad\itshape 4.3 \; Voisinage}\\
+\rowcolor{cenvel}
+\var{in.horiz\_loc\_Middle} & Position centrale dans une rangée & \texttt{Middle} & \texttt{1} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.horiz\_loc\_Right} & Position droite dans une rangée & \texttt{Left} & \texttt{0} & OHE binaire & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.neighbor\_distance\_ft} & Distance au voisin (pieds) & \texttt{15 ft} & \texttt{15.0} & Extraction & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.neighbor\_both\_sides} & Voisins des deux côtés & \texttt{L/R 15ft} & \texttt{1.0} & Binaire dérivé & Enveloppe & \Sup \\
+\rowcolor{cenvel}
+\var{in.corridor} & Présence d'un couloir commun & \texttt{0} & \texttt{0} & Binaire & Occupants & \Keep \\
+
+% ===== GROUPE 5 --- SYSTÈMES ÉNERGÉTIQUES =====
+\rowcolor{hsyste}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 5 \quad Systèmes Énergétiques}\\[1pt]
+
+\rowcolor{hsyste!40}\multicolumn{7}{l}{\quad\itshape 5.2 \; Chauffage et Climatisation (HVAC)}\\
+\rowcolor{csyste}
+\var{in.hvac\_has\_ducts} & Présence d'un réseau de gaines & \texttt{Yes} & \texttt{1} & Binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.duct\_leakage} & Fuite des gaines vers l'extérieur & \texttt{10\% Leakage} & \texttt{0.1} & Extraction \% → ratio & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.duct\_insulation} & R-value isolation des gaines & \texttt{R-8} & \texttt{8} & Extraction R & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.duct\_location\_int} & Emplacement des gaines & \texttt{Living Space} & \texttt{1} & Label & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.hvac\_cooling\_efficiency} & SEER de la climatisation & \texttt{SEER 13} & \texttt{13.0} & Extraction SEER & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.hvac\_cooling\_partial\_space\_conditioning} & Fraction climatisée & \texttt{1.0} & \texttt{1.0} & Numérique & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.hvac\_has\_zonal\_electric\_heating} & Chauffage électrique zonal & \texttt{No} & \texttt{0} & Binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.cooling\_setpoint} & Consigne de climatisation (°C) & \texttt{75F} & \texttt{23.9} & °F→°C & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.cooling\_setpoint\_has\_offset} & Programmation horaire clim & \texttt{Yes} & \texttt{1} & Binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.cooling\_setpoint\_offset\_magnitude} & Amplitude du décalage clim & \texttt{-3°F} & \texttt{-16.7} & Numérique & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.heating\_setpoint} & Consigne de chauffage (°C) & \texttt{68F} & \texttt{20.0} & °F→°C & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.heating\_setpoint\_has\_offset} & Programmation horaire chauffage & \texttt{No} & \texttt{0} & Binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.heating\_setpoint\_offset\_magnitude} & Amplitude du décalage chauffage & \texttt{-8°F} & \texttt{-17.8} & Numérique & Systèmes & \Keep \\
+
+\rowcolor{hsyste!40}\multicolumn{7}{l}{\quad\itshape 5.3 \; Eau Chaude Sanitaire (DHW)}\\
+\rowcolor{csyste}
+\var{in.water\_heater\_efficiency} & Rendement du chauffe-eau (EF/COP) & \texttt{Elec. Standard} & \texttt{0.92} & Extraction EF/COP & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_in\_unit} & Chauffe-eau dans le logement & \texttt{Yes} & \texttt{1} & Binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_technology\_indirect} & Technologie indirecte (OHE) & \texttt{Indirect} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_technology\_storage} & Ballon de stockage (OHE) & \texttt{Storage} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_technology\_tankless} & Instantané sans réservoir (OHE) & \texttt{Tankless} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_fuel\_fuel\_oil} & Combustible fioul (OHE) & \texttt{Fuel Oil} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_fuel\_natural\_gas} & Combustible gaz naturel (OHE) & \texttt{Natural Gas} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_fuel\_propane} & Combustible propane (OHE) & \texttt{Propane} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_location\_semi\_conditioned} & Espace semi-conditionné (OHE) & \texttt{Garage} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.water\_heater\_location\_unconditioned} & Espace non conditionné (OHE) & \texttt{Attic} & \texttt{1} & OHE binaire & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.dishwasher\_kwh} & Conso lave-vaisselle (kWh/an) & \texttt{290} & \texttt{290.0} & Numérique & Systèmes & \Keep \\
+\rowcolor{csyste}
+\var{in.has\_dishwasher} & Présence d'un lave-vaisselle & \texttt{Yes} & \texttt{1} & Binaire & Systèmes & \Keep \\
+
+% ===== GROUPE 6 --- USAGES ÉLECTRIQUES =====
+\rowcolor{husage}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 6 \quad Classification des Usages Électriques}\\[1pt]
+
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_efficiency} & Rendement du sèche-linge (CEF) & \texttt{Electric} & \texttt{2.7} & CEF par combustible & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_has} & Présence d'un sèche-linge & \texttt{Electric} & \texttt{1} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_electric} & Sèche-linge électrique (OHE) & \texttt{Electric} & \texttt{1} & OHE binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.clothes\_dryer\_gas} & Sèche-linge au gaz (OHE) & \texttt{Electric} & \texttt{0} & OHE binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.clothes\_washer\_efficiency} & Efficacité du lave-linge (IMEF) & \texttt{Standard} & \texttt{0.95} & Extraction IMEF & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.clothes\_washer\_has} & Présence d'un lave-linge & \texttt{Standard} & \texttt{1} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.refrigerator\_ef} & EF du réfrigérateur principal & \texttt{EF 15.9} & \texttt{15.9} & Extraction EF & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.refrigerator\_has} & Présence d'un réfrigérateur & \texttt{EF 15.9} & \texttt{1} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.lighting\_efficiency} & Efficacité de l'éclairage & \texttt{100\% CFL} & \texttt{2} & Label ordinal & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.misc\_extra\_refrigerator\_ef} & EF frigo/congélateur supplémentaire & \texttt{EF 10.5} & \texttt{10.5} & Extraction EF & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.misc\_extra\_refrigerator\_has} & Présence 2ᵉ frigo/congélateur & \texttt{EF 10.5} & \texttt{1} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.misc\_freezer\_ef} & EF du congélateur dédié & \texttt{EF 12.0} & \texttt{12.0} & Extraction EF & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.misc\_gas\_fireplace\_present} & Cheminée décorative au gaz & \texttt{No} & \texttt{0} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.misc\_gas\_grill\_present} & Barbecue au gaz raccordé & \texttt{No} & \texttt{0} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.misc\_gas\_lighting\_present} & Éclairage extérieur au gaz & \texttt{No} & \texttt{0} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.has\_hot\_tub} & Présence d'un spa/jacuzzi & \texttt{No} & \texttt{0} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.hot\_tub\_electric} & Spa électrique (OHE) & \texttt{Electric} & \texttt{1} & OHE binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.misc\_hot\_tub\_gas} & Spa au gaz (OHE) & \texttt{Gas} & \texttt{1} & OHE binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.has\_pool} & Présence d'une piscine & \texttt{No} & \texttt{0} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.pool\_heater\_present} & Chauffage de piscine présent & \texttt{No} & \texttt{0} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.pool\_heater\_electric} & Chauffage piscine électrique (OHE) & \texttt{Electric} & \texttt{1} & OHE binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.pool\_heater\_gas} & Chauffage piscine au gaz (OHE) & \texttt{Gas} & \texttt{1} & OHE binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.has\_well\_pump} & Présence d'une pompe de puits & \texttt{Yes} & \texttt{1} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.has\_ceiling\_fan} & Présence d'un ventilateur de plafond & \texttt{Yes} & \texttt{1} & Binaire & Usages & \Keep \\
+\rowcolor{cusage}
+\var{in.ceiling\_fan\_used} & Ventilateur utilisé en saison chaude & \texttt{Yes} & \texttt{1} & Binaire & Usages & \Keep \\
+
+% ===== GROUPE 7 --- BLANC ET BRUN =====
+\rowcolor{hblanc}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 7 \quad Part des Usages Blanc et Brun}\\[1pt]
+
+\rowcolor{cblanc}
+\var{in.plug\_loads} & Intensité des prises et petits appareils & \texttt{134\%} & \texttt{1.34} & Ratio \%/100 & Blanc/Brun & \Keep \\
+\rowcolor{cblanc}
+\var{in.plug\_load\_diversity} & Diversité temporelle des prises & \texttt{100\%} & \texttt{1.0} & Ratio \%/100 & Blanc/Brun & \Keep \\
+\rowcolor{cblanc}
+\var{in.clothes\_dryer\_usage\_level} & Multiplicateur d'usage sèche-linge & \texttt{1.0} & \texttt{1.0} & Numérique & Blanc/Brun & \Keep \\
+\rowcolor{cblanc}
+\var{in.refrigerator\_usage\_level} & Multiplicateur d'usage réfrigérateur & \texttt{1.0} & \texttt{1.0} & Numérique & Blanc/Brun & \Keep \\
+
+% ===== GROUPE 8 --- INFRASTRUCTURE =====
+\rowcolor{hblanc}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 8 \quad Infrastructure Électrique}\\[1pt]
+
+\rowcolor{cblanc}
+\var{in.electric\_panel\_service\_rating..a} & Puissance du tableau (ampères) & \texttt{125 A} & \texttt{125.0} & Numérique & Infra & \Keep \\
+\rowcolor{cblanc}
+\var{in.electric\_panel\_breaker\_space\_total\_count} & Emplacements de disjoncteurs & \texttt{25} & \texttt{25.0} & Numérique & Infra & \Keep \\
+
+% ===== GROUPE 9 --- PV =====
+\rowcolor{hblanc}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 9 \quad Production Photovoltaïque (PV)}\\[1pt]
+
+\rowcolor{cblanc}
+\var{in.has\_pv} & Présence d'un système PV & \texttt{No} & \texttt{0} & Binaire & PV & \Keep \\
+\rowcolor{cblanc}
+\var{in.pv\_system\_size} & Puissance installée PV (kW DC) & \texttt{None} & \texttt{0.0} & Extraction ; None→0 & PV & \Keep \\
+
+% ===== GROUPE 10 --- EV =====
+\rowcolor{hblanc}
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 10 \quad Mobilité Électrique (EV)}\\[1pt]
+
+\rowcolor{cblanc}
+\var{in.electric\_vehicle\_charge\_at\_home} & Probabilité de recharge à domicile & \texttt{0.9} & \texttt{0.9} & Numérique & EV & \Keep \\
+\rowcolor{cblanc}
+\var{in.electric\_vehicle\_charger} & Niveau du chargeur VE & \texttt{None} & \texttt{0} & Label & EV & \Keep \\
+\rowcolor{cblanc}
+\var{in.electric\_vehicle\_miles\_traveled} & Kilométrage annuel VE & \texttt{9000} & \texttt{9000.0} & Numérique & EV & \Keep \\
+
+\end{longtable}
+}
+\end{landscape}
 
 % ============================================================================
-\chapter{Clustering des profils de consommation}
-\label{ch:clustering}
-
-\section{Objectif et méthodologie}
-\begin{todobox}[Source : \code{06\_timeseries/timeseries\_clustering.ipynb}, section « Objectif »/« Approche suivie »]
-Pourquoi clusteriser les profils journaliers de consommation avant/en complément de la
-modélisation par métadonnées : identifier des typologies de comportement de consommation,
-enrichir potentiellement les features du modèle prédictif (ch.~\ref{ch:modelisation}) avec un
-label de cluster. Décrire l'approche : extraction jour $\times$ pas de temps, double
-normalisation forme (z-score intra-jour) / amplitude (StandardScaler global), choix de $k$ par
-coude + silhouette.
-\end{todobox}
-
-\section{Clustering univarié (bâtiment de référence)}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{kmeans_elbow_silhouette.png}
-  \caption{[TODO] Choix du nombre de clusters $k$ --- méthode du coude et score de silhouette.}
-  \label{fig:elbow-silhouette}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{cluster_daily_profiles.png}
-  \caption{[TODO] Profils journaliers moyens $\pm$ écart-type par cluster.}
-  \label{fig:daily-profiles}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{cluster_shape_profiles_colorblind_safe.png}
-  \caption{[TODO] Profils de forme par cluster --- palette adaptée aux daltoniens (protan/deutan/tritan).}
-  \label{fig:shape-colorblind}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{cluster_individual_days.png}
-  \caption{[TODO] Inspection d'un bâtiment particulier --- ses journées colorées par cluster.}
-  \label{fig:individual-days}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{cluster_timeline.png}
-  \caption{[TODO] Frise temporelle des clusters sur l'année.}
-  \label{fig:timeline}
-\end{figure}
-
-\begin{todobox}[À rédiger --- 1 à 2 paragraphes par figure ci-dessus]
-Pour chaque figure : combien de clusters retenus et pourquoi (coude/silhouette), à quoi
-correspond chaque cluster en termes de comportement (ex. profil « journée de semaine chauffée »
-vs « journée creuse »), ce que révèle la frise temporelle (saisonnalité des clusters ?).
-\end{todobox}
-
-\section{Clustering multivarié (100 bâtiments tout-électriques)}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{cluster_multi_analysis.png}
-  \caption{[TODO] Analyse des clusters multivariés (forme + amplitude + météo), 100 bâtiments.}
-  \label{fig:multi-analysis}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{cluster_multi_summary_heatmap.png}
-  \caption{[TODO] Heatmap résumé du clustering multivarié.}
-  \label{fig:multi-heatmap}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{cluster_multi_shape_profiles.png}
-  \caption{[TODO] Profils de forme par cluster --- clustering multi-bâtiments.}
-  \label{fig:multi-shape}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{cluster_calendar_composition.png}
-  \caption{[TODO] Composition calendaire des clusters (jours de semaine/week-end, saisons).}
-  \label{fig:calendar-composition}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.7\textwidth]{pca_variance.png}
-  \caption{[TODO] Variance expliquée par composante --- PCA sur la forme des courbes.}
-  \label{fig:pca-variance}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.7\textwidth]{pca_2d_clusters.png}
-  \caption{[TODO] Projection PCA 2D des clusters.}
-  \label{fig:pca-2d}
-\end{figure}
-
-\begin{todobox}[Source : \code{timeseries\_clustering\_multi.ipynb}]
-\begin{itemize}
-  \item Justifier le passage au pas de temps journalier (24 points) et la sélection des 100
-  bâtiments tout-électriques.
-  \item Expliquer le choix : PCA appliquée uniquement sur la forme ; amplitude et météo
-  gardées en variables brutes standardisées (interprétabilité des corrélations).
-  \item Résultat de l'analyse de corrélation : quelle(s) variable(s) --- notamment météo ---
-  expliquent le mieux l'amplitude de consommation (scatter interactif + droite de tendance).
-  \item Vérification de robustesse : un cluster n'est pas dominé par un seul bâtiment.
-\end{itemize}
-\end{todobox}
-
-\section{Synthèse du chapitre}
-\begin{todobox}[À rédiger]
-Ce que le clustering apporte concrètement : typologies identifiées, lien avec la météo/le
-climat (cohérent avec le résultat du chapitre~\ref{ch:modelisation} où la zone climatique
-domine l'importance des variables), et si/comment les labels de cluster ont été (ou pourraient
-être) réinjectés comme feature dans les modèles prédictifs.
-\end{todobox}
-
-% ============================================================================
-\chapter{Modélisation : prédiction de la consommation}
+\chapter{Modélisation}
 \label{ch:modelisation}
 
-\begin{todobox}[Contenu déjà rédigé --- reports/rapport\_modelisation.tex]
-Ce chapitre reprend le contenu de \code{reports/rapport\_modelisation.tex} (déjà finalisé).
-Les résultats validés sont repris ci-dessous dans des \emph{resultbox} vertes. À compléter :
-reformuler la transition avec les chapitres précédents, et vérifier si le périmètre
-« 5 cibles » doit être réduit à l'électricité seule pour rester cohérent avec le cadrage
-tout-électrique (\S 2.3) --- si oui, adapter les tableaux en ne gardant que la colonne
-électricité, ou préciser explicitement que ce chapitre couvre une étape antérieure au
-recentrage de périmètre.
-\end{todobox}
+Le climat structure la consommation (chapitre~\ref{ch:exploration}), l'enveloppe et les
+équipements expliquent une partie de la dispersion résiduelle (chapitre~\ref{ch:beyond-climate}),
+et 108 attributs bruts ont été réduits à un jeu de features exploitable, physique ou complet
+(chapitre~\ref{ch:features}). Reste à vérifier si un modèle prédictif retrouve effectivement ces
+déterminants, et jusqu'à quel point il peut prédire la consommation électrique.
 
-\section{Démarche générale}
-Deux familles de modèles sont comparées : \textbf{LightGBM} (gradient boosting sur arbres) et
-un \textbf{MLP} (réseau de neurones dense), sur un split train/test partagé et stratifié
-(\code{clustering\_stratifie.ipynb}), garantissant que tous les modèles sont évalués sur
-exactement les mêmes bâtiments de test. Deux jeux de features sont comparés : l'ensemble complet
-(108 variables encodées, « Global ») et l'ensemble physique réduit (\S\ref{sec:global-vs-physique},
-$\sim$30 variables, cf. chapitre~\ref{ch:features}).
-
-\begin{resultbox}[Baseline naïve --- $R^2$ sur le jeu de test]
-\begin{table}[H]
-\centering
-\begin{tabular}{lr}
-\toprule
-Cible & $R^2$ \\
-\midrule
-Électricité      & $-0.057$ \\
-Gaz naturel       & $-0.253$ \\
-Fuel oil          & $-0.033$ \\
-Propane           & $-0.032$ \\
-Émissions CO$_2$e & $-0.071$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-Le $R^2$ négatif est attendu : la médiane minimise l'erreur absolue, pas l'erreur quadratique,
-donc structurellement moins bonne dès que les distributions sont asymétriques (queue lourde).
-\end{resultbox}
-
-\section{LightGBM vs MLP}
-\begin{resultbox}[$R^2$ sur le jeu de test --- jeu de features « Global »]
-\begin{table}[H]
-\centering
-\begin{tabular}{lrr}
-\toprule
-Cible & LightGBM & MLP \\
-\midrule
-Émissions CO$_2$e & \textbf{0.911} & 0.865 \\
-Gaz naturel        & \textbf{0.869} & 0.841 \\
-Électricité        & \textbf{0.847} & 0.800 \\
-Fuel oil            & \textbf{0.674} & 0.639 \\
-Propane             & \textbf{0.503} & 0.473 \\
-\bottomrule
-\end{tabular}
-\end{table}
-LightGBM surpasse systématiquement le MLP sur les cinq cibles (3 à 5 points de $R^2$), avec un
-meilleur contrôle du sur-apprentissage --- cohérent avec la littérature sur données tabulaires.
+\section{Un modèle LightGBM sur le périmètre tout-électrique}
+\label{sec:lgbm-electricite}
+\begin{resultbox}[Source : \code{05\_deeplearning/lgbm\_electricity.ipynb} --- sous-ensemble tout-électrique plain-pied, 64\,062 logements]
+Un LightGBM entraîné sur les 107 features encodées (\S\ref{sec:principe-encodage}), avec split
+stratifié par zone ASHRAE (Train 40\,999 / Val 10\,250 / Test 12\,813) et 50 essais
+d'optimisation Optuna, atteint sur le test $R^2=0{,}9254$ (RMSE $=2\,712$~kWh, soit 13,8\% de la
+consommation moyenne ; écart train/test $=0{,}057$, contrôlé). C'est une nette amélioration par
+rapport au premier modèle du stage, entraîné avant le recentrage tout-électrique sur les
+549\,971 bâtiments et les cinq vecteurs énergétiques (\code{lightgbm\_stratified.ipynb},
+$R^2=0{,}8446$, RMSE $=28{,}9\%$) : le gain ($+0{,}08$ de $R^2$, RMSE relative divisée par deux)
+tient moins à un modèle différent qu'au périmètre lui-même --- un sous-ensemble tout-électrique
+et géométriquement homogène, sur une cible unique, stratifié directement sur la zone climatique
+plutôt que sur une stratification composite plus généraliste.
 \end{resultbox}
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{modelisation_dummy_vs_lgbm.png}
-    \caption{Gain de LightGBM par rapport à la baseline naïve, pour chaque cible.}
-    \label{fig:dummy-vs-lgbm}
+  \centering
+  \includegraphics[width=0.85\textwidth]{modelisation_comparaison_electricite.png}
+  \caption{$R^2$, RMSE et RMSE relative --- modèle multi-cibles pré-recentrage
+  (\code{lightgbm\_stratified}) vs modèle électricité sur le périmètre tout-électrique
+  (\code{lgbm\_electricity}).}
+  \label{fig:modelisation-comparaison}
 \end{figure}
 
-\section{Global vs Physique}
+L'erreur par zone climatique (test) confirme le fil conducteur du rapport : les zones rares et
+extrêmes (7B, $n=8$, RMSE $=9\,044$~kWh ; 6A, $n=233$, RMSE $=4\,168$~kWh) concentrent l'essentiel
+de l'erreur et du biais, tandis que les zones tempérées majoritaires (2A, 3A, 4A) restent sous
+3\,300~kWh de RMSE --- une limite de taille d'échantillon plus qu'une faiblesse du modèle.
+
+\section{Global vs Physique : le compromis interprétabilité}
 \label{sec:global-vs-physique}
-\begin{resultbox}[LightGBM --- Global vs Physique, mêmes bâtiments de test]
-\begin{table}[H]
-\centering
-\begin{tabular}{lrrr}
-\toprule
-Cible & $R^2$ Global & $R^2$ Physique & $\Delta$ \\
-\midrule
-Émissions CO$_2$e & 0.913 & 0.892 & $-0.021$ \\
-Gaz naturel         & 0.870 & 0.856 & $-0.014$ \\
-Électricité         & 0.848 & 0.817 & $-0.031$ \\
-Fuel oil              & 0.678 & 0.666 & $-0.012$ \\
-Propane               & 0.511 & 0.495 & $-0.016$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-Écart modeste (1 à 3 points de $R^2$) : l'essentiel du signal prédictif est conservé par les
-$\sim$30 variables physiques --- argument en faveur du jeu Physique quand l'interprétabilité
-compte.
+\begin{resultbox}[Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} --- même sous-ensemble, 64\,062 logements]
+Remplacer les 30 attributs bruts d'enveloppe par les 5 agrégats physiques du
+\S\ref{sec:agregation-physique} (83 features au lieu de 107, jeu \og Physique\fg) coûte peu :
+$R^2=0{,}9120$ (RMSE $=2\,945$~kWh, 15,0\%) contre $0{,}9254$ pour le jeu \og Global\fg{} --- une
+perte de 1,3 point de $R^2$ pour cinq variables interprétables en moins de description physique
+du bâti. L'importance des variables confirme que cette perte est mesurée, pas accidentelle : $UA$
+arrive en 2\textsuperscript{e} position (8,85\% de l'importance totale, juste derrière la latitude
+météo), et les 5 agrégats cumulés pèsent \textbf{32,3\%} de l'importance du modèle --- l'enveloppe
+compte, même réduite à cinq nombres. La latitude et la longitude météo dominent toujours
+largement (18,4\% cumulés), confirmant à l'échelle du modèle prédictif ce que l'exploration
+suggérait déjà (\S\ref{sec:localisation-climat}) : le climat prime sur le bâti. Une courbe du
+coude sur le nombre de features retenues montre par ailleurs que la moitié des attributs
+(50 sur 83, ou 80 sur 107 pour le jeu Global) suffit à retrouver la performance du jeu complet ---
+la longue traîne de variables à faible importance (VE, PV, spa, piscine, redondantes avec le
+filtre du sous-ensemble) n'apporte rien de plus.
 \end{resultbox}
 
-\section{Importance des variables}
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{modelisation_importance_electricite.png}
-    \caption{Top 20 variables les plus importantes pour la prédiction de la consommation
-    électrique (LightGBM, jeu Global).}
-    \label{fig:importance-elec}
+  \centering
+  \includegraphics[width=0.85\textwidth]{modelisation_importance_agregats.png}
+  \caption{Importance des 83 variables du jeu Physique (gain LightGBM) --- les 5 agrégats
+  physiques en rouge.}
+  \label{fig:modelisation-importance}
 \end{figure}
-\begin{resultbox}
-Déterminant dominant sur toutes les cibles : la \textbf{localisation météorologique}
-(\code{in.weather\_file\_latitude}/\code{longitude}, proxy de la zone climatique ASHRAE) ---
-cohérent avec le chapitre~\ref{ch:exploration} (\S sur la zone climatique). Viennent ensuite le
-dimensionnement électrique, la géométrie, et l'étanchéité à l'air.
+
+\section{Performance par usage électrique}
+\label{sec:performance-usages}
+\begin{resultbox}[Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} --- quatre modèles, mêmes features et split]
+Prédire chaque usage séparément (mêmes 83 features, mêmes hyperparamètres qu'en
+\S\ref{sec:global-vs-physique}) révèle une hétérogénéité nette : l'eau chaude sanitaire est
+l'usage le plus facile ($R^2=0{,}980$, RMSE $=214$~kWh) et le chauffage le plus difficile
+($R^2=0{,}816$, RMSE relative $=54{,}0\%$). Ce n'est pas un défaut du modèle mais une conséquence
+de la variance du signal : la consommation de chauffage varie fortement d'un ménage à l'autre
+(moyenne 6\,030~kWh, mais 98,9\% des logements seulement en ont --- contre 84,6\% pour l'eau
+chaude, dont la consommation moyenne, plus faible et plus stable, est mécaniquement plus facile à
+approcher en valeur relative). La climatisation se situe entre les deux ($R^2=0{,}930$,
+18,9\%). Ce classement --- eau chaude $>$ climatisation $>$ total $>$ chauffage --- est cohérent
+avec le rôle du climat déjà établi : le chauffage est l'usage le plus exposé à la variabilité
+climatique inter-zones, donc le plus dur à généraliser sur un modèle unique.
 \end{resultbox}
 
-\section{Qualité des prédictions et limites}
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{modelisation_scatter_electricite.png}
-    \caption{Consommation électrique prédite vs réelle (LightGBM, sélection SHAP), échelles
-    linéaire et logarithmique.}
-    \label{fig:scatter-elec}
+  \centering
+  \includegraphics[width=0.85\textwidth]{modelisation_par_usage.png}
+  \caption{$R^2$ et RMSE par usage électrique (total, chauffage, climatisation, eau chaude),
+  jeu de features Physique.}
+  \label{fig:modelisation-par-usage}
 \end{figure}
-\begin{resultbox}
-\code{fuel\_oil} et \code{propane} restent les points faibles constants (cibles rares,
-zero-inflated) --- piste non implémentée : objectif Tweedie/Poisson plutôt que MSE.
-\end{resultbox}
-
-\begin{todobox}[À adapter]
-Si le rapport final se limite au périmètre tout-électrique, indiquer explicitement que
-\code{fuel\_oil}/\code{propane}/\code{natural\_gas} sont hors périmètre \emph{a posteriori}
-(structurellement nuls pour les bâtiments tout-électriques) et que ce chapitre documente une
-étape antérieure au recentrage --- ou refaire les tableaux uniquement sur l'électricité si le
-temps le permet.
-\end{todobox}
-
-% ============================================================================
-\chapter{RNN/MLP hybride pour la série temporelle}
-\label{ch:rnn}
-
-\begin{todobox}[Source : \code{06\_timeseries/rnn\_mlp\_hybrid\_electricite.ipynb}]
-Notebook non encore extrait pour ce rapport (résultats à relire directement dedans, ou à
-exécuter/relire cellule par cellule). Structure du notebook, à reprendre comme plan de
-section :
-\begin{itemize}
-  \item Objectif ; données et limite importante (préciser laquelle --- ex. nombre de
-  bâtiments, complétude des séries).
-  \item Chargement des 100 bâtiments (séries horaires + features statiques physiques).
-  \item Split train/val/test au niveau bâtiment (pas au niveau ligne --- à justifier :
-  évite la fuite d'information entre journées d'un même bâtiment).
-  \item Architecture hybride commune (RNN/LSTM/GRU pour la dynamique temporelle + MLP pour les
-  features statiques) --- décrire précisément la fusion (concaténation avant la couche de
-  sortie ? à combien de couches ?).
-\end{itemize}
-\end{todobox}
-
-\section{Tâche A --- prévision à court terme (t+1, fenêtre 24h)}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{rnn_mlp_tacheA_scatter.png}
-    \caption{[TODO] Prévision à t+1 (fenêtre 24h) --- valeurs prédites vs réelles.}
-    \label{fig:rnn-tacheA}
-\end{figure}
-\begin{todobox}
-Métriques ($R^2$/RMSE/MAE) à reporter ici, et comparaison qualitative avec les modèles du
-chapitre~\ref{ch:modelisation} (LightGBM/MLP sur métadonnées) --- ce ne sont pas directement
-comparables (tâches différentes : prévision temporelle vs régression sur métadonnées), le
-préciser explicitement pour éviter toute confusion dans le rapport.
-\end{todobox}
-
-\section{Tâche B --- extrapolation du total annuel (90 premiers jours observés)}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{rnn_mlp_tacheB_scatter.png}
-    \caption{[TODO] Extrapolation du total annuel à partir de 90 jours observés --- prédit vs réel.}
-    \label{fig:rnn-tacheB}
-\end{figure}
-\begin{todobox}
-Intérêt pratique de cette tâche (estimer la consommation annuelle sans attendre un an de
-mesures) ; métriques ; limites (représentativité des 90 premiers jours selon la saison de
-démarrage).
-\end{todobox}
-
-\section{Synthèse du chapitre}
-\begin{todobox}[À rédiger]
-Comparer les deux tâches ; ce que l'architecture hybride apporte par rapport à un RNN seul ou
-un MLP seul (si cette comparaison existe dans le notebook) ; limites (100 bâtiments seulement
---- généralisation).
-\end{todobox}
-
-% ============================================================================
-\chapter{Synthèse transversale et discussion}
-
-\begin{todobox}[À rédiger]
-\begin{itemize}
-  \item Mettre en regard les trois approches : modélisation sur métadonnées (ch.~6), clustering
-  de profils (ch.~5), RNN/MLP hybride sur séries temporelles (ch.~7) --- quelles questions
-  chacune répond, et comment elles se complètent.
-  \item Fil rouge « zone climatique » : déterminant n°1 en importance de variables (ch.~6),
-  variable la plus corrélée à l'amplitude de consommation (ch.~5) --- cohérence des résultats
-  entre approches.
-  \item Limites transversales : échantillon de 100 bâtiments pour le clustering/RNN vs 549\,971
-  pour la modélisation LightGBM/MLP --- écart de représentativité à mentionner honnêtement.
-  \item Ce qui a été corrigé en cours de route (bugs de split, remapping d'indices...) et ce que
-  ça dit sur la rigueur méthodologique du pipeline.
-\end{itemize}
-\end{todobox}
-
-% ============================================================================
-\chapter{Conclusion et perspectives}
-
-\begin{todobox}[À rédiger]
-\begin{itemize}
-  \item Rappel de l'objectif et des résultats principaux (1 paragraphe).
-  \item Ce qui reste à faire si le stage continuait : ex. loss Tweedie/Poisson pour
-  fuel\_oil/propane, extension du RNN/MLP hybride à plus de bâtiments, réinjection des labels
-  de cluster comme feature dans LightGBM/MLP, recherche d'hyperparamètres (Optuna).
-  \item Apport personnel / compétences développées (data science appliquée à l'énergie,
-  gestion d'un pipeline multi-notebooks partagé, rigueur méthodologique).
-\end{itemize}
-\end{todobox}
 
 % ============================================================================
 \begin{thebibliography}{99}
-\begin{todobox}[À vérifier/compléter selon les exigences de citation de l'école]
-Vérifier le format de citation demandé (MINES Paris--PSL peut imposer un style particulier) ;
-passer éventuellement à \code{biblatex}+\code{biber} avec un fichier \code{.bib} si requis.
-\end{todobox}
 
 \bibitem{resstock} National Renewable Energy Laboratory (NREL), \textit{ResStock --- Technical
 Reference Guide}, 2025 Release 1.
@@ -1165,16 +1399,18 @@ Statistics and Probability, 1967.
 \code{01\_exploration} & Exploration initiale (enveloppe thermique, HVAC, occupants,
 climat/localisation, vue d'ensemble des groupes \code{in.*}). \\
 \code{02\_nettoyage} & Nettoyage des métadonnées $\to$ \code{metadata\_clean.parquet}. \\
-\code{03\_visualisation} & Classification métier des variables, visualisation du sous-ensemble
-national. \\
+\code{03\_visualisation} & Classification métier des variables, décomposition nationale par
+usage/vecteur énergétique, visualisation du sous-ensemble national. \\
 \code{04\_features} & Transformations numériques, encodage catégoriel, feature engineering
 physique, préparation finale $\to$ \code{X.parquet}/\code{y.parquet}. \\
-\code{05\_deeplearning} & LightGBM, MLP, analyse SHAP, clustering stratifié pour le split
-partagé. \\
+\code{05\_deeplearning} & Modélisation LightGBM (électricité, Global vs Physique, par usage),
+clustering stratifié pour le split partagé. \\
 \code{06\_timeseries} & Extraction OEDI, clustering des profils (univarié/multivarié), RNN/MLP
 hybride pour la prévision. \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+
 
 \end{document}
