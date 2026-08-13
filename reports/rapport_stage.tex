@@ -169,35 +169,29 @@ $\rightarrow$ \code{06\_timeseries} --- dépôt \code{FlexiMax}\par}
 \chapter*{Remerciements}
 \addcontentsline{toc}{chapter}{Remerciements}
 
-Je tiens à remercier chaleureusement mes deux tuteurs de stage, \emph{[Nom du tuteur 1]} et
-\emph{[Nom du tuteur 2]}, pour leur suivi régulier, leur disponibilité et leurs conseils tout au
+Je tiens à remercier chaleureusement mes deux tuteurs de stage, Gilles Guerassimoff et
+Damien Corral, pour leur suivi régulier, leur disponibilité et leurs conseils tout au
 long de ce projet, ainsi que pour la confiance accordée dans la conduite des différentes étapes
 de l'analyse.
 
-Je remercie également \emph{[Nom du tuteur Polytech]}, mon tuteur académique à Polytech, pour
+Je remercie également Abderrahmane Habbal, mon tuteur académique à Polytech, pour
 son accompagnement et le suivi pédagogique apporté durant ce stage.
 
-Mes remerciements vont aussi à \emph{[Nom du responsable de stage]}, responsable de stage de la
-filière \emph{[nom de la filière]} à Polytech, pour son suivi et sa disponibilité tout au long
+Mes remerciements vont aussi à Didier Auroux, responsable de stage de la
+filière MAM à Polytech, pour son suivi et sa disponibilité tout au long
 de cette expérience.
 
-Je remercie également l'ensemble de l'équipe du programme FlexiMax à MINES Paris --- PSL /
+Je souhaite aussi remercier l'ensemble de l'équipe du programme FlexiMax à MINES Paris --- PSL /
 ARMINES pour son accueil et pour les échanges enrichissants sur les enjeux de flexibilité
 énergétique résidentielle, ainsi que pour l'accès aux données et aux outils nécessaires à la
 réalisation de ce travail.
 
-Merci à Boubaker Amdyoun, avec qui j'ai partagé ce dépôt de travail, pour les échanges
+Merci également à Boubaker Amdyoun, avec qui j'ai partagé ce dépôt de travail, pour les échanges
 techniques et méthodologiques qui ont permis d'améliorer la fiabilité des analyses présentées
 dans ce rapport.
 
 Enfin, je remercie le programme France 2030 et l'ADEME pour le financement de ce projet de
 recherche.
-
-\begin{todobox}[À compléter]
-Remplacer les 4 champs \emph{[Nom ...]} ci-dessus par les noms réels (2 tuteurs de stage, tuteur
-Polytech, responsable de stage/filière), et vérifier qu'aucun n'a été oublié (ex. co-encadrant
-ponctuel, personne ayant donné accès à un jeu de données spécifique).
-\end{todobox}
 
 % ============================================================================
 \chapter*{Résumé}
@@ -215,12 +209,12 @@ L'enquête commence par l'exploration : sous les 771 colonnes brutes du jeu de m
 cachent des doublons, des artefacts de simulation et des variables réellement informatives. Une
 fois le bruit écarté (391 colonnes retenues), un même indice revient sans cesse au fil des
 analyses --- la zone climatique. Elle structure la consommation de chauffage et de climatisation,
-conditionne le potentiel de flexibilité des thermostats (43,8\,\% des bâtiments seulement
+conditionne le potentiel de flexibilité des thermostats (seulement 43,8\,\% des bâtiments
 disposent d'un thermostat programmable pour le chauffage), et réapparaît plus tard comme le
 déterminant n°1 identifié par le modèle prédictif final. Ce fil conducteur --- la géographie
-climatique comme clé de lecture de la consommation --- traverse tout le rapport, de l'exploration
-des métadonnées au clustering des profils journaliers jusqu'à l'importance des variables du
-modèle LightGBM.
+climatique comme clé de lecture de la consommation --- traverse tout le rapport, depuis
+l'exploration des métadonnées, en passant par le clustering des profils journaliers, jusqu'à
+l'importance des variables du modèle LightGBM.
 
 Le récit se prolonge avec le choix, motivé par la cohérence du périmètre du stage, de recentrer
 l'analyse sur les bâtiments \textbf{tout-électriques}. Un pipeline de feature engineering
@@ -228,10 +222,11 @@ transforme ensuite les variables catégorielles brutes de ResStock en un jeu exp
 une trentaine de variables physiquement interprétables. Le clustering des profils de consommation
 journaliers révèle des « jours types » récurrents, distincts par leur forme et leur amplitude,
 avant qu'un modèle LightGBM entraîné sur les métadonnées n'atteigne un $R^2$ de 0,847 sur la
-consommation électrique (contre $-0,057$ pour une baseline naïve), avec un écart minime face à un
-jeu de features réduit et interprétable. Enfin, une architecture hybride RNN/MLP explore deux
-problèmes complémentaires sur les séries temporelles horaires : prévoir la consommation à l'heure
-suivante, et extrapoler la consommation annuelle à partir de 90 jours d'observation seulement.
+consommation électrique (contre $-0,057$ pour une baseline naïve), avec un écart minime par
+rapport à un jeu de features réduit et interprétable. Enfin, une architecture hybride RNN/MLP
+explore deux problèmes complémentaires sur les séries temporelles horaires : prévoir la
+consommation à l'heure suivante, et extrapoler la consommation annuelle à partir de seulement
+90 jours d'observation.
 
 Au terme de ce parcours, le rapport livre moins une collection de modèles qu'une lecture
 cohérente de ce qui détermine la consommation électrique résidentielle --- et une chaîne de
@@ -252,8 +247,8 @@ columns retained), one clue keeps resurfacing --- the climate zone. It shapes he
 cooling consumption, bounds the flexibility potential of thermostats (only 43.8\% of buildings
 have a programmable heating thermostat), and later re-emerges as the number-one determinant
 identified by the final predictive model. This thread --- climate geography as the key to
-reading consumption --- runs through the entire report, from metadata exploration to daily-profile
-clustering to LightGBM feature importance.
+reading consumption --- runs through the entire report, from metadata exploration, through
+daily-profile clustering, to LightGBM feature importance.
 
 The story continues with the decision, made to keep the internship's scope coherent, to focus
 the analysis on \textbf{all-electric} buildings. A feature engineering pipeline then turns
@@ -261,7 +256,7 @@ ResStock's raw categorical variables into a usable set, reduced to about thirty 
 interpretable features. Clustering the daily consumption profiles reveals recurring "typical
 days", distinct in shape and amplitude, before a LightGBM model trained on the metadata reaches
 an $R^2$ of 0.847 on electricity consumption (versus $-0.057$ for a naive baseline), with only a
-small gap against a reduced, interpretable feature set. Finally, a hybrid RNN/MLP architecture
+small gap compared to a reduced, interpretable feature set. Finally, a hybrid RNN/MLP architecture
 tackles two complementary problems on the hourly time series: forecasting next-hour consumption,
 and extrapolating annual consumption from just 90 days of observation.
 
@@ -305,32 +300,98 @@ flexibilité HVAC/upgrades dr\_001--dr\_005, hors périmètre confirmé de ce st
 \end{todobox}
 
 \section{Le jeu de données ResStock}
-\begin{todobox}[Source : ResStockTechnicalReferenceGuide\_2025\_1.pdf, dans reports/figures/]
+\label{sec:jeu-donnees-resstock}
+Le jeu de données central de ce stage est \textbf{ResStock 2025 Release 1}, produit par le
+National Renewable Energy Laboratory (NREL) : une simulation détaillée, bâtiment par bâtiment,
+du parc résidentiel américain, construite à partir de modèles EnergyPlus calibrés sur les
+caractéristiques réelles du parc (recensement, enquêtes RECS, données de construction). Le
+fichier national \code{upgrade0.parquet} correspond au scénario \emph{baseline} (avant
+application d'upgrades) : 549\,971 bâtiments, chacun décrit à l'origine par 771 colonnes.
+
+Ces colonnes se répartissent en deux grandes familles, une distinction qui structure tout le
+reste du rapport :
 \begin{itemize}
-  \item ResStock 2025 Release 1 (NREL) : simulation du parc résidentiel américain.
-  \item \code{upgrade0.parquet} : métadonnées nationales, 549\,971 bâtiments $\times$ 771
-  colonnes (baseline, avant upgrades).
-  \item Séries temporelles individuelles par bâtiment (pas 15 min, 35\,040 lignes/an),
-  téléchargées à la demande depuis OEDI (\code{extraction\_timeseries\_oedi.ipynb}).
-  \item Données météo (fichiers associés à chaque zone climatique ASHRAE).
-  \item Rappeler ici le renvoi vers le guide technique ResStock pour les définitions de
-  variables citées plus loin.
+  \item les variables \textbf{\code{in.*}} (« inputs ») décrivent le bâtiment tel qu'il est
+  simulé : localisation, géométrie, enveloppe thermique, système HVAC, appareils, profil
+  socio-économique des occupants --- ce sont les variables exploitées comme \emph{features} par
+  les modèles prédictifs (chapitres~\ref{ch:exploration} à \ref{ch:modelisation}) ;
+  \item les variables \textbf{\code{out.*}} (« outputs ») sont les résultats de la simulation
+  EnergyPlus : consommations d'énergie par usage et par vecteur énergétique (électricité, gaz
+  naturel, propane, fioul), émissions de CO$_2$e, factures, dimensionnement des équipements,
+  heures d'inconfort thermique... Ce sont elles qui fournissent les \emph{cibles} des modèles
+  (\code{out.electricity.total.energy\_consumption..kwh} pour la consommation électrique
+  annuelle, par exemple), ainsi que plusieurs indicateurs utilisés comme grille de lecture
+  (décomposition par usage, cf. \S\ref{ch:exploration}).
 \end{itemize}
-\end{todobox}
+
+\begin{resultbox}[Répartition \code{in.*} / \code{out.*} --- Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb}]
+Après nettoyage (\S\ref{sec:nettoyage-metadata}), les 391 colonnes conservées se répartissent en
+165 variables \code{in.*}, 221 variables \code{out.*} et 5 colonnes d'identification/pondération
+(\code{bldg\_id}, \code{completed\_status}, \code{upgrade}, \code{weight}, \code{applicability}).
+\begin{table}[H]
+\centering
+\caption{Structure du jeu de métadonnées nettoyé (391 colonnes, 549\,971 bâtiments).}
+\begin{tabular}{lr}
+\toprule
+Famille & Colonnes \\
+\midrule
+\code{in.*} --- caractéristiques du bâtiment (features)          & 165 \\
+\code{out.*} --- résultats de simulation (cibles \& indicateurs) & 221 \\
+Identifiants et pondération (\code{bldg\_id}, \code{weight}...)  & 5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{resultbox}
+
+Au-delà des métadonnées, deux autres sources de données complètent le jeu ResStock : les séries
+temporelles individuelles par bâtiment (pas de temps 15~minutes, 35\,040 lignes par année,
+téléchargées à la demande depuis l'OEDI via \code{extraction\_timeseries\_oedi.ipynb}) et les
+données météo horaires associées à chaque zone climatique ASHRAE, utilisées par EnergyPlus pour
+produire les simulations. Le guide technique ResStock
+(\code{ResStockTechnicalReferenceGuide\_2025\_1.pdf}, disponible dans \code{reports/figures/})
+documente la définition exacte de chaque variable citée dans ce rapport.
 
 \section{Cadrage : périmètre tout-électrique}
-\begin{todobox}[Cf. décision de cadrage --- à justifier avec tes propres mots]
-Expliquer pourquoi le projet se concentre désormais sur les bâtiments \textbf{tout-électriques}
-(pas de gaz/fuel/propane) : simplification de la cible (l'électricité devient la cible
-principale/unique), cohérence avec l'échantillon de 100 bâtiments déjà préparé pour le
-clustering (\code{data/raw/timeseries\_100\_all\_electric}).
-\end{todobox}
+\label{sec:cadrage-tout-electrique}
+Le stage a d'abord visé cinq cibles héritées des sorties ResStock : la consommation
+d'électricité, de gaz naturel, de propane, de fioul, ainsi que les émissions de CO$_2$e associées
+(chapitre~\ref{ch:modelisation}). Or un bâtiment n'utilise jamais l'ensemble de ces vecteurs
+énergétiques à la fois --- il est chauffé à l'électricité, au gaz, au propane \emph{ou} au fioul
+--- si bien que le gaz naturel, le propane et le fioul sont des cibles \emph{structurellement
+nulles} pour une large part du parc (tout bâtiment ne les utilisant pas). Cette hétérogénéité
+s'est traduite par de grandes erreurs de prédiction sur ces trois cibles : le $R^2$ de la
+baseline naïve est le plus dégradé pour le gaz naturel ($-0,253$, contre $-0,057$ pour
+l'électricité), et même le meilleur modèle entraîné (LightGBM) plafonne nettement plus bas sur le
+propane ($R^2=0,503$) et le fioul ($R^2=0,674$) que sur l'électricité ($R^2=0,847$) --- ce sont
+d'ailleurs les points faibles constants identifiés au chapitre~\ref{ch:modelisation}
+(cibles rares, \emph{zero-inflated}).
+
+C'est ce constat, survenu en cours de stage lors des premiers essais de modélisation multi-cibles,
+qui a motivé le recentrage du périmètre sur les bâtiments \textbf{tout-électriques} (aucun
+chauffage/appareil au gaz, propane ou fioul) : l'électricité devient la cible
+principale/unique du reste du rapport, ce qui évite le problème des cibles \emph{zero-inflated}
+et simplifie l'interprétation des résultats. Ce choix est également cohérent avec l'échantillon
+de 100 bâtiments tout-électriques déjà préparé pour le clustering et le RNN/MLP
+(\code{data/raw/timeseries\_100\_all\_electric}).
 
 % ============================================================================
 \chapter{Exploration et nettoyage des données}
 \label{ch:exploration}
 
-\section{Vue d'ensemble des variables \code{in.*}}
+Ce chapitre réunit les notebooks des dossiers \code{01\_exploration}, \code{02\_nettoyage} et
+\code{03\_visualisation}. Son périmètre est celui des \textbf{métadonnées} ResStock : une ligne
+par bâtiment, décrivant ses caractéristiques (\code{in.*}) et les résultats agrégés de sa
+simulation (\code{out.*}) --- cf. \S\ref{sec:jeu-donnees-resstock} pour la structure du jeu de
+données. Les séries temporelles horaires (consommation par bâtiment, pas 15~minutes) n'y sont
+pas traitées :
+elles sont introduites séparément une fois le sous-échantillon de bâtiments tout-électriques
+constitué (\S\ref{sec:cadrage-tout-electrique}), et font l'objet des chapitres dédiés au
+clustering des profils journaliers (chapitre~\ref{ch:clustering}) et à la modélisation RNN/MLP
+(chapitre~\ref{ch:rnn}).
+
+\section{Vue d'ensemble des variables \code{in.*} et \code{out.*}}
+
+\subsection{Variables \code{in.*}}
 \begin{resultbox}[Source : \code{01\_exploration/exploration\_in\_groups.ipynb}]
 Sur les 391 colonnes du jeu de métadonnées nettoyé (cf. \S\ref{sec:nettoyage-metadata}), 165
 colonnes \code{in.*} décrivent le bâtiment et ses occupants. Elles ont été réparties en 11
@@ -343,24 +404,24 @@ groupes métier (164 colonnes couvertes, seule \code{in.upgrade\_name} reste hor
 \toprule
 Groupe & Colonnes & \% manquant moyen \\
 \midrule
-Localisation          & 21 & 0.0\% \\
-Zone climatique        & 5 & 0.0\% \\
-Géométrie du bâtiment  & 20 & 0.0\% \\
-Enveloppe thermique    & 17 & 0.0\% \\
-HVAC                    & 42 & 0.0\% \\
-Eau chaude               & 6 & 0.0\% \\
-Appareils électroménagers & 28 & 0.0\% \\
-Véhicule électrique      & 6 & 0.0\% \\
-Panneau électrique       & 2 & 0.0\% \\
-Solaire et stockage      & 4 & 0.0\% \\
-Occupants et socio-économique & 13 & 0.9\% \\
+Localisation          & 21 & 0,0\% \\
+Zone climatique        & 5 & 0,0\% \\
+Géométrie du bâtiment  & 20 & 0,0\% \\
+Enveloppe thermique    & 17 & 0,0\% \\
+HVAC                    & 42 & 0,0\% \\
+Eau chaude               & 6 & 0,0\% \\
+Appareils électroménagers & 28 & 0,0\% \\
+Véhicule électrique      & 6 & 0,0\% \\
+Panneau électrique       & 2 & 0,0\% \\
+Solaire et stockage      & 4 & 0,0\% \\
+Occupants et socio-économique & 13 & 0,9\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 Le taux de valeurs manquantes est quasi nul partout : ResStock est une base \emph{simulée} (pas
-de non-réponse d'enquête), le seul groupe avec un peu de manquant étant les variables de revenu
-représentatif (groupe Occupants, 0.9\%). Le groupe HVAC est le plus riche (42 variables), suivi
-de l'enveloppe thermique (17) et des appareils électroménagers (28).
+de non-réponse d'enquête), le seul groupe présentant un peu de valeurs manquantes étant celui des
+variables de revenu représentatif (groupe Occupants, 0,9\%). Le groupe HVAC est le plus riche
+(42 variables), suivi des appareils électroménagers (28) et de l'enveloppe thermique (17).
 \end{resultbox}
 
 \begin{figure}[H]
@@ -371,6 +432,48 @@ de l'enveloppe thermique (17) et des appareils électroménagers (28).
   chacun des 11 groupes (\code{reports/figures/groupe\_*.png}).}
   \label{fig:groupe-geometrie}
 \end{figure}
+
+\subsection{Variables \code{out.*}}
+\begin{resultbox}[Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb} --- calcul direct sur \code{metadata\_clean.parquet}]
+Les 221 colonnes \code{out.*} sont les résultats de la simulation EnergyPlus pour chaque
+bâtiment. Elles se répartissent en 14 groupes, dominés par la consommation électrique (60 col.)
+et par des paramètres physiques dérivés du bâtiment (57 col. --- surfaces, dimensionnement des
+équipements, contraintes de panneau électrique) :
+\begin{table}[H]
+\centering
+\caption{Les 14 groupes de variables \code{out.*} (549\,971 bâtiments).}
+\label{tab:groupes-out}
+\begin{tabular}{lrr}
+\toprule
+Groupe & Colonnes & \% manquant moyen \\
+\midrule
+Consommation électrique (\code{electricity})       & 60 & 0,0\% \\
+Paramètres physiques dérivés (\code{params})         & 57 & 0,0\% \\
+Émissions CO$_2$e (\code{emissions})                  & 33 & 0,3\% \\
+Consommation gaz naturel (\code{natural\_gas})       & 22 & 0,0\% \\
+Consommation propane (\code{propane})                 & 12 & 0,0\% \\
+Consommation fioul (\code{fuel\_oil})                  & 8 & 0,0\% \\
+Charges thermiques (\code{load})                        & 7 & 0,0\% \\
+Factures (\code{utility\_bills})                          & 5 & 0,0\% \\
+Eau chaude, volumes (\code{hot\_water})                 & 4 & 0,0\% \\
+Énergie totale du site (\code{site\_energy})            & 4 & 0,0\% \\
+Puissances dimensionnantes (\code{capacity})            & 3 & 0,0\% \\
+Heures d'inconfort thermique (\code{unmet\_hours})     & 3 & 0,0\% \\
+Indicateurs de qualité (\code{qoi})                       & 2 & 0,0\% \\
+Taux d'effort énergétique (\code{energy\_burden})    & 1 & 12,1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+Comme pour les variables \code{in.*}, le taux de valeurs manquantes reste quasi nul : seule
+\code{out.energy\_burden..percentage} (taux d'effort énergétique, dérivé du revenu du ménage)
+présente un manquant notable (12,1\%), probablement pour les logements vacants ou sans revenu
+déclaré. Cinq cibles concentrent l'essentiel de l'attention du reste du rapport --- la
+consommation totale par vecteur énergétique (\code{out.electricity.total.energy\_consumption..kwh}
+et ses équivalents \code{natural\_gas}/\code{propane}/\code{fuel\_oil}) et les émissions
+associées (\code{out.emissions.total.*}), cf. chapitre~\ref{ch:modelisation}. Le détail de la
+décomposition de la consommation électrique par usage (chauffage, climatisation, eau chaude...)
+est présenté en \S\ref{sec:classification-metier} (Classification métier des variables).
+\end{resultbox}
 
 \section{Localisation et zone climatique}
 \begin{resultbox}[Source : \code{exploration\_localisation\_climat.ipynb}]
@@ -464,8 +567,8 @@ la plus élevée (15\,564~kWh/an), loin devant le gaz naturel, le propane ou le 
 tout-électriques (\S 2.3).
 
 \textbf{Consignes de température (flexibilité FlexiMax).} Consigne médiane de 70\degree F
-(chauffage) et 72\degree F (climatisation). \textbf{43.8\%} des bâtiments ont un thermostat
-programmable avec décalage (offset) pour le chauffage, \textbf{35.8\%} pour la climatisation ---
+(chauffage) et 72\degree F (climatisation). \textbf{43,8\%} des bâtiments ont un thermostat
+programmable avec décalage (offset) pour le chauffage, \textbf{35,8\%} pour la climatisation ---
 c'est-à-dire qu'une majorité de bâtiments n'a \emph{pas} de pilotage automatique du chauffage/
 climatisation, ce qui borne le potentiel de flexibilité immédiatement activable sans changement
 d'équipement.
@@ -508,7 +611,7 @@ d'isolation des gaines égal.
 récent, plus sa consommation \emph{absolue} est élevée en moyenne (de 10\,013~kWh/an pour les
 bâtiments d'avant 1940 à 12\,659~kWh/an pour les bâtiments des années 2000), alors que
 l'\emph{intensité} de consommation (kWh/ft²) est minimale pour les bâtiments des années 2010
-(7.0~kWh/ft²) --- les constructions récentes sont plus efficaces énergétiquement par m², mais
+(7,0~kWh/ft²) --- les constructions récentes sont plus efficaces énergétiquement par m², mais
 en moyenne plus grandes, ce qui inverse la tendance en valeur absolue.
 
 \textbf{Occupants.} Relation monotone croissante et quasi linéaire entre le nombre d'occupants et
@@ -559,6 +662,7 @@ Fichier exporté vers \code{data/processed/metadata\_clean.parquet}.
 \end{figure}
 
 \section{Classification métier des variables}
+\label{sec:classification-metier}
 \begin{resultbox}[Source : \code{03\_visualisation/classification\_variables.ipynb}]
 Ce notebook croise les 165 variables \code{in.*} avec les usages électriques
 \code{out.electricity.*} pour produire une classification orientée « métier » plutôt que
@@ -571,14 +675,14 @@ engineering, clustering, modélisation) :
   (11\%), Météo/zone climatique (10\%), Comportemental (9\%), Eau chaude/DHW (6\%), Occupants
   (5\%), VE (5\%), Production PV (5\%) ;
   \item Décomposition de la consommation électrique moyenne (11\,756~kWh/an) par usage :
-  climatisation (27.4\%), électronique « brun » (20.6\%), chauffage (19.3\%), électroménager
-  « blanc » (14.5\%), eau chaude (8.2\%), éclairage (7.5\%), divers (1.9\%) ;
+  climatisation (27,4\%), électronique « brun » (20,6\%), chauffage (19,3\%), électroménager
+  « blanc » (14,5\%), eau chaude (8,2\%), éclairage (7,5\%), divers (1,9\%) ;
   \item Cas particulier \code{in.neighbors} : d'abord suspectée d'être un proxy météo, l'analyse
   montre que c'est en réalité une variable d'\textbf{enveloppe thermique / mitoyenneté}
-  (67.7\% des bâtiments sont des maisons individuelles avec voisins à 15 pieds ; le reste sont
+  (67,7\% des bâtiments sont des maisons individuelles avec voisins à 15 pieds ; le reste sont
   des logements collectifs avec 2 à 27 voisins) --- un bâtiment mitoyen perd moins de chaleur par
   ses murs communs, d'où une corrélation négative attendue avec le chauffage ;
-  \item Véhicule électrique : seulement 1.1\% des ménages possèdent un VE, mais leur
+  \item Véhicule électrique : seulement 1,1\% des ménages possèdent un VE, mais leur
   consommation de recharge moyenne atteint 2\,082~kWh/an (contre 22~kWh/an en moyenne sur
   l'ensemble du parc) --- un usage marginal en pénétration mais fortement pilotable, à traiter
   séparément d'une analyse thermique du bâtiment.
