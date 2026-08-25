@@ -1,0 +1,55 @@
+{
+ "nom": "huber",
+ "args": {
+  "nom": "huber",
+  "cache": "503",
+  "n_bat": null,
+  "feats": "",
+  "arch": "base",
+  "couches": 1,
+  "dropout": 0.0,
+  "hidden": 128,
+  "stride": 168,
+  "batch": 64,
+  "lr": 0.001,
+  "loss": "huber",
+  "delta": 1.0,
+  "sched": "plateau",
+  "clip": 0.0,
+  "epochs": 40,
+  "patience": 8,
+  "seed": 42,
+  "val_ref": false
+ },
+ "n_bat": 503,
+ "n_static": 48,
+ "n_time": 31,
+ "fenetres_train": 20904,
+ "epoques": 4,
+ "val_mse": 0.18242917954921722,
+ "r2": {
+  "total": 0.8260530829429626,
+  "chauffage": 0.8010920286178589,
+  "clim": 0.8839699625968933,
+  "eau_chaude": 0.82793128490448
+ },
+ "rmse": {
+  "total": 1.0125318765640259,
+  "chauffage": 0.906514048576355,
+  "clim": 0.3236200511455536,
+  "eau_chaude": 0.13980670273303986
+ },
+ "nmbe_median": {
+  "total": 9.205584526062012,
+  "chauffage": 31.905380249023438,
+  "clim": 12.551665306091309,
+  "eau_chaude": 11.78620719909668
+ },
+ "cvrmse_median": {
+  "total": 30.947431564331055,
+  "chauffage": 96.7431869506836,
+  "clim": 37.848731994628906,
+  "eau_chaude": 63.302093505859375
+ },
+ "minutes": 30.4
+}

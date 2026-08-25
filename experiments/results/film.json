@@ -1,0 +1,55 @@
+{
+ "nom": "film",
+ "args": {
+  "nom": "film",
+  "cache": "503",
+  "n_bat": null,
+  "feats": "",
+  "arch": "film",
+  "couches": 1,
+  "dropout": 0.0,
+  "hidden": 128,
+  "stride": 168,
+  "batch": 64,
+  "lr": 0.001,
+  "loss": "mse",
+  "delta": 1.0,
+  "sched": "none",
+  "clip": 0.0,
+  "epochs": 40,
+  "patience": 8,
+  "seed": 42,
+  "val_ref": false
+ },
+ "n_bat": 503,
+ "n_static": 48,
+ "n_time": 31,
+ "fenetres_train": 20904,
+ "epoques": 18,
+ "val_mse": 0.17751695215702057,
+ "r2": {
+  "total": 0.8201801180839539,
+  "chauffage": 0.8260772228240967,
+  "clim": 0.8827924132347107,
+  "eau_chaude": 0.8253663182258606
+ },
+ "rmse": {
+  "total": 1.0294829607009888,
+  "chauffage": 0.8476697206497192,
+  "clim": 0.3252580463886261,
+  "eau_chaude": 0.14084488153457642
+ },
+ "nmbe_median": {
+  "total": 10.535929679870605,
+  "chauffage": 27.640018463134766,
+  "clim": 12.536962509155273,
+  "eau_chaude": 8.585049629211426
+ },
+ "cvrmse_median": {
+  "total": 29.420896530151367,
+  "chauffage": 93.7663803100586,
+  "clim": 37.69012451171875,
+  "eau_chaude": 61.63188171386719
+ },
+ "minutes": 54.2
+}

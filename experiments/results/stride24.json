@@ -1,0 +1,56 @@
+{
+ "nom": "stride24",
+ "args": {
+  "nom": "stride24",
+  "cache": "503",
+  "parc": "nn_buildings.csv",
+  "n_bat": null,
+  "feats": "cop,copt,oos",
+  "arch": "base",
+  "couches": 1,
+  "dropout": 0.0,
+  "hidden": 128,
+  "stride": 24,
+  "batch": 64,
+  "lr": 0.001,
+  "loss": "mse",
+  "delta": 1.0,
+  "sched": "none",
+  "clip": 0.0,
+  "epochs": 12,
+  "patience": 4,
+  "seed": 42,
+  "val_ref": false
+ },
+ "n_bat": 503,
+ "n_static": 51,
+ "n_time": 32,
+ "fenetres_train": 144318,
+ "epoques": 1,
+ "val_mse": 0.1482173353433609,
+ "r2": {
+  "total": 0.8485241532325745,
+  "chauffage": 0.8862054944038391,
+  "clim": 0.8867520093917847,
+  "eau_chaude": 0.8344992399215698
+ },
+ "rmse": {
+  "total": 0.9448699355125427,
+  "chauffage": 0.6856605410575867,
+  "clim": 0.31971678137779236,
+  "eau_chaude": 0.13711248338222504
+ },
+ "nmbe_median": {
+  "total": 8.694180488586426,
+  "chauffage": 21.150148391723633,
+  "clim": 15.156356811523438,
+  "eau_chaude": 10.312522888183594
+ },
+ "cvrmse_median": {
+  "total": 29.357933044433594,
+  "chauffage": 77.12290954589844,
+  "clim": 36.878456115722656,
+  "eau_chaude": 63.776859283447266
+ },
+ "minutes": 58.4
+}

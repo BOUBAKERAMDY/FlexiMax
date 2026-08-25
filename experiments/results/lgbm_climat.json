@@ -1,0 +1,35 @@
+{
+ "nom": "climat",
+ "args": {
+  "nom": "climat",
+  "feats": "clim",
+  "log1p": false,
+  "objectif": "l2",
+  "optuna": 0,
+  "arbres": 3000,
+  "export": false,
+  "kfold": 5,
+  "jobs": 3
+ },
+ "n": 64062,
+ "n_feat": 58,
+ "r2": {
+  "total": 0.8895155602872047,
+  "chauffage": 0.8051739872020984,
+  "clim": 0.9244784490181582,
+  "eau_chaude": 0.9743730618232255
+ },
+ "rmse": {
+  "total": 3300.684040547352,
+  "chauffage": 3369.5113570428666,
+  "clim": 854.1255295465752,
+  "eau_chaude": 243.83437287390976
+ },
+ "arbres": {
+  "total": 1941,
+  "chauffage": 668,
+  "clim": 1318,
+  "eau_chaude": 2087
+ },
+ "best_params": {}
+}

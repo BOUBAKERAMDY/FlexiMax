@@ -1,0 +1,57 @@
+{
+ "nom": "solar",
+ "args": {
+  "nom": "solar",
+  "cache": "503",
+  "parc": "nn_buildings.csv",
+  "n_bat": null,
+  "feats": "cop,copt,oos,solar",
+  "arch": "base",
+  "couches": 1,
+  "dropout": 0.0,
+  "hidden": 128,
+  "stride": 168,
+  "batch": 64,
+  "lr": 0.001,
+  "loss": "mse",
+  "delta": 1.0,
+  "sched": "none",
+  "clip": 0.0,
+  "epochs": 40,
+  "patience": 8,
+  "seed": 42,
+  "save": "",
+  "val_ref": false
+ },
+ "n_bat": 503,
+ "n_static": 51,
+ "n_time": 33,
+ "fenetres_train": 20904,
+ "epoques": 10,
+ "val_mse": 0.15310649573802948,
+ "r2": {
+  "total": 0.8437676429748535,
+  "chauffage": 0.8680276274681091,
+  "clim": 0.8951818943023682,
+  "eau_chaude": 0.8303443193435669
+ },
+ "rmse": {
+  "total": 0.9595901966094971,
+  "chauffage": 0.7383971214294434,
+  "clim": 0.30758723616600037,
+  "eau_chaude": 0.13882294297218323
+ },
+ "nmbe_median": {
+  "total": 10.165459632873535,
+  "chauffage": 22.305334091186523,
+  "clim": 10.229557991027832,
+  "eau_chaude": 10.285968780517578
+ },
+ "cvrmse_median": {
+  "total": 28.264978408813477,
+  "chauffage": 75.12769317626953,
+  "clim": 38.659950256347656,
+  "eau_chaude": 62.893463134765625
+ },
+ "minutes": 35.4
+}

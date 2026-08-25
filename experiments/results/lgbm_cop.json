@@ -1,0 +1,35 @@
+{
+ "nom": "cop",
+ "args": {
+  "nom": "cop",
+  "feats": "cop",
+  "log1p": false,
+  "objectif": "l2",
+  "optuna": 0,
+  "arbres": 3000,
+  "export": false,
+  "kfold": 5,
+  "jobs": 3
+ },
+ "n": 64062,
+ "n_feat": 50,
+ "r2": {
+  "total": 0.9361721558276931,
+  "chauffage": 0.9384950280618478,
+  "clim": 0.9413007723699894,
+  "eau_chaude": 0.9750529528283916
+ },
+ "rmse": {
+  "total": 2508.7563370710495,
+  "chauffage": 1893.2090226649652,
+  "clim": 753.0129518658706,
+  "eau_chaude": 240.5781277747397
+ },
+ "arbres": {
+  "total": 2997,
+  "chauffage": 2940,
+  "clim": 3000,
+  "eau_chaude": 2993
+ },
+ "best_params": {}
+}

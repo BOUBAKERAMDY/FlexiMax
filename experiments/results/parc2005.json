@@ -1,0 +1,56 @@
+{
+ "nom": "parc2005",
+ "args": {
+  "nom": "parc2005",
+  "cache": "elargi",
+  "parc": "nn_buildings_elargi.csv",
+  "n_bat": null,
+  "feats": "cop,copt,oos",
+  "arch": "base",
+  "couches": 1,
+  "dropout": 0.0,
+  "hidden": 128,
+  "stride": 168,
+  "batch": 64,
+  "lr": 0.001,
+  "loss": "mse",
+  "delta": 1.0,
+  "sched": "none",
+  "clip": 0.0,
+  "epochs": 40,
+  "patience": 8,
+  "seed": 42,
+  "val_ref": true
+ },
+ "n_bat": 2005,
+ "n_static": 51,
+ "n_time": 32,
+ "fenetres_train": 99008,
+ "epoques": 25,
+ "val_mse": 0.10841242969036102,
+ "r2": {
+  "total": 0.8948467373847961,
+  "chauffage": 0.9139165282249451,
+  "clim": 0.9225050806999207,
+  "eau_chaude": 0.8522213101387024
+ },
+ "rmse": {
+  "total": 0.7872483134269714,
+  "chauffage": 0.5963598489761353,
+  "clim": 0.2644762694835663,
+  "eau_chaude": 0.1295635849237442
+ },
+ "nmbe_median": {
+  "total": 8.945680618286133,
+  "chauffage": 15.930082321166992,
+  "clim": 12.744993209838867,
+  "eau_chaude": 5.651968955993652
+ },
+ "cvrmse_median": {
+  "total": 23.823694229125977,
+  "chauffage": 59.52805709838867,
+  "clim": 33.645774841308594,
+  "eau_chaude": 58.575111389160156
+ },
+ "minutes": 186.3
+}

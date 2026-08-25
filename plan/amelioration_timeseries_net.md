@@ -313,7 +313,7 @@ avéré être un cas extrême choisi par hasard.
 ## À vérifier avant de conclure quoi que ce soit
 
 `static_preds.parquet` couvre les 55 732 bâtiments avec un R² de **0,949** sur `total`,
-alors que le split test de `lgbm_electricity_5features.ipynb` tourne autour de 0,85
+alors que le split test de `lgbm_consommation_annuelle.ipynb` tourne autour de 0,85
 (référence citée en c15 : 0,8446).
 
 L'écart suggère que ~80 % de ces prédictions sont **in-sample** : les bâtiments de
@@ -335,20 +335,64 @@ code qui a produit ce fichier, il n'a donc pas pu être relu.
 1. ~~**Partie 1** — tête multiplicative~~ — *testée le 04/08, **rejetée**, revertée
    (`TETE = 'additive'`). Retour à la référence 0.836 / 0.815.*
 2. ~~**Partie 0** — hygiène des données~~ — *faite le 05/08 : arbitrage des consignes sur 108
-   bâtiments + retrait des 6 colonnes de consigne de `s`. **À relancer pour prendre la
-   nouvelle référence** (les entrées ont changé, l'ancienne 0.836 / 0.815 n'est plus comparable).*
-3. **Le COP / système de chauffage** — mesuré **+0.092**, sur 100 % du parc
-4. **Le produit enveloppe `(UA + H_ve) × ecart` dans `f(t)`** — mesuré **+0.073**
-5. **Partie 3** — évaluation par bâtiment *(le bloc NMBE est déjà en place, reste le
-   CV(RMSE), le nuage annuel et le triptyque de courbes)*
-6. Le climat (`HDD18`) dans `s` — utile pour le niveau, plus prioritaire depuis la mesure
-7. Re-test de la tête multiplicative, une fois le climat présent
-8. Vérification `static_preds` hors échantillon
-9. Leviers secondaires, un A/B à la fois — dont les apports solaires, déclassés (+0.002)
+   bâtiments + retrait des 6 colonnes de consigne de `s`.*
+3. ~~Le COP / système de chauffage~~ — *fait le 21/08, **+0.059** sur le chauffage*
+4. ~~Le produit enveloppe `(UA + H_ve) × ecart` dans `f(t)`~~ — *testé le 21/08, **+0.002**,
+   écarté : le gain annoncé de +0.073 était mesuré sur régression linéaire poolée, où le
+   produit remplace une interaction que le réseau construit déjà tout seul*
+5. ~~Le climat (`HDD18`) dans `s`~~ — *testé le 21/08, **+0.008**, écarté seul*
+6. ~~Vérification `static_preds` hors échantillon~~ — *faite le 21/08 : la présomption était
+   juste, fichier régénéré en KFold*
+7. ~~Leviers secondaires~~ — *tous testés le 21/08, voir le tableau ci-dessous*
+8. **Reste : Partie 3**, l'évaluation par bâtiment dans le notebook (NMBE et CV(RMSE) sont
+   dans le banc `experiments/`, pas encore reportés en `c10`), et le re-test de la tête
+   multiplicative maintenant que `s` contient le système de chauffage.
 
-Chaque partie est mesurée seule, sur les mêmes 503 bâtiments et la même graine (42),
-et le résultat est consigné en commentaire dans la cellule concernée — comme les
-A/B du 29/07, 31/07 et 03/08 déjà présents dans le notebook.
+---
+
+## Campagne du 21/08 — 15 configurations
+
+Banc d'essai `experiments/` (cache `.npy`, une expérience par ligne de commande, résultat
+JSON). Même graine, **mêmes 101 bâtiments de validation** dans tous les cas, y compris pour
+les runs à 2005 bâtiments — sinon agrandir le parc changerait aussi le jeu de validation.
+
+### Ce qui marche
+
+| levier | total | chauffage | clim | eau_chaude |
+|---|---|---|---|---|
+| référence (503 bât., `s` à 48 colonnes) | 0.828 | 0.805 | 0.883 | 0.831 |
+| `pac`, `cop`, `mshp` dans `s` | +0.021 | **+0.059** | +0.010 | +0.002 |
+| ... plus `besoin_elec_chauffage` dans `f(t)` | +0.020 | **+0.068** | +0.013 | +0.002 |
+| ... plus niveaux annuels hors échantillon | +0.024 | +0.077 | +0.004 | +0.006 |
+| ... plus **parc élargi à 2005 bâtiments** | **+0.067** | **+0.109** | **+0.040** | **+0.021** |
+
+**Résultat : 0.895 / 0.914 / 0.923 / 0.852.** NMBE médian par bâtiment sur le chauffage :
+29.8 % → 15.9 %. CV(RMSE) médian : total 23.8 % (sous le seuil ASHRAE Guideline 14 de 30 %),
+chauffage 59.5 % — encore loin du compte.
+
+### Ce qui ne marche pas
+
+| levier | Δ total | pourquoi |
+|---|---|---|
+| FiLM | −0.008 | la modulation `h·γ + β` n'aide pas là où la concaténation suffisait |
+| GRU 2 couches + dropout | −0.009 | 2× le temps, aucun gain : le plafond n'est pas la capacité |
+| perte de Huber + `ReduceLROnPlateau` | −0.002 | |
+| `log1p` sur la cible (LightGBM) | −0.015 sur le chauffage | déplace l'erreur vers les gros consommateurs |
+| fenêtres glissantes `stride=24` | +0.000 | 7× plus de fenêtres, mais les **mêmes** bâtiments |
+| produit enveloppe `(UA+H_ve) × ecart` | +0.002 | |
+| climat (`HDD18`, `CDD18`, …) dans `s` | +0.008 | utile à LightGBM, redondant pour le réseau |
+
+### La leçon principale
+
+**Le levier dominant est le nombre de bâtiments, pas le modèle.** À configuration identique,
+passer de 503 à 2005 bâtiments rapporte +0.043 sur le total et +0.032 sur le chauffage — plus
+que toutes les variantes d'architecture réunies, qui sont toutes négatives. Et le contraste
+avec `stride=24` est net : 7× plus de fenêtres sur le **même** parc ne donne rien, 4× plus de
+**bâtiments** donne tout. Ce qui manquait au réseau n'était ni de la capacité, ni des heures,
+c'était de la **diversité de bâtiments** — cohérent avec le ratio bâtiments/colonnes de `s`
+suivi depuis le début, passé de 8.4 à 37.
+
+Le parc reste extensible : 55 732 bâtiments passent le filtre, 2005 sont téléchargés.
 
 ## Ce que l'échec de la partie 1 a appris
 

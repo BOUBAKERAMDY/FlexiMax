@@ -1,0 +1,57 @@
+{
+ "nom": "final",
+ "args": {
+  "nom": "final",
+  "cache": "elargi",
+  "parc": "nn_buildings_elargi.csv",
+  "n_bat": null,
+  "feats": "cop,copt,oos",
+  "arch": "base",
+  "couches": 1,
+  "dropout": 0.0,
+  "hidden": 128,
+  "stride": 168,
+  "batch": 64,
+  "lr": 0.001,
+  "loss": "mse",
+  "delta": 1.0,
+  "sched": "none",
+  "clip": 0.0,
+  "epochs": 40,
+  "patience": 8,
+  "seed": 42,
+  "save": "loadnet.pt",
+  "val_ref": true
+ },
+ "n_bat": 2005,
+ "n_static": 51,
+ "n_time": 32,
+ "fenetres_train": 99008,
+ "epoques": 37,
+ "val_mse": 0.10680744051933289,
+ "r2": {
+  "total": 0.895745038986206,
+  "chauffage": 0.9115410447120667,
+  "clim": 0.9284316301345825,
+  "eau_chaude": 0.8521815538406372
+ },
+ "rmse": {
+  "total": 0.7838782668113708,
+  "chauffage": 0.6045320630073547,
+  "clim": 0.2541620433330536,
+  "eau_chaude": 0.129581019282341
+ },
+ "nmbe_median": {
+  "total": 8.345894813537598,
+  "chauffage": 15.521618843078613,
+  "clim": 12.07795524597168,
+  "eau_chaude": 5.665981769561768
+ },
+ "cvrmse_median": {
+  "total": 24.26286506652832,
+  "chauffage": 59.11989974975586,
+  "clim": 33.65479278564453,
+  "eau_chaude": 58.677101135253906
+ },
+ "minutes": 193.2
+}
