@@ -1,0 +1,270 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\geometry{margin=2.5cm}
+
+\definecolor{headerblue}{RGB}{31,73,125}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{headerblue}{\small Rapport --- Modélisation de la consommation énergétique (FlexiMax)}}
+\lhead{\small \leftmark}
+\rfoot{\thepage}
+
+\titleformat{\section}{\large\bfseries\color{headerblue}}{\thesection}{0.6em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{headerblue!80}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\itshape}{\thesubsubsection}{0.6em}{}
+
+% Adapter ce chemin si les figures sont ailleurs
+\graphicspath{{figures/}}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\LARGE\bfseries\color{headerblue} Modélisation de la consommation énergétique résidentielle\par}
+    \vspace{0.5cm}
+    {\large LightGBM et MLP sur les métadonnées ResStock --- comparaison et interprétation\par}
+    \vspace{1.5cm}
+    {\large Projet FlexiMax --- MINES Paris--PSL / ARMINES\par}
+    \vspace{0.3cm}
+    {\normalsize Notebooks : \code{lightgbm\_stratified.ipynb}, \code{lgbm\_shap.ipynb},
+    \code{lgbm\_stratified.ipynb}, \code{mlp\_stratified.ipynb}\par}
+    \vfill
+    {\normalsize Yassmin Zouarhi \par}
+    {\normalsize \today\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Objectif et démarche générale}
+
+L'objectif de cette partie est de \textbf{prédire la consommation énergétique} des bâtiments
+résidentiels à partir de leurs métadonnées (données ResStock : géométrie, enveloppe thermique,
+équipements, occupants, météo) --- cinq cibles simultanées :
+
+\begin{itemize}
+    \item \code{out.electricity.total.energy\_consumption..kwh}
+    \item \code{out.natural\_gas.total.energy\_consumption..kwh}
+    \item \code{out.fuel\_oil.total.energy\_consumption..kwh}
+    \item \code{out.propane.total.energy\_consumption..kwh}
+    \item \code{out.emissions.total.lrmer\_mid\_case\_25..co2e\_kg}
+\end{itemize}
+
+Deux familles de modèles sont comparées : \textbf{LightGBM} (gradient boosting sur arbres) et un
+\textbf{MLP} (réseau de neurones dense), sur un \textbf{split train/test partagé et stratifié}
+(cf. \code{clustering\_stratifie.ipynb}), garantissant que tous les modèles sont évalués sur
+\emph{exactement les mêmes bâtiments de test}. Deux jeux de features sont également comparés :
+l'ensemble complet (108 variables encodées, \og{}Global\fg{}) et un ensemble réduit de variables
+physiquement construites (\og{}Physique\fg{} : indices d'enveloppe thermique, d'occupation, de
+gain solaire...), pour évaluer le compromis performance / interprétabilité.
+
+\subsection{Pipeline d'exécution}
+
+Les quatre notebooks de modélisation dépendent d'artefacts générés en amont :
+
+\begin{enumerate}
+    \item \code{clustering\_stratifie.ipynb} --- construit le split train/test
+    (\code{idx\_train.npy} / \code{idx\_test.npy}) par stratification composite (climat,
+    géométrie, enveloppe, HVAC, occupants...), garantissant sa représentativité.
+    \item \code{physical\_feature\_engineering.ipynb} --- construit le jeu de features physiques
+    réduit (\code{X\_physical\_engineered.parquet}).
+    \item Les notebooks de modélisation proprement dits, décrits ci-après.
+\end{enumerate}
+
+\subsection{Point méthodologique : fiabilisation du split partagé}
+
+Avant les résultats présentés ici, une revue de code a mis en évidence plusieurs incohérences
+dans la façon dont le split partagé était appliqué :
+
+\begin{itemize}
+    \item dans \code{lgbm\_shap.ipynb}, les positions \code{idx\_train}/\code{idx\_test}
+    (calculées sur les 549\,971 lignes du jeu complet) étaient appliquées \emph{après} un
+    filtrage supplémentaire (bâtiments tout-électriques, surface $<250\,\text{m}^2$) suivi d'un
+    \code{reset\_index} --- ce qui décalait les positions et sélectionnait de mauvais bâtiments ;
+    \item \code{lgbm\_stratified.ipynb} construisait sa propre stratification (par quantiles)
+    \emph{séparément} pour les jeux Global et Physique, produisant deux jeux de test différents
+    --- rendant la comparaison Global vs Physique invalide.
+\end{itemize}
+
+Ces deux points ont été corrigés avant de produire les résultats ci-dessous (remapping correct
+des indices après filtrage ; réutilisation du split partagé pour les deux jeux de features).
+Les chiffres présentés sont donc calculés sur un split cohérent et strictement identique entre
+tous les modèles comparés.
+
+\section{Baseline naïve}
+
+Pour chaque cible, une baseline naïve (prédiction = médiane du jeu d'entraînement) sert de
+référence minimale.
+
+\begin{table}[H]
+\centering
+\caption{Baseline naïve (médiane) --- $R^2$ sur le jeu de test.}
+\begin{tabular}{lr}
+\toprule
+Cible & $R^2$ \\
+\midrule
+Électricité      & $-0.057$ \\
+Gaz naturel       & $-0.253$ \\
+Fuel oil          & $-0.033$ \\
+Propane           & $-0.032$ \\
+Émissions CO$_2$e & $-0.071$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Le $R^2$ négatif est attendu : la médiane minimise l'erreur absolue, pas l'erreur quadratique
+(base du $R^2$), donc elle est structurellement moins bonne qu'une baseline moyenne dès que les
+distributions sont asymétriques --- ce qui est le cas ici (consommations énergétiques à queue
+lourde). C'est volontaire : l'écart avec les modèles ci-après n'en est que plus net.
+
+\section{LightGBM vs MLP}
+
+Les deux modèles sont entraînés sur le jeu de features \og{}Global\fg{} (108 variables), sur le
+même split (\code{lightgbm\_stratified.ipynb} et \code{mlp\_stratified.ipynb}).
+
+\begin{table}[H]
+\centering
+\caption{Comparaison LightGBM vs MLP --- $R^2$ sur le jeu de test.}
+\begin{tabular}{lrr}
+\toprule
+Cible & LightGBM & MLP \\
+\midrule
+Émissions CO$_2$e & \textbf{0.911} & 0.865 \\
+Gaz naturel        & \textbf{0.869} & 0.841 \\
+Électricité        & \textbf{0.847} & 0.800 \\
+Fuel oil            & \textbf{0.674} & 0.639 \\
+Propane             & \textbf{0.503} & 0.473 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{LightGBM surpasse systématiquement le MLP sur les cinq cibles}, avec un écart de 3 à 5
+points de $R^2$, et un écart train/test (\emph{overfit gap}) plus faible en général --- le MLP
+sur-apprend davantage, en particulier sur \code{fuel\_oil} (gap $\approx$ 0.13 vs 0.17 pour
+LightGBM) et \code{propane}. Sur ces données tabulaires de taille moyenne (108 variables,
+$\sim$440\,000 lignes d'entraînement), le gradient boosting reste l'approche la plus efficace ---
+un résultat cohérent avec la littérature sur les données tabulaires, où les réseaux de neurones
+n'apportent généralement un avantage qu'avec davantage de structure (images, texte, séries) ou de
+volume.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{modelisation_dummy_vs_lgbm.png}
+    \caption{Gain de LightGBM par rapport à la baseline naïve, pour chaque cible.}
+    \label{fig:dummy-vs-lgbm}
+\end{figure}
+
+\section{Global vs Physique}
+
+Le jeu \og{}Physique\fg{} remplace les 108 variables encodées par un ensemble réduit de features
+physiquement interprétables (indice d'enveloppe thermique, intensité d'occupation, indice de gain
+solaire, intensité ECS...), construites dans \code{physical\_feature\_engineering.ipynb}.
+
+\begin{table}[H]
+\centering
+\caption{LightGBM --- Global vs Physique, mêmes bâtiments de test (\code{lgbm\_stratified.ipynb}).}
+\begin{tabular}{lrrr}
+\toprule
+Cible & $R^2$ Global & $R^2$ Physique & $\Delta$ \\
+\midrule
+Émissions CO$_2$e & 0.913 & 0.892 & $-0.021$ \\
+Gaz naturel         & 0.870 & 0.856 & $-0.014$ \\
+Électricité         & 0.848 & 0.817 & $-0.031$ \\
+Fuel oil              & 0.678 & 0.666 & $-0.012$ \\
+Propane               & 0.511 & 0.495 & $-0.016$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+L'écart de performance entre les deux jeux de features est \textbf{modeste (1 à 3 points de
+$R^2$)} et systématiquement en faveur du jeu Global --- logique, puisqu'il contient strictement
+plus d'information. Mais l'essentiel du signal prédictif est conservé par les $\sim$30 variables
+physiques : c'est un argument solide en faveur du jeu Physique quand l'interprétabilité et la
+parcimonie du modèle comptent (ex. restitution à un public non technique, diagnostic
+énergétique), au prix d'une perte de performance limitée.
+
+\section{Importance des variables}
+
+L'analyse d'importance (LightGBM natif, cf. figure~\ref{fig:importance-elec}, et SHAP pour la
+sélection de features dans \code{lgbm\_shap.ipynb}) fait ressortir un déterminant dominant sur
+toutes les cibles : \textbf{la localisation météorologique}
+(\code{in.weather\_file\_latitude}/\code{longitude}, proxy de la zone climatique ASHRAE). Viennent
+ensuite des variables de dimensionnement électrique (\code{in.electric\_panel\_breaker\_space\_total\_count}),
+de géométrie (\code{in.geometry\_floor\_area}), et d'étanchéité (\code{in.air\_leakage\_to\_outside\_ach50}).
+
+Ce résultat est cohérent avec l'intuition physique : le climat (besoins de chauffage/climatisation)
+domine la variabilité de consommation avant les caractéristiques intrinsèques du bâtiment, qui
+jouent un rôle de second ordre --- mais non négligeable, puisque le modèle atteint tout de même
+$R^2 \approx 0.85$ sur l'électricité en les intégrant.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{modelisation_importance_electricite.png}
+    \caption{Top 20 variables les plus importantes pour la prédiction de la consommation
+    électrique (LightGBM, jeu Global).}
+    \label{fig:importance-elec}
+\end{figure}
+
+\section{Qualité des prédictions et limites}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{modelisation_scatter_electricite.png}
+    \caption{Consommation électrique prédite vs réelle (modèle LightGBM final,
+    sélection de features SHAP), échelles linéaire et logarithmique.}
+    \label{fig:scatter-elec}
+\end{figure}
+
+La figure~\ref{fig:scatter-elec} montre un alignement globalement satisfaisant autour de la
+diagonale, avec une dispersion qui augmente pour les fortes consommations (hétéroscédasticité
+attendue sur ce type de variable).
+
+\textbf{Les cibles \code{fuel\_oil} et \code{propane} restent les points faibles constants} de
+tous les modèles testés : $R^2$ le plus bas (0.47--0.68) et écart train/test le plus élevé (jusqu'à
+0.20), quel que soit le modèle ou le jeu de features. Cause probable : ce sont des cibles
+\emph{rares et fortement zero-inflated} dans un échantillon national dominé par le chauffage
+électrique et gaz --- peu d'exemples d'apprentissage pour les logements effectivement chauffés au
+fuel/propane. Piste d'amélioration identifiée mais non implémentée : objectif Tweedie ou Poisson
+(adapté aux variables zero-inflated) plutôt que la MSE par défaut, et/ou une recherche
+d'hyperparamètres dédiée (Optuna, déjà importé mais non utilisé dans ces notebooks) pour ces deux
+cibles spécifiquement.
+
+\section{Synthèse}
+
+\begin{itemize}
+    \item \textbf{LightGBM domine le MLP} sur les cinq cibles énergétiques, avec un écart net et
+    un meilleur contrôle du sur-apprentissage.
+    \item Un jeu de \textbf{30 features physiquement interprétables conserve l'essentiel de la
+    performance} du jeu complet (108 variables) --- perte de 1 à 3 points de $R^2$ seulement.
+    \item La \textbf{zone climatique} est le déterminant numéro un de la consommation, avant les
+    caractéristiques du bâtiment lui-même.
+    \item \textbf{\code{fuel\_oil} et \code{propane}} concentrent les limites actuelles du modèle
+    --- cibles rares, nécessitant un traitement statistique dédié (loss zero-inflated) pour
+    progresser davantage.
+\end{itemize}
+
+Ces résultats offrent une base solide pour conclure le stage : un modèle de prédiction fiable et
+interprétable pour la majorité des usages (électricité, gaz, émissions), avec des limites
+identifiées et documentées pour les usages minoritaires.
+
+\end{document}
