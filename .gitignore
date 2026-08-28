@@ -22,3 +22,18 @@ reports/figures/*.png
 reports/figures/*.jpg
 *.png
 *.jpg
+
+# Personnel — pas partagé sur le dépôt collectif
+.claude/
+reports/presentation/
+
+# Artefacts de compilation LaTeX
+*.aux
+*.lof
+*.lot
+*.out
+*.toc
+*.fdb_latexmk
+*.fls
+*.log
+reports/rapport_stage.pdf
