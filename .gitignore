@@ -11,6 +11,17 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 
+# Cache du banc d'essai — entièrement reconstruit par build_cache en ~1 min
+experiments/cache/
+experiments/logs/
+
+# Compilation LaTeX
+*.aux
+*.log
+*.synctex.gz
+*.out
+*.toc
+
 # OS
 .DS_Store
 Thumbs.db

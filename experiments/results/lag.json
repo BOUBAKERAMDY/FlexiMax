@@ -1,0 +1,57 @@
+{
+ "nom": "lag",
+ "args": {
+  "nom": "lag",
+  "cache": "503",
+  "parc": "nn_buildings.csv",
+  "n_bat": null,
+  "feats": "cop,copt,oos,lag",
+  "arch": "base",
+  "couches": 1,
+  "dropout": 0.0,
+  "hidden": 128,
+  "stride": 168,
+  "batch": 64,
+  "lr": 0.001,
+  "loss": "mse",
+  "delta": 1.0,
+  "sched": "none",
+  "clip": 0.0,
+  "epochs": 40,
+  "patience": 8,
+  "seed": 42,
+  "save": "",
+  "val_ref": false
+ },
+ "n_bat": 503,
+ "n_static": 51,
+ "n_time": 35,
+ "fenetres_train": 20904,
+ "epoques": 3,
+ "val_mse": 0.15996964275836945,
+ "r2": {
+  "total": 0.8446377515792847,
+  "chauffage": 0.8652253746986389,
+  "clim": 0.8778745532035828,
+  "eau_chaude": 0.8274519443511963
+ },
+ "rmse": {
+  "total": 0.9569143652915955,
+  "chauffage": 0.7461953163146973,
+  "clim": 0.3320115804672241,
+  "eau_chaude": 0.1400013118982315
+ },
+ "nmbe_median": {
+  "total": 7.436072826385498,
+  "chauffage": 21.8680477142334,
+  "clim": 11.032413482666016,
+  "eau_chaude": 8.796974182128906
+ },
+ "cvrmse_median": {
+  "total": 30.28567123413086,
+  "chauffage": 78.12844848632812,
+  "clim": 37.192588806152344,
+  "eau_chaude": 62.848758697509766
+ },
+ "minutes": 25.1
+}

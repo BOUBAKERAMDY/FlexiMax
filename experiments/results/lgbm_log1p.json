@@ -1,0 +1,35 @@
+{
+ "nom": "log1p",
+ "args": {
+  "nom": "log1p",
+  "feats": "",
+  "log1p": true,
+  "objectif": "l2",
+  "optuna": 0,
+  "arbres": 3000,
+  "export": false,
+  "kfold": 5,
+  "jobs": 3
+ },
+ "n": 64062,
+ "n_feat": 47,
+ "r2": {
+  "total": 0.8860102624550678,
+  "chauffage": 0.7857101025604711,
+  "clim": 0.8944688127352091,
+  "eau_chaude": 0.9679373877430475
+ },
+ "rmse": {
+  "total": 3352.6349752190695,
+  "chauffage": 3533.8190021649857,
+  "clim": 1009.663519329066,
+  "eau_chaude": 272.7382302922193
+ },
+ "arbres": {
+  "total": 2377,
+  "chauffage": 1078,
+  "clim": 811,
+  "eau_chaude": 1731
+ },
+ "best_params": {}
+}

@@ -1,0 +1,78 @@
+{
+ "nom": "final",
+ "args": {
+  "nom": "final",
+  "feats": "cop,clim",
+  "log1p": false,
+  "tweedie": "chauffage,clim",
+  "optuna": 20,
+  "arbres": 4000,
+  "export": true,
+  "kfold": 5,
+  "jobs": 4
+ },
+ "n": 64062,
+ "n_feat": 61,
+ "r2": {
+  "total": 0.9426925715668055,
+  "chauffage": 0.9533554981644752,
+  "clim": 0.9569660444108044,
+  "eau_chaude": 0.9749504239724469
+ },
+ "rmse": {
+  "total": 2377.1624136917785,
+  "chauffage": 1648.707762872239,
+  "clim": 644.7507951701763,
+  "eau_chaude": 241.0719920050229
+ },
+ "arbres": {
+  "total": 3992,
+  "chauffage": 3980,
+  "clim": 4000,
+  "eau_chaude": 3012
+ },
+ "best_params": {
+  "total": {
+   "learning_rate": 0.04023720404936629,
+   "num_leaves": 23,
+   "min_child_samples": 13,
+   "colsample_bytree": 0.8589113478326698,
+   "subsample": 0.640535380158451,
+   "reg_lambda": 1.1273102302030817,
+   "reg_alpha": 3.12766975076336
+  },
+  "chauffage": {
+   "learning_rate": 0.017341061673960226,
+   "num_leaves": 36,
+   "min_child_samples": 77,
+   "colsample_bytree": 0.405302206768111,
+   "subsample": 0.8100308334813918,
+   "reg_lambda": 15.720815630684418,
+   "reg_alpha": 1.3911311259206154
+  },
+  "clim": {
+   "learning_rate": 0.02599473139440067,
+   "num_leaves": 20,
+   "min_child_samples": 202,
+   "colsample_bytree": 0.40149061405418995,
+   "subsample": 0.7923301539015852,
+   "reg_lambda": 1.5723988534643214,
+   "reg_alpha": 2.093101323409994
+  },
+  "eau_chaude": {
+   "learning_rate": 0.029320038966932034,
+   "num_leaves": 99,
+   "min_child_samples": 11,
+   "colsample_bytree": 0.6230653854183595,
+   "subsample": 0.7397451008611544,
+   "reg_lambda": 0.9189966871284455,
+   "reg_alpha": 2.86515023330792
+  }
+ },
+ "r2_oos": {
+  "total": 0.9414644806623855,
+  "chauffage": 0.9508046661083063,
+  "clim": 0.9551980050445432,
+  "eau_chaude": 0.980919917095757
+ }
+}

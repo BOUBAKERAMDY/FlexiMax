@@ -1,0 +1,35 @@
+{
+ "nom": "tweedie",
+ "args": {
+  "nom": "tweedie",
+  "feats": "cop,clim",
+  "log1p": false,
+  "objectif": "tweedie",
+  "optuna": 0,
+  "arbres": 3000,
+  "export": false,
+  "kfold": 5,
+  "jobs": 3
+ },
+ "n": 64062,
+ "n_feat": 61,
+ "r2": {
+  "total": 0.9408038692569207,
+  "chauffage": 0.952645362200125,
+  "clim": 0.954963800947376,
+  "eau_chaude": 0.9714371622476626
+ },
+ "rmse": {
+  "total": 2416.01738389317,
+  "chauffage": 1661.2106733694868,
+  "clim": 659.5794523289545,
+  "eau_chaude": 257.42293828827354
+ },
+ "arbres": {
+  "total": 2970,
+  "chauffage": 2142,
+  "clim": 2001,
+  "eau_chaude": 1187
+ },
+ "best_params": {}
+}
