@@ -1,4 +1,4 @@
-# Données volumineuses — ne pas versionner
+# Donnees volumineuses : ne pas versionner
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*
@@ -11,22 +11,15 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 
-# Cache du banc d'essai — entièrement reconstruit par build_cache en ~1 min
+# Cache du banc d'essai (reconstruit par build_cache en ~1 min)
 experiments/cache/
 experiments/logs/
-
-# Compilation LaTeX
-*.aux
-*.log
-*.synctex.gz
-*.out
-*.toc
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Images générées par les notebooks — ne pas versionner
+# Images generees par les notebooks : ne pas versionner
 notebooks/**/*.png
 notebooks/**/*.jpg
 reports/figures/*.png
@@ -34,17 +27,21 @@ reports/figures/*.jpg
 *.png
 *.jpg
 
-# Personnel — pas partagé sur le dépôt collectif
-.claude/
-reports/presentation/
-
-# Artefacts de compilation LaTeX
+# Compilation LaTeX
 *.aux
 *.lof
 *.lot
+*.log
 *.out
 *.toc
+*.nav
+*.snm
+*.synctex.gz
 *.fdb_latexmk
 *.fls
-*.log
 reports/rapport_stage.pdf
+
+# Environnements virtuels et brouillons locaux
+.venv/
+venv/
+reports/presentation/
