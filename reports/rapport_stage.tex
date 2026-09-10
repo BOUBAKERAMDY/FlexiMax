@@ -31,6 +31,7 @@
 \usepackage{array}
 \usepackage{xcolor}
 \usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
 \usepackage[most]{tcolorbox}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
@@ -42,12 +43,14 @@
 \usepackage{subcaption}
 \usepackage[hidelinks]{hyperref}
 \usepackage{alltt}
+\usepackage{placeins}
+\usepackage{etoolbox}
 \usepackage{pdflscape}
 \usepackage{colortbl}
 \usepackage{pifont}
 \usepackage{longtable}
 
-\geometry{margin=2.5cm}
+\geometry{margin=2cm}
 \graphicspath{{figures/}{../figures/}}
 
 % ---------------------------------------------------------------------------
@@ -56,11 +59,21 @@
 % ---------------------------------------------------------------------------
 \setlist{nosep, topsep=3pt, itemsep=2pt, parsep=0pt}
 \renewcommand{\arraystretch}{0.92}
-\setlength{\abovecaptionskip}{4pt}
-\setlength{\belowcaptionskip}{2pt}
-\setlength{\intextsep}{6pt plus 2pt minus 2pt}
-\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
-\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{1pt}
+\setlength{\intextsep}{4pt plus 1pt minus 1pt}
+\setlength{\textfloatsep}{5pt plus 1pt minus 1pt}
+\setlength{\floatsep}{4pt plus 1pt minus 1pt}
+
+% Places plus de flottants par page avant de forcer une page dédiée --- limite le nombre de
+% pages perdues à attendre qu'un flottant [htbp] trouve sa place idéale.
+\setcounter{topnumber}{9}
+\setcounter{bottomnumber}{9}
+\setcounter{totalnumber}{16}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.75}
 
 % ---------------------------------------------------------------------------
 % Palette « énergie » FlexiMax
@@ -107,8 +120,8 @@
   colback=energyaccent!8, colframe=energyaccent!85!black,
   coltitle=white, colbacktitle=energyaccent!85!black,
   fonttitle=\bfseries\small, title=#1,
-  boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt,
-  before skip=4pt, after skip=6pt
+  boxrule=0.5pt, arc=2pt, left=5pt, right=5pt, top=2pt, bottom=2pt,
+  before skip=3pt, after skip=4pt
 }
 
 \newtcolorbox{resultbox}[1][Résultat déjà disponible]{
@@ -116,8 +129,8 @@
   colback=energygreen!8, colframe=energygreen!60!black,
   coltitle=white, colbacktitle=energygreen!60!black,
   fonttitle=\bfseries\small, title=#1,
-  boxrule=0.5pt, arc=2pt, left=6pt, right=6pt, top=3pt, bottom=3pt,
-  before skip=4pt, after skip=6pt
+  boxrule=0.5pt, arc=2pt, left=5pt, right=5pt, top=2pt, bottom=2pt,
+  before skip=3pt, after skip=4pt
 }
 
 \newtcolorbox{figplaceholder}[1][]{
@@ -137,6 +150,10 @@
   {\filright\Huge\color{energydark}}
   [\vspace{2pt}{\color{energyaccent}\titlerule[2.2pt]}\vspace{6pt}]
 
+% Force le placement de tous les flottants [htbp] en attente avant chaque nouveau chapitre ---
+% évite l'erreur "Float(s) lost" et les pages orphelines de flottants non placés.
+\pretocmd{\chapter}{\FloatBarrier}{}{}
+
 \titleformat{\section}
   {\large\bfseries\color{energydark}}{\thesection}{0.6em}{}
   [{\color{energyaccent}\titlerule[1pt]}]
@@ -144,6 +161,12 @@
   {\normalsize\bfseries\color{energydark!80!black}}{\thesubsection}{0.6em}{}
 \titleformat{\subsubsection}
   {\normalsize\bfseries\itshape\color{energydark!70!black}}{\thesubsubsection}{0.6em}{}
+
+% Espacement resserré autour des titres --- gain cumulé sur ~12 chapitres et ~35 sections.
+\titlespacing*{\chapter}{0pt}{0pt}{16pt}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{8pt}{3pt}
+\titlespacing*{\subsubsection}{0pt}{6pt}{2pt}
 
 % ---------------------------------------------------------------------------
 % En-têtes / pieds de page
@@ -162,9 +185,9 @@
 }
 
 \hypersetup{
-  pdftitle={Rapport de stage --- FlexiMax},
+  pdftitle={Rapport de stage - FlexiMax},
   pdfauthor={Yassmin Zouarhi},
-  pdfsubject={Prédiction de la consommation énergétique résidentielle --- ResStock},
+  pdfsubject={Prédiction de la consommation énergétique résidentielle - ResStock},
 }
 
 \begin{document}
@@ -173,7 +196,7 @@
 % PAGE DE GARDE
 % ============================================================================
 \begin{titlepage}
-\noindent\hspace*{-2.5cm}%
+\noindent\hspace*{-2cm}%
 \begin{tikzpicture}
 \useasboundingbox (0,0) rectangle (21cm,8.6cm);
 \fill[energydark] (0,0) rectangle (21cm,8.6cm);
@@ -185,28 +208,33 @@
 \end{scope}
 \node[white,align=center,font=\Huge\bfseries] at (10.5,4.9) {Rapport de stage};
 \node[energyaccent!90!white,align=center,font=\Large\bfseries] at (10.5,3.9)
-  {FlexiMax --- Flexibilité énergétique résidentielle};
+  {FlexiMax - Flexibilité énergétique résidentielle};
 \node[white!85!black,align=center,font=\normalsize] at (10.5,3.1)
   {Prédiction de la consommation énergétique à partir des données ResStock};
 \end{tikzpicture}
 
 \vspace{1.4cm}
 \begin{center}
-{\Large\textbf{MINES Paris --- PSL / ARMINES}}\\[2pt]
-{\normalsize Programme France 2030 --- ADEME}\\[14pt]
+{\Large\textbf{MINES Paris - PSL / ARMINES}}\\[2pt]
+{\normalsize Programme France 2030 - ADEME}\\[14pt]
 {\color{energyaccent}\rule{6cm}{0.8pt}}\\[14pt]
 {\large\textbf{Yassmin Zouarhi}}\\[6pt]
-% TODO : dates exactes du stage, intitulé officiel, encadrant(e)
-\normalsize Stage de \emph{[durée à préciser]}, \emph{[dates à préciser]}\\[4pt]
-Encadrant(e) : \emph{[nom à préciser]}\\[24pt]
+\normalsize Stage de \emph{4 mois}, \emph{2025/2026}\\[4pt]
+Encadrants : \emph{Gilles Guerassimoff, Damien Corral, Abderrahmane Habbal}\\[24pt]
 \today
 \end{center}
 \vfill
 \begin{center}
+\includegraphics[height=1.3cm]{logo_polytech.png}\hspace{2cm}%
+\includegraphics[height=1.3cm]{logo_mines_psl.png}
+\end{center}
+\vspace{10pt}
+
+\begin{center}
 {\footnotesize\color{energygrey}
 Pipeline de notebooks : \code{01\_exploration} $\rightarrow$ \code{02\_nettoyage} $\rightarrow$
 \code{03\_visualisation} $\rightarrow$ \code{04\_features} $\rightarrow$ \code{05\_deeplearning}
-$\rightarrow$ \code{06\_timeseries} --- dépôt \code{FlexiMax}\par}
+$\rightarrow$ \code{06\_timeseries} - dépôt \code{FlexiMax}\par}
 \end{center}
 \end{titlepage}
 
@@ -226,7 +254,7 @@ Mes remerciements vont aussi à Didier Auroux, responsable de stage de la
 filière MAM à Polytech, pour son suivi et sa disponibilité tout au long
 de cette expérience.
 
-Je souhaite aussi remercier l'ensemble de l'équipe du programme FlexiMax à MINES Paris --- PSL /
+Je souhaite aussi remercier l'ensemble de l'équipe du programme FlexiMax à MINES Paris - PSL /
 ARMINES pour son accueil et pour les échanges enrichissants sur les enjeux de flexibilité
 énergétique résidentielle, ainsi que pour l'accès aux données et aux outils nécessaires à la
 réalisation de ce travail.
@@ -235,6 +263,9 @@ Merci également à Boubaker Amdyoun, avec qui j'ai partagé ce dépôt de trava
 techniques et méthodologiques qui ont permis d'améliorer la fiabilité des analyses présentées
 dans ce rapport.
 
+Je remercie aussi Eyua Assoumou, stagiaire ayant rejoint l'équipe pour un mois, qui nous a aidés à
+lancer l'exploration des séries temporelles.
+
 Enfin, je remercie le programme France 2030 et l'ADEME pour le financement de ce projet de
 recherche.
 
@@ -242,60 +273,70 @@ recherche.
 \chapter*{Résumé}
 \addcontentsline{toc}{chapter}{Résumé}
 
-Combien d'électricité un bâtiment résidentiel américain va-t-il consommer, et pourquoi ? Ce
-stage, mené dans le cadre du programme FlexiMax (MINES Paris --- PSL / ARMINES, France 2030 /
+Combien d'électricité un bâtiment résidentiel va-t-il consommer, et pourquoi ? Ce
+stage, mené dans le cadre du programme FlexiMax (MINES Paris - PSL / ARMINES, France 2030 /
 ADEME), construit pas à pas une chaîne de modélisation de la consommation énergétique
-résidentielle à partir des données de simulation ResStock (NREL) --- près de 550\,000 bâtiments,
-chacun décrit par plusieurs centaines de variables et une série temporelle horaire sur un an.
+résidentielle. En l'absence de données disponibles sur le projet FlexiMax lui-même au moment du
+stage, ce travail s'appuie sur un cas d'étude alternatif : les données de simulation ResStock
+(NREL) - près de 550\,000 bâtiments, chacun décrit par plusieurs centaines de variables et une
+série temporelle horaire sur un an.
 
 L'exploration révèle que, sous les 771 colonnes brutes du jeu de métadonnées, se cachent des
-doublons et artefacts de simulation (391 colonnes retenues) ; un même facteur revient sans cesse
---- la zone climatique. Elle structure la consommation de chauffage/climatisation, borne le
+doublons et artefacts de simulation (391 colonnes retenues) ; un même facteur revient sans cesse,
+la zone climatique. Elle structure la consommation de chauffage/climatisation, borne le
 potentiel de flexibilité des thermostats (43,8\,\% seulement des bâtiments disposent d'un
 thermostat programmable pour le chauffage), et réapparaîtra comme déterminant n°1 du modèle
-prédictif final. Ce fil conducteur --- la géographie climatique comme clé de lecture de la
-consommation --- traverse tout le rapport, de l'exploration au clustering des profils
+prédictif final. Ce fil conducteur, la géographie climatique comme clé de lecture de la
+consommation, traverse tout le rapport, de l'exploration au clustering des profils
 journaliers jusqu'à l'importance des variables du modèle LightGBM.
 
 Pour la cohérence du périmètre, l'analyse se recentre ensuite sur les bâtiments
-\textbf{tout-électriques}. Un pipeline de feature engineering réduit les variables catégorielles
-brutes à une trentaine de features physiquement interprétables. Le clustering des profils
-journaliers révèle des « jours types » récurrents, avant qu'un modèle LightGBM n'atteigne un
-$R^2$ de 0,847 sur la consommation électrique (contre $-0,057$ pour une baseline naïve), avec un
-écart minime face à un jeu de features réduit. Une architecture hybride RNN/MLP explore enfin
-deux problèmes sur les séries horaires : prévoir la consommation à l'heure suivante, et
-extrapoler la consommation annuelle à partir de 90 jours d'observation.
+\textbf{tout-électriques}. Un pipeline de feature engineering réduit 108 attributs bruts à 83
+features physiquement interprétables, dont cinq agrégats d'enveloppe qui remplacent une trentaine
+de variables catégorielles propres au parc états-unien. Un modèle LightGBM entraîné sur ce
+périmètre atteint un $R^2$ de 0,925 sur la consommation électrique - contre 0,845 avant le
+recentrage tout-électrique - avec un écart minime face au jeu de features réduit aux seuls
+agrégats physiques. Le clustering des profils journaliers révèle ensuite des « jours types »
+récurrents, à l'échelle d'un bâtiment puis d'un panel de 100 logements, avant qu'une architecture
+hybride RNN/MLP n'explore deux horizons de prédiction sur les séries horaires : prévoir la
+consommation à l'heure suivante ($R^2=0{,}877$) et extrapoler la consommation annuelle à partir de
+90 jours d'observation ($R^2=0{,}803$).
 
 Le rapport livre ainsi moins une collection de modèles qu'une lecture cohérente des déterminants
-de la consommation électrique résidentielle --- et une chaîne reproductible pour l'étendre.
+de la consommation électrique résidentielle, et une chaîne reproductible pour l'étendre.
 
 \section*{Abstract}
 
-How much electricity will a US home draw, and why? This internship, carried out within the
-FlexiMax program (MINES Paris --- PSL / ARMINES, France 2030 / ADEME), builds step by step a
-residential energy consumption modelling pipeline based on the ResStock simulation dataset
-(NREL) --- close to 550,000 buildings, each described by hundreds of attributes and a full year
-of hourly time series.
+How much electricity will a residential building draw, and why? This internship, carried out within the
+FlexiMax program (MINES Paris - PSL / ARMINES, France 2030 / ADEME), builds step by step a
+residential energy consumption modelling pipeline. With no data yet available on the FlexiMax
+project itself at the time of the internship, this work relies on an alternative case study:
+the ResStock simulation dataset (NREL) - close to 550,000 buildings, each described by hundreds
+of attributes and a full year of hourly time series.
 
 Exploration shows that behind the 771 raw metadata columns lie duplicates and simulation
-artifacts (391 columns retained); one factor keeps resurfacing --- the climate zone. It shapes
+artifacts (391 columns retained); one factor keeps resurfacing, the climate zone. It shapes
 heating/cooling consumption, bounds thermostat flexibility potential (only 43.8\% of buildings
 have a programmable heating thermostat), and later re-emerges as the top determinant of the
-final predictive model. This thread --- climate geography as the key to reading consumption ---
+final predictive model. This thread, climate geography as the key to reading consumption, 
 runs through the report, from metadata exploration to daily-profile clustering to LightGBM
 feature importance.
 
 For scope coherence, the analysis then focuses on \textbf{all-electric} buildings. A feature
-engineering pipeline reduces ResStock's raw categorical variables to about thirty physically
-interpretable features. Clustering the daily profiles reveals recurring "typical days" before a
-LightGBM model reaches an $R^2$ of 0.847 on electricity consumption (versus $-0.057$ for a naive
-baseline), with only a small gap versus a reduced feature set. A hybrid RNN/MLP architecture
-finally tackles two problems on the hourly series: forecasting next-hour consumption, and
-extrapolating annual consumption from 90 days of observation.
+engineering pipeline reduces 108 raw attributes to 83 physically interpretable features, including
+five envelope aggregates that replace about thirty categorical variables specific to the US
+housing stock. A LightGBM model trained on this scope reaches an $R^2$ of 0.925 on electricity
+consumption, versus 0.845 before the all-electric recentering, with only a small gap versus
+the feature set reduced to the physical aggregates alone. Clustering the daily profiles then
+reveals recurring "typical days", at the scale of a single building and of a 100-building panel,
+before a hybrid RNN/MLP architecture tackles two prediction horizons on the hourly series:
+forecasting next-hour consumption ($R^2=0.877$) and extrapolating annual consumption from 90 days
+of observation ($R^2=0.803$).
 
 The report thus delivers less a collection of models than a coherent reading of what drives
-residential electricity consumption --- and a reproducible pipeline to extend it.
+residential electricity consumption, and a reproducible pipeline to extend it.
 
+\enlargethispage{2\baselineskip}
 \tableofcontents
 \listoffigures
 \listoftables
@@ -308,14 +349,14 @@ residential electricity consumption --- and a reproducible pipeline to extend it
 Le jeu de données central de ce stage est \textbf{ResStock 2025 Release 1}, produit par le
 National Renewable Energy Laboratory (NREL) : une simulation bâtiment par bâtiment du parc
 résidentiel américain, à partir de modèles EnergyPlus calibrés sur le parc réel (recensement,
-enquêtes RECS). Le fichier national \code{upgrade0.parquet} --- scénario \emph{baseline}, avant
-upgrades --- couvre 549\,971 bâtiments décrits par 771 colonnes.
+enquêtes RECS). Le fichier national \code{upgrade0.parquet} - scénario \emph{baseline}, avant
+upgrades - couvre 549\,971 bâtiments décrits par 771 colonnes.
 
 Ces colonnes se répartissent en deux familles, une distinction qui structure tout le rapport :
 \begin{itemize}
   \item les variables \textbf{\code{in.*}} (« inputs ») décrivent le bâtiment simulé :
   localisation, géométrie, enveloppe thermique, système HVAC, appareils, profil socio-économique
-  --- ce sont les \emph{features} des modèles prédictifs ;
+, ce sont les \emph{features} des modèles prédictifs ;
   \item les variables \textbf{\code{out.*}} (« outputs ») sont les résultats de simulation
   EnergyPlus : consommations par usage et vecteur énergétique (électricité, gaz naturel, propane,
   fioul), émissions de CO$_2$e, factures, dimensionnement, heures d'inconfort... Elles fournissent
@@ -324,7 +365,7 @@ Ces colonnes se répartissent en deux familles, une distinction qui structure to
   cf. \S\ref{sec:visual-national}).
 \end{itemize}
 
-\begin{resultbox}[Répartition \code{in.*} / \code{out.*} --- Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb}]
+\begin{resultbox}[Répartition \code{in.*} / \code{out.*} - Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb}]
 Après nettoyage (\S\ref{sec:nettoyage-metadata}), les 391 colonnes se répartissent en 165
 \code{in.*}, 221 \code{out.*} et 5 colonnes d'identification/pondération.
 \begin{table}[H]
@@ -334,8 +375,8 @@ Après nettoyage (\S\ref{sec:nettoyage-metadata}), les 391 colonnes se répartis
 \toprule
 Famille & Colonnes \\
 \midrule
-\code{in.*} --- caractéristiques du bâtiment (features)          & 165 \\
-\code{out.*} --- résultats de simulation (cibles \& indicateurs) & 221 \\
+\code{in.*} - caractéristiques du bâtiment (features)          & 165 \\
+\code{out.*} - résultats de simulation (cibles \& indicateurs) & 221 \\
 Identifiants et pondération (\code{bldg\_id}, \code{weight}...)  & 5 \\
 \bottomrule
 \end{tabular}
@@ -353,11 +394,11 @@ ASHRAE utilisées par EnergyPlus. Le guide technique ResStock
 (\code{ResStockTechnicalReferenceGuide\_2025\_1.pdf}, dans \code{reports/figures/}) documente la
 définition exacte de chaque variable citée dans ce rapport.
 
-\textbf{Un choix méthodologique à expliciter :} FlexiMax est un projet français (MINES Paris
---- PSL / ARMINES, France 2030 / ADEME), mais aucune base résidentielle française de résolution
-et de richesse comparable à ResStock n'était disponible pour ce stage --- d'où le recours aux
+\textbf{Un choix méthodologique à expliciter :} FlexiMax est un projet français (MINES Paris -
+PSL / ARMINES, France 2030 / ADEME), mais aucune base résidentielle française de résolution
+et de richesse comparable à ResStock n'était disponible pour ce stage, d'où le recours aux
 données américaines du NREL. Ce choix n'est pas neutre : le parc américain diffère du parc
-français sur plusieurs dimensions rencontrées au fil de l'analyse --- le mix énergétique du
+français sur plusieurs dimensions rencontrées au fil de l'analyse - le mix énergétique du
 chauffage (part du gaz et du fioul bien plus importante aux États-Unis qu'en France), les
 habitudes de vie et d'occupation, la mobilité (le
 véhicule électrique et son infrastructure de recharge sont modélisés selon des usages
@@ -372,13 +413,13 @@ Avant toute exploration, encore faut-il s'assurer que les 771 colonnes brutes so
 Le fichier national brut (\code{upgrade0.parquet}) contient 549\,971 bâtiments $\times$ 771
 colonnes. 380 colonnes sont supprimées selon 6 critères, pour 391 colonnes conservées :
 \begin{itemize}
-  \item \code{upgrade.*} (20 col.) --- toutes vides dans le scénario baseline (\code{upgrade=0}) ;
-  \item \code{calc.weighted.*} (172 col.) --- agrégats de pondération, non utiles bâtiment par
+  \item \code{upgrade.*} (20 col.) - toutes vides dans le scénario baseline (\code{upgrade=0}) ;
+  \item \code{calc.weighted.*} (172 col.) - agrégats de pondération, non utiles bâtiment par
   bâtiment ;
-  \item \code{out.*} \emph{savings/reduction} (164 col.) --- économies vs upgrade, toutes à 0 en
+  \item \code{out.*} \emph{savings/reduction} (164 col.) - économies vs upgrade, toutes à 0 en
   baseline ;
-  \item \code{in.simulation\_control.*} (6 col.) --- identiques pour tous les bâtiments ;
-  \item \code{in.utility\_bill.*} (8 col.) --- déjà présentes sous \code{out.utility\_bills.*} ;
+  \item \code{in.simulation\_control.*} (6 col.) - identiques pour tous les bâtiments ;
+  \item \code{in.utility\_bill.*} (8 col.) - déjà présentes sous \code{out.utility\_bills.*} ;
   \item doublons de colonnes « binned » moins précises que leur équivalent continu (10 col.).
 \end{itemize}
 Après nettoyage : 0 colonne entièrement vide, 0 colonne à plus de 50\% de valeurs manquantes.
@@ -389,7 +430,7 @@ exporté vers \code{data/processed/metadata\_clean.parquet}, est donc directemen
 sans étape d'imputation.
 \end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\textwidth]{diagramme_nettoyage.png}
   \caption{Colonnes gardées vs supprimées par groupe (771 $\to$ 391 colonnes).}
@@ -426,17 +467,17 @@ Occupants et socio-économique & 13 & 0,9\% \\
 \end{tabular}
 \end{table}
 Le taux de manquant quasi nul (base \emph{simulée}, pas de non-réponse d'enquête, seul le groupe
-Occupants en présente 0,9\%) évite tout travail d'imputation --- un confort rare face à des
+Occupants en présente 0,9\%) évite tout travail d'imputation, un confort rare face à des
 données réelles de consommation. La richesse du groupe HVAC (42 variables) en fait le principal
 réservoir de leviers de flexibilité pilotables (thermostats, systèmes), là où enveloppe et
 géométrie (17+20 variables) ne décrivent que des caractéristiques figées du bâti.
 \end{resultbox}
 
 \subsection{Variables \code{out.*}}
-\begin{resultbox}[Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb} --- calcul direct sur \code{metadata\_clean.parquet}]
+\begin{resultbox}[Source : \code{02\_nettoyage/nettoyage\_metadata.ipynb} - calcul direct sur \code{metadata\_clean.parquet}]
 Les 221 colonnes \code{out.*} sont les résultats de simulation EnergyPlus, réparties en 14
 groupes, dominés par la consommation électrique (60 col.) et les paramètres physiques dérivés du
-bâtiment (57 col. --- surfaces, dimensionnement, contraintes de panneau électrique) :
+bâtiment (57 col. - surfaces, dimensionnement, contraintes de panneau électrique) :
 \begin{table}[H]
 \centering
 \caption{Les 14 groupes de variables \code{out.*} (549\,971 bâtiments).}
@@ -463,16 +504,16 @@ Taux d'effort énergétique (\code{energy\_burden})    & 1 & 12,1\% \\
 \end{tabular}
 \end{table}
 Seule \code{out.energy\_burden..percentage} présente un manquant notable (12,1\%, probablement
-logements vacants ou sans revenu déclaré). Cinq cibles candidates ressortent de ces 221 colonnes
---- la consommation totale par vecteur énergétique et les émissions associées --- mais chaque
+logements vacants ou sans revenu déclaré). Cinq cibles candidates ressortent de ces 221 colonnes,
+la consommation totale par vecteur énergétique et les émissions associées, mais chaque
 vecteur a sa propre distribution et ses propres facteurs explicatifs : c'est cette hétérogénéité
 qui a justifié de n'en retenir qu'une seule, l'électricité, comme cible finale du rapport.
 \end{resultbox}
 
-Le jeu de données posé, une question se pose naturellement : parmi ces 165 variables
-\code{in.*}, lesquelles pèsent réellement sur la consommation ? L'exploration qui suit part du
-facteur le plus immédiat --- la géographie --- avant d'élargir progressivement aux
-caractéristiques du bâtiment lui-même (chapitre~\ref{ch:beyond-climate}).
+Le jeu de données posé, l'exploration qui suit cherche à identifier lesquelles de ces 165
+variables \code{in.*} pèsent réellement sur la consommation, en partant du facteur le plus
+immédiat, la géographie, avant d'élargir progressivement aux caractéristiques du bâtiment
+lui-même (chapitre~\ref{ch:beyond-climate}).
 
 % ============================================================================
 \chapter{Le climat, premier déterminant de la consommation}
@@ -483,13 +524,13 @@ caractéristiques du bâtiment lui-même (chapitre~\ref{ch:beyond-climate}).
 \begin{resultbox}[Source : \code{exploration\_localisation\_climat.ipynb}]
 La Californie, le Texas et la Floride concentrent le plus de bâtiments simulés, mais ce sont des
 états au climat plus doux (CA en particulier) qui affichent les consommations moyennes les
-\emph{plus faibles} du top 20 (8\,030~kWh/an) --- à l'inverse, le Tennessee (15\,887~kWh/an), la
+\emph{plus faibles} du top 20 (8\,030~kWh/an) - à l'inverse, le Tennessee (15\,887~kWh/an), la
 Virginie et le Missouri dominent malgré un parc plus petit. Au niveau régional, le Sud regroupe
 le plus de bâtiments (210\,283) et la consommation moyenne la plus élevée ($\sim$14\,400~kWh/an) ;
 le Nord-Est est la région la moins consommatrice.
 \end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\textwidth]{localisation_etats_conso.png}
   \caption{Top 20 états par nombre de bâtiments et par consommation électrique moyenne ;
@@ -497,7 +538,7 @@ le Nord-Est est la région la moins consommatrice.
   \label{fig:localisation-etats}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.75\textwidth]{localisation_carte_batiments.png}
   \caption{Nombre de bâtiments simulés par état (ResStock).}
@@ -507,26 +548,26 @@ le Nord-Est est la région la moins consommatrice.
 Le nombre de bâtiments simulés ne suit donc pas la consommation : c'est la zone climatique, pas
 la taille du parc, qui structure ces écarts.
 
-\begin{resultbox}[Zone climatique ASHRAE --- déterminant n°1 identifié par le modèle prédictif]
+\begin{resultbox}[Zone climatique ASHRAE - déterminant n°1 identifié par le modèle prédictif]
 Les zones 5A (123\,952 bâtiments) et 4A (118\,416) dominent le parc ; les zones extrêmes (1A «
 très chaud », 7B/8AK « arctique ») sont marginales ($<$1\,000 bâtiments). Le gradient
 chauffage/climatisation est net : la 2B très chaude/humide consomme $\sim$6\,800~kWh/an de
 climatisation contre quasiment rien en chauffage, l'inverse pour les zones froides 6A/7A. Le
-panneau « pics de puissance été/hiver » --- lu comme indicateur de \textbf{flexibilité FlexiMax}
---- montre des pics hivernaux nettement supérieurs aux pics estivaux pour les zones froides (2A,
+panneau « pics de puissance été/hiver », lu comme indicateur de \textbf{flexibilité FlexiMax},
+montre des pics hivernaux nettement supérieurs aux pics estivaux pour les zones froides (2A,
 3A), et l'inverse pour les zones chaudes (1A, 2B) : le potentiel de flexibilité n'est donc pas
 uniforme sur le territoire.
 \end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.82\textwidth]{zones_climatiques_synthese.png}
-  \caption{Zones climatiques ASHRAE --- distribution, usage chauffage/climatisation et pics de
+  \caption{Zones climatiques ASHRAE  -  distribution, usage chauffage/climatisation et pics de
   puissance été/hiver (indicateur de flexibilité FlexiMax).}
   \label{fig:zones-synthese}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.75\textwidth]{zones_climatiques_carte_dominante.png}
   \caption{Zone climatique ASHRAE dominante par état.}
@@ -537,7 +578,7 @@ uniforme sur le territoire.
 \label{sec:dispersion-intra-zone}
 Les moyennes par zone (\S\ref{sec:localisation-climat}) masquent la distribution complète : est-ce
 que deux bâtiments de la même zone climatique consomment vraiment de façon comparable ?
-\begin{resultbox}[Source : \code{visualisation\_metadata.ipynb} --- échantillon illustratif de 5\,000 bâtiments]
+\begin{resultbox}[Source : \code{visualisation\_metadata.ipynb} - échantillon illustratif de 5\,000 bâtiments]
 Vue complémentaire, en distribution complète plutôt qu'en moyenne, de la consommation électrique
 par zone climatique : les zones les plus peuplées (4A, 5A) présentent aussi la plus grande
 dispersion et les valeurs extrêmes les plus hautes (jusqu'à $\sim$90\,000~kWh/an en zone 7A), ce
@@ -549,7 +590,7 @@ extrêmes.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.75\textwidth]{visualisation_conso_par_zone_boxplot.png}
+  \includegraphics[width=0.55\textwidth]{visualisation_conso_par_zone_boxplot.png}
   \caption{Distribution (boxplot) de la consommation électrique totale par zone climatique
   ASHRAE, échantillon de 5\,000 bâtiments.}
   \label{fig:vismeta-boxplot}
@@ -563,21 +604,23 @@ occupants, explorés au chapitre~\ref{ch:beyond-climate}.
 \chapter{Au-delà du climat : bâti, équipements et comportement}
 \label{ch:beyond-climate}
 
-Trois familles de déterminants restent à explorer --- l'enveloppe thermique, les systèmes
-techniques (HVAC, eau chaude), et le profil des occupants --- avant de les synthétiser en une
-classification métier et une lecture par usage et par vecteur énergétique.
+Ce chapitre couvre les trois familles de déterminants encore non explorées - l'enveloppe
+thermique, les systèmes techniques (HVAC, eau chaude), et le profil des occupants - avant de les
+synthétiser en une classification métier et une lecture par usage et par vecteur énergétique.
 
 \section{Enveloppe thermique}
-Pour le plafond et la toiture (\code{exploration\_enveloppe\_thermique.ipynb}), la relation
-isolation $\to$ consommation suit la logique attendue : la consommation moyenne diminue quand le
-R-value augmente (plafond non isolé $\approx$16\,500~kWh vs R-49 $\approx$13\,200~kWh). Pour les
-murs en revanche, la relation n'est \emph{pas} monotone (R-15 associé à une consommation plus
-élevée que R-11 ou R-19) : signe probable d'un facteur de confusion non contrôlé (l'isolation des
-murs est corrélée à la zone climatique et au type de bâtiment). Une lecture « toutes choses
-égales par ailleurs » nécessiterait de contrôler ces facteurs (régression multivariée,
-comparaison à zone climatique fixée).
+\begin{resultbox}[Source : \code{exploration\_enveloppe\_thermique.ipynb}]
+Pour le plafond et la toiture, la relation isolation $\to$ consommation suit la logique
+attendue : la consommation moyenne diminue quand le R-value augmente (plafond non isolé
+$\approx$16\,500~kWh vs R-49 $\approx$13\,200~kWh). Pour les murs en revanche, la relation n'est
+\emph{pas} monotone (R-15 associé à une consommation plus élevée que R-11 ou R-19) : signe
+probable d'un facteur de confusion non contrôlé (l'isolation des murs est corrélée à la zone
+climatique et au type de bâtiment). Une lecture « toutes choses égales par ailleurs »
+nécessiterait de contrôler ces facteurs (régression multivariée, comparaison à zone climatique
+fixée).
+\end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.82\textwidth]{enveloppe_r_values.png}
   \caption{Nombre de bâtiments et consommation moyenne par niveau d'isolation (R-value),
@@ -602,12 +645,12 @@ changement d'équipement.
 
 \textbf{Gaines (ducts).} 423\,599 bâtiments sur \(\sim\)550\,000 ont des gaines de distribution
 d'air, avec une consommation moyenne nettement supérieure (12\,772~kWh/an) à ceux qui n'en ont
-pas (8\,348~kWh/an) --- surtout un effet de taille/type de système (gaines associées aux systèmes
+pas (8\,348~kWh/an) - surtout un effet de taille/type de système (gaines associées aux systèmes
 centraux, plus consommateurs). Les fuites de gaines sont associées à une surconsommation
 croissante avec le taux de fuite, à isolation égale.
 \end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.82\textwidth]{hvac_types_systemes.png}
   \caption{Types de chauffage/climatisation et consommation associée ; consommation moyenne par
@@ -615,7 +658,7 @@ croissante avec le taux de fuite, à isolation égale.
   \label{fig:hvac-types}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.82\textwidth]{hvac_setpoints_flexibilite.png}
   \caption{Consignes de température et potentiel de flexibilité (part des bâtiments avec
@@ -623,7 +666,7 @@ croissante avec le taux de fuite, à isolation égale.
   \label{fig:hvac-setpoints}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.82\textwidth]{hvac_gaines.png}
   \caption{Présence et localisation des gaines de distribution d'air ; impact des fuites sur la
@@ -632,23 +675,24 @@ croissante avec le taux de fuite, à isolation égale.
 \end{figure}
 
 \section{Occupants et profil socio-économique}
-Sur le \emph{vintage} du bâti (\code{exploration\_occupants.ipynb}), un paradoxe apparent :
-plus un bâtiment est récent, plus sa consommation \emph{absolue} est élevée (10\,013~kWh/an avant
-1940 à 12\,659~kWh/an années 2000), alors que l'\emph{intensité} (kWh/ft²) est minimale pour les
-années 2010 (7,0~kWh/ft²) --- les constructions récentes sont plus efficaces par m², mais en
-moyenne plus grandes. Côté occupants, la relation est quasi linéaire avec la consommation
-moyenne : de $\sim$4\,100~kWh/an à 0 occupant (vacant) à $\sim$21\,700~kWh/an à 9 occupants. Les
-foyers de 2 personnes dominent (167\,006 bâtiments), suivis des foyers d'une personne
-(132\,575).
+\begin{resultbox}[Source : \code{exploration\_occupants.ipynb}]
+Sur le \emph{vintage} du bâti, un paradoxe apparent : plus un bâtiment est récent, plus sa
+consommation \emph{absolue} est élevée (10\,013~kWh/an avant 1940 à 12\,659~kWh/an années 2000),
+alors que l'\emph{intensité} (kWh/ft²) est minimale pour les années 2010 (7,0~kWh/ft²) - les
+constructions récentes sont plus efficaces par m², mais en moyenne plus grandes. Côté occupants,
+la relation est quasi linéaire avec la consommation moyenne : de $\sim$4\,100~kWh/an à 0
+occupant (vacant) à $\sim$21\,700~kWh/an à 9 occupants. Les foyers de 2 personnes dominent
+(167\,006 bâtiments), suivis des foyers d'une personne (132\,575).
+\end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.75\textwidth]{vintage_timeline.png}
   \caption{Consommation moyenne et intensité (kWh/ft²) par décennie de construction.}
   \label{fig:vintage-timeline}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.78\textwidth]{occupants_distribution.png}
   \caption{Distribution du nombre d'occupants et consommation moyenne associée.}
@@ -657,8 +701,8 @@ foyers de 2 personnes dominent (167\,006 bâtiments), suivis des foyers d'une pe
 
 \section{Classification métier des variables}
 \label{sec:classification-metier}
-Enveloppe, HVAC, occupants : ces familles étant explorées séparément, il reste à les mettre en
-regard des usages électriques eux-mêmes, et à juger lesquelles sont réellement pilotables.
+Enveloppe, HVAC, occupants : ces familles explorées séparément gagnent à être mises en regard des
+usages électriques eux-mêmes, pour juger lesquelles sont réellement pilotables.
 \begin{resultbox}[Source : \code{03\_visualisation/classification\_variables.ipynb}]
 Ce notebook croise les 165 variables \code{in.*} avec les usages électriques
 \code{out.electricity.*} pour produire une classification « métier » (plutôt que technique),
@@ -670,17 +714,16 @@ utilisée comme grille de lecture pour la suite du rapport :
   \item Décomposition de la \emph{consommation électrique} moyenne (11\,756~kWh/an, tous usages
   électriques confondus) : climatisation (27,4\%), électronique « brun » (20,6\%), chauffage
   (19,3\%), électroménager « blanc » (14,5\%), eau chaude (8,2\%), éclairage (7,5\%), divers
-  (1,9\%) --- climatisation et chauffage électriques combinés (46,7\% \emph{de l'électricité})
+  (1,9\%) - climatisation et chauffage électriques combinés (46,7\% \emph{de l'électricité})
   restent le premier poste, mais l'écart avec l'« électronique brun » (non pilotable, 20,6\%)
   borne le gain maximal atteignable par la seule flexibilité thermique. \emph{À ne pas confondre
   avec la part du confort thermique tous vecteurs confondus (64,2\%, \S\ref{sec:visual-national})
   : cette dernière inclut aussi le chauffage au gaz, propane et fioul, absent ici.} ;
-  \item Cas \code{in.neighbors} : suspectée proxy météo, c'est en réalité une variable
-  d'\textbf{enveloppe thermique / mitoyenneté} (67,7\% de maisons individuelles à 15 pieds, le
-  reste en logements collectifs) --- un bâtiment mitoyen perd moins de chaleur par ses murs
-  communs, d'où l'intérêt de la garder comme feature plutôt que de l'écarter comme redondante ;
+  \item Cas \code{in.neighbors} : pas un proxy météo mais une variable de mitoyenneté (67,7\%
+  de maisons individuelles), gardée comme feature d'enveloppe plutôt qu'écartée comme
+  redondante ;
   \item VE : 1,1\% des ménages seulement, mais consommation de recharge moyenne de
-  2\,082~kWh/an (contre 22~kWh/an sur l'ensemble du parc) --- marginal en pénétration mais
+  2\,082~kWh/an (contre 22~kWh/an sur l'ensemble du parc) - marginal en pénétration mais
   fortement pilotable, à traiter séparément de l'analyse thermique.
 \end{itemize}
 Cette classification par catégorie, plutôt qu'une liste plate de 61 variables, servira de grille
@@ -689,22 +732,16 @@ si un déterminant dominant relève du bâti, du climat ou du comportement, plut
 chaque variable isolément.
 \end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.8\textwidth]{classification_usages_electriques.png}
+  \includegraphics[width=\textwidth]{classification_usages_et_categories.png}
   \caption{Décomposition de la consommation électrique moyenne par usage (chauffage,
-  climatisation, eau chaude, électroménager « blanc », électronique « brun »...).}
+  climatisation, eau chaude, électroménager « blanc », électronique « brun »...) et répartition
+  des variables retenues par catégorie métier.}
   \label{fig:classif-usages}
 \end{figure}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.7\textwidth]{classification_repartition_categories.png}
-  \caption{Répartition des variables retenues par catégorie métier.}
-  \label{fig:classif-repartition}
-\end{figure}
-
-\begin{resultbox}[Schéma hiérarchique --- consommation électrique et facteurs explicatifs]
+\begin{resultbox}[Schéma hiérarchique - consommation électrique et facteurs explicatifs]
 \begin{footnotesize}
 \begin{alltt}
 CONSOMMATION ELECTRIQUE RESIDENTIELLE
@@ -736,7 +773,7 @@ FACTEURS EXPLICATIFS
 La classification précédente porte sur l'électricité seule. Élargie à \emph{tous} les vecteurs
 énergétiques (gaz, propane, fioul inclus), la même décomposition par usage change-t-elle
 d'équilibre ?
-\begin{resultbox}[{Source : \code{03\_visualisation/visual.ipynb} --- \code{upgrade0.parquet}, ménages pondérés}]
+\begin{resultbox}[Source : \code{03\_visualisation/visual.ipynb} - \code{upgrade0.parquet} - ménages pondérés]
 Sur le parc entier (549\,971 bâtiments pondérés), le confort thermique (chauffage + climatisation,
 \emph{tous vecteurs}) concentre \textbf{64,2\%} de la consommation totale, loin devant l'eau chaude
 sanitaire (12,0\%) et le divertissement/loisirs (11,3\%). Ce chiffre est plus élevé que les 46,7\%
@@ -745,13 +782,13 @@ propane et le fioul consacrés au chauffage, invisibles dans une lecture électr
 vecteur, l'électricité (1\,641,5~TWh) et le gaz naturel (1\,479,1~TWh) sont proches en volume
 national, très loin devant le fioul (178,8~TWh) et le propane (154,1~TWh). La décomposition par
 groupe montre où se concentre ce gaz : quasi exclusivement sur le confort thermique et, dans une
-moindre mesure, l'eau chaude sanitaire et l'alimentation --- tous les autres usages
+moindre mesure, l'eau chaude sanitaire et l'alimentation - tous les autres usages
 (divertissement, éclairage, VE, infrastructure, PV) sont déjà quasi 100\% électriques. Cette
 proximité électricité/gaz, concentrée sur les usages thermiques, confirme à l'échelle nationale
 l'intérêt du recentrage tout-électrique du périmètre.
 \end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \centering
@@ -770,11 +807,11 @@ l'intérêt du recentrage tout-électrique du périmètre.
   \label{fig:viz-repartition-nationale}
 \end{figure}
 
-\begin{resultbox}[Corrélations entre usages --- \code{03\_visualisation/visual.ipynb}]
+\begin{resultbox}[Corrélations entre usages - \code{03\_visualisation/visual.ipynb}]
 Deux logiques se distinguent. Un \textbf{cluster « comportemental »} (eau chaude sanitaire,
 hygiène/nettoyage, divertissement) est fortement corrélé en interne ($\rho=0,50$ à $0,62$) : ces
 usages suivent l'intensité d'occupation du logement. Le \textbf{confort thermique}, pourtant
-premier poste (64,2\%), n'est que faiblement corrélé aux autres ($\rho=0,21$ à $0,35$) --- sa
+premier poste (64,2\%), n'est que faiblement corrélé aux autres ($\rho=0,21$ à $0,35$) - sa
 variance dépend du bâti et du climat, pas du comportement, cohérent avec le rôle de la zone
 climatique comme déterminant n°1 (\S\ref{sec:localisation-climat}). VE et PV sont quasi
 indépendants de tout le reste ($|\rho|<0,05$) : des choix d'équipement, pas de comportement.
@@ -783,43 +820,11 @@ feature engineering (\S\ref{sec:principe-encodage}), alors que confort thermique
 garderont chacun leurs propres variables et leviers de flexibilité dédiés.
 \end{resultbox}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \centering
   \includegraphics[width=0.75\textwidth]{viz6_heatmap_correlation.png}
   \caption{Corrélation de Pearson entre les consommations par groupe fonctionnel.}
   \label{fig:viz-correlation}
-\end{figure}
-
-\begin{resultbox}[Taux d'effort énergétique et confort --- \code{03\_visualisation/visual.ipynb}]
-Le taux d'effort énergétique (\code{out.energy\_burden}) a une moyenne (7,3\%) au-dessus du seuil
-de précarité usuel (6\%), mais une médiane (4,1\%) en dessous : une majorité de ménages peu
-exposés, et une traîne à droite marquée (jusqu'à plus de 40\%) qui tire la moyenne vers le haut
---- signe d'une poche de précarité énergétique minoritaire mais significative, plutôt que d'un
-problème généralisé à tout le parc. Les heures d'inconfort thermique suivent la même asymétrie :
-l'immense majorité des bâtiments reste sous 200~h/an d'inconfort (chauffage ou climatisation
-non satisfaits), avec une traîne rare mais sévère jusqu'à 5\,000--6\,000~h/an --- deux
-indicateurs distincts (budget contraint vs. confort non atteint) qui pourraient toucher en
-partie les mêmes ménages vulnérables, une hypothèse à vérifier par croisement direct.
-
-\emph{Utilité :} \code{energy\_burden} et \code{unmet\_hours} identifient un sous-ensemble de
-ménages où toute mesure de flexibilité (effacement, décalage de consigne) devra être dimensionnée
-avec prudence --- dégrader encore le confort d'un ménage déjà précaire irait à l'encontre de
-l'objectif social de FlexiMax. Ce sont aussi des critères de segmentation utiles pour cibler en
-priorité les ménages qui bénéficieraient le plus d'une intervention.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.75\textwidth]{viz7_energy_burden.png}
-  \caption{Distribution du taux d'effort énergétique (part du revenu consacrée à l'énergie).}
-  \label{fig:viz-burden}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.75\textwidth]{viz9_unmet_hours.png}
-  \caption{Distribution des heures d'inconfort thermique (chauffage / climatisation).}
-  \label{fig:viz-unmethours}
 \end{figure}
 
 % ============================================================================
@@ -837,12 +842,12 @@ Chaque variable \code{in.*} est encodée selon sa nature : valeur numérique con
 quelle, table de correspondance officielle du \emph{ResStock Technical Reference Guide} (isolation,
 vitrage), extraction de la valeur numérique dans une chaîne composite (ex. cote SEER, EF, IMEF,
 CEF), encodage binaire ou one-hot pour les catégories nominales sans ordre, et encodage circulaire
-(sinus/cosinus) pour l'orientation --- une variable cyclique (0°=360°) qu'un simple entier
+(sinus/cosinus) pour l'orientation, une variable cyclique (0°=360°) qu'un simple entier
 briserait artificiellement en deux extrêmes opposés.
 
 Cas notable : l'isolation est encodée par sa \textbf{valeur R d'assemblage} (celle réellement
 utilisée par EnergyPlus, incluant les ponts thermiques de l'ossature, Table~45 du guide) plutôt
-que sa valeur R \textbf{nominale} (celle affichée sur le produit) --- l'écart croît avec la
+que sa valeur R \textbf{nominale} (celle affichée sur le produit) - l'écart croît avec la
 conductivité de la structure porteuse : un mur à ossature bois isolé R-11 (nominal) descend à
 10,3 en valeur d'assemblage, R-15 à 12,1. Un encodage sur la seule valeur nominale surestimerait
 donc la performance thermique réelle des parois.
@@ -861,13 +866,13 @@ l'encodage choisi.
 Groupe & Var. & Encodage principal appliqué \\
 \midrule
 1 Socio-économique         & 7  & Midpoint d'intervalle (\$), ratio, binaire \\
-2 Occupants                 & 5  & Numérique, binaire, label ordinal \\
+2 Occupants                 & 6  & Numérique, binaire, label ordinal \\
 3 Météo                      & 2  & Numérique (latitude/longitude, inchangé) \\
-4 Enveloppe thermique        & 33 & Lookup R d'assemblage, OHE finitions, circulaire orientation \\
+4 Enveloppe thermique        & 32 & Lookup R d'assemblage, OHE finitions, circulaire orientation \\
 5 Systèmes HVAC/DHW          & 25 & Conversion \degree F$\to$\degree C, extraction SEER/EF, OHE techno./combustible \\
 6 Usages électriques         & 25 & Extraction CEF/EF, binaire présence, OHE énergie \\
 7 Blanc/Brun                  & 4  & Ratio (\%$\to$décimal), numérique \\
-8 Infrastructure électrique   & 2  & Numérique (A, count --- inchangé) \\
+8 Infrastructure électrique   & 2  & Numérique (A, count - inchangé) \\
 9 Photovoltaïque (PV)         & 2  & Binaire, extraction puissance (kW) \\
 10 Mobilité (VE)               & 3  & Numérique, label niveau de chargeur \\
 \midrule
@@ -875,17 +880,17 @@ Groupe & Var. & Encodage principal appliqué \\
 \bottomrule
 \end{tabular}
 \end{table}
-Le groupe Enveloppe (33 variables, 31\% du total) domine largement : c'est ce volume, et sa
+Le groupe Enveloppe (32 variables, 30\% du total) domine largement : c'est ce volume, et sa
 spécificité au parc états-unien (catégories ResStock plutôt que grandeurs physiques directes),
 qui motive l'agrégation du \S\ref{sec:agregation-physique}.
 \end{resultbox}
 
 \section{Agrégation physique de l'enveloppe}
 \label{sec:agregation-physique}
-\begin{resultbox}[{Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} --- sous-ensemble tout-électrique plain-pied, 64\,062 logements}]
+\begin{resultbox}[Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} - sous-ensemble tout-électrique plain-pied - 64\,062 logements]
 Pour une variante physiquement interprétable du modèle prédictif (\code{05\_deeplearning}), un
 sous-ensemble filtré (maisons individuelles à un niveau, chauffage électrique, sans VE ni piscine
-ni PV --- une restriction plus étroite que le recentrage tout-électrique du rapport) recalcule,
+ni PV - une restriction plus étroite que le recentrage tout-électrique du rapport) recalcule,
 à partir des colonnes \code{out.params.*} et des variables encodées au \S\ref{sec:principe-encodage},
 30 attributs bruts d'enveloppe en \textbf{5 grandeurs physiques universelles} :
 \begin{table}[H]
@@ -911,25 +916,634 @@ compacité (m$^{-1}$) & $(A_\mathrm{mur}\!+\!A_\mathrm{toit}\!+\!A_\mathrm{pl}\!
 \end{table}
 
 \textbf{Bilan :} 108 attributs bruts $\to$ 83 features (5 agrégats physiques + 78 conservés tels
-quels). Seul le bloc enveloppe (30 attributs) est fondu dans les agrégats ; le reste --- HVAC,
-gaines, eau chaude, occupants, socio-économique, usages électriques --- est conservé sans
+quels). Seul le bloc enveloppe (30 attributs) est fondu dans les agrégats ; le reste - HVAC,
+gaines, eau chaude, occupants, socio-économique, usages électriques - est conservé sans
 élagage supplémentaire à ce stade. Réduire une trentaine de catégories propres au parc
-états-unien à cinq grandeurs physiques sert un double objectif : la \textbf{transférabilité}
---- ces grandeurs ont un sens hors ResStock, sur un parc de logements différent --- et
+états-unien à cinq grandeurs physiques sert un double objectif : la \textbf{transférabilité} -
+ces grandeurs ont un sens hors ResStock, sur un parc de logements différent - et
 l'\textbf{interprétabilité}, en vue d'un modèle thermique de type RC (résistance-capacité)
 plutôt qu'une boîte noire sur 108 colonnes hétérogènes. L'importance de ces agrégats dans le
 modèle prédictif est vérifiée au chapitre~\ref{ch:modelisation}.
 \end{resultbox}
 
+Le détail complet des 108 attributs - variable par variable, avec statut réel (conservé, supprimé ou fondu dans un agrégat) - est reporté en annexe~\ref{app:variables-detail} pour ne pas alourdir ce chapitre.
+
+% ============================================================================
+\chapter{Modélisation}
+\label{ch:modelisation}
+
+Le climat structure la consommation (chapitre~\ref{ch:exploration}), l'enveloppe et les
+équipements expliquent une partie de la dispersion résiduelle (chapitre~\ref{ch:beyond-climate}),
+et 108 attributs bruts ont été réduits à un jeu de features exploitable, physique ou complet
+(chapitre~\ref{ch:features}). Ce chapitre vérifie si un modèle prédictif retrouve effectivement
+ces déterminants, et jusqu'à quel point il peut prédire la consommation électrique.
+
+\section{Un modèle LightGBM sur le périmètre tout-électrique}
+\label{sec:lgbm-electricite}
+\begin{resultbox}[Source : \code{05\_deeplearning/lgbm\_electricity.ipynb} - sous-ensemble tout-électrique plain-pied - 64\,062 logements]
+Un LightGBM entraîné sur les 107 features encodées (\S\ref{sec:principe-encodage}), avec split
+stratifié par zone ASHRAE (Train 40\,999 / Val 10\,250 / Test 12\,813) et 50 essais
+d'optimisation Optuna, atteint sur le test $R^2=0{,}9254$ (RMSE $=2\,712$~kWh, soit 13,8\% de la
+consommation moyenne ; écart train/test $=0{,}057$, contrôlé). C'est une nette amélioration par
+rapport au premier modèle du stage, entraîné avant le recentrage tout-électrique sur les
+549\,971 bâtiments et les cinq vecteurs énergétiques (\code{lightgbm\_stratified.ipynb},
+$R^2=0{,}8446$, RMSE $=28{,}9\%$) : le gain ($+0{,}08$ de $R^2$, RMSE relative divisée par deux)
+tient moins à un modèle différent qu'au périmètre lui-même - un sous-ensemble tout-électrique
+et géométriquement homogène, sur une cible unique, stratifié directement sur la zone climatique
+plutôt que sur une stratification composite plus généraliste.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{modelisation_comparaison_electricite.png}
+  \caption{$R^2$, RMSE et RMSE relative  -  modèle multi-cibles pré-recentrage
+  (\code{lightgbm\_stratified}) vs modèle électricité sur le périmètre tout-électrique
+  (\code{lgbm\_electricity}).}
+  \label{fig:modelisation-comparaison}
+\end{figure}
+
+L'erreur par zone climatique (test) confirme le fil conducteur du rapport : les zones rares et
+extrêmes (7B, $n=8$, RMSE $=9\,044$~kWh ; 6A, $n=233$, RMSE $=4\,168$~kWh) concentrent l'essentiel
+de l'erreur et du biais, tandis que les zones tempérées majoritaires (2A, 3A, 4A) restent sous
+3\,300~kWh de RMSE, une limite de taille d'échantillon plus qu'une faiblesse du modèle.
+
+\section{Global vs Physique : le compromis interprétabilité}
+\label{sec:global-vs-physique}
+\begin{resultbox}[Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} - même sous-ensemble - 64\,062 logements]
+Remplacer les 30 attributs bruts d'enveloppe par les 5 agrégats physiques du
+\S\ref{sec:agregation-physique} (83 features au lieu de 107, jeu \og Physique\fg) coûte peu :
+$R^2=0{,}9120$ (RMSE $=2\,945$~kWh, 15,0\%) contre $0{,}9254$ pour le jeu \og Global\fg{} - une
+perte de 1,3 point de $R^2$ pour cinq variables interprétables en moins de description physique
+du bâti. L'importance des variables confirme que cette perte est mesurée, pas accidentelle : $UA$
+arrive en 2\textsuperscript{e} position (8,85\% de l'importance totale, juste derrière la latitude
+météo), et les 5 agrégats cumulés pèsent \textbf{32,3\%} de l'importance du modèle - l'enveloppe
+compte, même réduite à cinq nombres. La latitude et la longitude météo dominent toujours
+largement (18,4\% cumulés), confirmant à l'échelle du modèle prédictif ce que l'exploration
+suggérait déjà (\S\ref{sec:localisation-climat}) : le climat prime sur le bâti. Une courbe du
+coude sur le nombre de features retenues montre par ailleurs que la moitié des attributs
+(50 sur 83, ou 80 sur 107 pour le jeu Global) suffit à retrouver la performance du jeu complet - 
+la longue traîne de variables à faible importance (VE, PV, spa, piscine, redondantes avec le
+filtre du sous-ensemble) n'apporte rien de plus.
+\end{resultbox}
+
+\section{Performance par usage électrique}
+\label{sec:performance-usages}
+\begin{resultbox}[Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} - quatre modèles - mêmes features et split]
+Prédire chaque usage séparément (mêmes 83 features, mêmes hyperparamètres qu'en
+\S\ref{sec:global-vs-physique}) révèle une hétérogénéité nette : l'eau chaude sanitaire est
+l'usage le plus facile ($R^2=0{,}980$, RMSE $=214$~kWh) et le chauffage le plus difficile
+($R^2=0{,}816$, RMSE relative $=54{,}0\%$). Ce n'est pas un défaut du modèle mais une conséquence
+de la variance du signal : la consommation de chauffage varie fortement d'un ménage à l'autre
+(moyenne 6\,030~kWh, mais 98,9\% des logements seulement en ont - contre 84,6\% pour l'eau
+chaude, dont la consommation moyenne, plus faible et plus stable, est mécaniquement plus facile à
+approcher en valeur relative). La climatisation se situe entre les deux ($R^2=0{,}930$,
+18,9\%). Ce classement, eau chaude $>$ climatisation $>$ total $>$ chauffage, est cohérent
+avec le rôle du climat déjà établi : le chauffage est l'usage le plus exposé à la variabilité
+climatique inter-zones, donc le plus dur à généraliser sur un modèle unique.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{modelisation_par_usage.png}
+  \caption{$R^2$ et RMSE par usage électrique (total, chauffage, climatisation, eau chaude),
+  jeu de features Physique.}
+  \label{fig:modelisation-par-usage}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{modelisation_importance_agregats.png}
+  \caption{Importance des 83 variables du jeu Physique (gain LightGBM)  -  les 5 agrégats
+  physiques en rouge.}
+  \label{fig:modelisation-importance}
+\end{figure}
+
+% ============================================================================
+\chapter{Dynamique temporelle}
+\label{ch:dynamique-temporelle}
+
+Les chapitres précédents traitent la consommation électrique comme une grandeur annuelle : un
+seul nombre par logement, expliqué par le climat, le bâti et les équipements
+(chapitres~\ref{ch:exploration} à \ref{ch:modelisation}). Or l'électricité qui compte pour la
+flexibilité se joue à l'heure, pas à l'année. Ce chapitre explore la dimension temporelle sur le
+même périmètre tout-électrique~: d'abord en cherchant des \og jours types \fg{} par clustering non
+supervisé des profils journaliers, à l'échelle d'un bâtiment puis d'un panel de 100 bâtiments,
+puis en entraînant un modèle hybride RNN+MLP pour prédire la consommation à deux horizons
+(l'heure suivante, et le total annuel à partir de 90 jours observés).
+
+\section{Jours types~: clustering du profil journalier d'un bâtiment de référence}
+\label{sec:clustering-jours-types}
+Avant tout traitement, les profils journaliers bruts d'un bâtiment sur une année entière
+(figure~\ref{fig:clustering-jours-types-brut}) ne montrent aucune structure évidente à l'œil
+nu~: c'est précisément ce que le clustering non supervisé qui suit cherche à organiser en
+régimes identifiables.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{timeseries_clustering_exemple_profil_horaire.png}
+  \caption{Les 365 profils horaires bruts d'un bâtiment (347201-0, exemple illustratif),
+  superposés (semaine en bleu, weekend en rouge) - avant toute normalisation ou clustering. Le
+  bâtiment de référence pour l'analyse qui suit (10672-0) est introduit ci-dessous.}
+  \label{fig:clustering-jours-types-brut}
+\end{figure}
+
+\begin{resultbox}[Source : \code{06\_timeseries/timeseries\_clustering.ipynb} - bâtiment 10672-0 - pas 15 minutes]
+Chaque journée (pas 15~minutes, 96 valeurs $x_1,\dots,x_{96}$) est normalisée de deux façons
+concurrentes, qui ne portent pas sur le même axe de la matrice jours$\times$pas de temps.
+
+\textbf{Forme} - z-score \emph{intra-jour} (par \emph{ligne})~: pour un jour $j$ donné,
+$x_{j,i}^{\text{forme}} = (x_{j,i} - \bar{x}_j) / \sigma_j$, où $\bar{x}_j$ et $\sigma_j$ sont la
+moyenne et l'écart-type calculés sur les 96 valeurs de \emph{ce jour} uniquement. Chaque jour est
+donc recentré-réduit sur sa propre échelle~: le niveau absolu disparaît complètement, seule
+reste la position relative des pics et des creux dans la journée.
+
+\textbf{Amplitude} - \code{StandardScaler} \emph{global} (par \emph{colonne})~: pour un pas de
+temps $i$ (une heure de la journée) donné, $x_{j,i}^{\text{amplitude}} = (x_{j,i} - \bar{x}_i) /
+\sigma_i$, où $\bar{x}_i$ et $\sigma_i$ sont cette fois calculés sur \emph{ce même pas de temps},
+à travers \emph{tous} les jours de l'année. La consommation de 8h un jour donné est donc comparée
+à la consommation moyenne à 8h sur l'année entière~: les écarts de niveau global entre un jour
+creux et un jour très consommateur sont \emph{préservés}, contrairement à la forme.
+
+Un K-Means est ajusté séparément sur chaque représentation, avec $k$
+choisi par méthode du coude puis vérifié par score de silhouette. Les deux normalisations
+retiennent toutes deux $k=5$, mais avec des profils de silhouette très différents~: la forme
+culmine à $k=3$ (0,29) puis décroît (0,21 à $k=5$) - des tailles de cluster 46/79/129/71/40,
+avec un recouvrement net entre formes voisines ; l'amplitude culmine dès $k=2$ (0,56) et reste
+élevée à $k=5$ (0,39, tailles 24/231/11/70/29) - un clustering nettement mieux séparé, porté par
+un cluster majoritaire (231 jours, le régime courant) entouré de clusters minoritaires qui captent
+les jours extrêmes.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{timeseries_clustering_coude_10672_forme.png}
+    \caption{Forme  -  $k=5$ retenu, silhouette maximale 0,29 (à $k=3$).}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{timeseries_clustering_coude_10672_amplitude.png}
+    \caption{Amplitude  -  $k=5$ retenu, silhouette maximale 0,56 (à $k=2$).}
+  \end{subfigure}
+  \caption{Méthode du coude et score de silhouette pour les deux normalisations  -  bâtiment
+  10672-0.}
+  \label{fig:clustering-jours-types-coude}
+\end{figure}
+
+La figure~\ref{fig:clustering-jours-types-coude} rend visible l'écart entre les deux
+normalisations~: le score de silhouette de l'amplitude reste au-dessus de 0,29 sur toute la plage
+$k=2$ à $k=9$, contre un plafond à 0,29 (atteint une seule fois, à $k=3$) puis une chute continue
+pour la forme - un clustering objectivement plus net, cohérent avec le diagnostic du texte
+ci-dessus.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{timeseries_clustering_profils_10672_forme.png}
+    \caption{Forme  -  profils normalisés par cluster (moyenne $\pm$ écart-type).}
+  \end{subfigure}
+  \begin{subfigure}[b]{\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{timeseries_clustering_profils_10672_amplitude.png}
+    \caption{Amplitude  -  profils en kWh par cluster (moyenne $\pm$ écart-type).}
+  \end{subfigure}
+  \caption{Courbes de consommation moyenne par cluster, sur 24h  -  bâtiment 10672-0.}
+  \label{fig:clustering-jours-types-profils}
+\end{figure}
+
+Les courbes de la figure~\ref{fig:clustering-jours-types-profils} donnent un visage concret aux
+clusters~: pour l'amplitude, le cluster majoritaire (1, $n=231$) reste plat et bas toute la
+journée, tandis que les clusters minoritaires (0, 2, 3, 4) affichent des niveaux et des pics
+(vers 12h et 22h) nettement plus marqués - une différence de \emph{palier}, pas de forme.
+Pour la forme, les 5 courbes se chevauchent visiblement sur la journée, avec des pics communs à
+11-12h et 21-22h dont seule l'amplitude relative diffère, ce chevauchement visuel est la
+contrepartie directe de la silhouette faible mesurée plus haut.
+
+La composition calendaire des clusters de forme confirme un résultat plus riche qu'une simple
+opposition saison/semaine~: les clusters 1 ($n=79$) et 4 ($n=40$) sont tous deux concentrés en
+hiver (novembre--février), mais s'opposent presque parfaitement sur le rythme hebdomadaire - 
+100\% de jours de semaine pour le cluster 1, 77,5\% de weekend pour le cluster 4. À l'inverse, les
+clusters 0 ($n=46$) et 2 ($n=129$) se recoupent sur la saison estivale (mai--septembre) sans
+opposition semaine/weekend marquée. Le climat (chapitre~\ref{ch:exploration}) structure donc bien
+la forme du profil journalier, mais le rythme hebdomadaire s'y superpose - les deux facteurs
+n'agissent pas au même niveau, la saison fixant le \emph{régime} et la semaine modulant son
+\emph{occurrence}.
+
+\begin{resultbox}[Source : \code{06\_timeseries/timeseries\_clustering.ipynb} - décomposition par poste - bâtiment 10672-0]
+Les métadonnées statiques du foyer (revenu 15\,000--19\,999\$, sous le seuil de pauvreté fédéral ;
+3 occupants ; locataire ; bâtiment des années 1950 ; chauffage gainé, climatisation centrale) ne
+disent rien de \emph{quand} la consommation varie dans la journée, elles ne portent aucune
+information temporelle. La décomposition par poste, elle, est directe~: le \textbf{chauffage}
+domine presque entièrement chaque courbe et porte, à lui seul, les deux pics à 11--12h et 21--22h
+sur les clusters d'hiver (0, 2, 3, 4 en amplitude) - les autres postes (eau chaude, réfrigérateur,
+éclairage) restent une fine bande quasi plate en comparaison. Le cluster majoritaire (amplitude,
+$n=231$) est quasiment plat toute la journée précisément parce que le chauffage y est
+quasi nul, des journées assez douces pour ne pas en avoir besoin. Ce motif à deux pics
+quotidiens est cohérent avec la métadonnée \code{in.heating\_setpoint\_has\_offset = Yes}~: ce
+foyer dispose d'un thermostat programmable pour le chauffage, et le double pic correspond au cycle
+classique d'abaissement/relance (nuit puis journée d'absence, relance le matin et en début de
+soirée) plutôt qu'à un usage continu.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{timeseries_clustering_par_poste_10672_amplitude.png}
+  \caption{Décomposition par poste de consommation, profils d'amplitude par cluster  -  bâtiment
+  10672-0. Le chauffage (hachures vertes) domine et porte les pics.}
+  \label{fig:clustering-jours-types-postes}
+\end{figure}
+
+\section{Vers un clustering à l'échelle du panel}
+\label{sec:clustering-panel}
+\begin{resultbox}[Source : \code{06\_timeseries/timeseries\_clustering\_multi.ipynb} - 100 bâtiments tout-électriques - 36\,500 jours-bâtiment]
+Passer du bâtiment unique au panel change l'échelle~: 100 bâtiments tout-électriques (même filtre
+que les chapitres~\ref{ch:modelisation}, plain-pied et sans équipement électrifiable annexe)
+téléchargés en séries horaires (8\,760~h/an chacun), soit 36\,500 jours-bâtiment. Chaque jour est
+décrit par sa forme (réduite par PCA sur 10 composantes - la première capte 38\% de la variance
+de forme sur l'ensemble du panel, 80\% cumulés sur les 10, signe d'une diversité de formes
+journalières plutôt que d'un mode unique dominant), son amplitude et
+12 variables météo (moyenne/min/max de température, humidité relative, température humide, ratio
+d'humidité), soit 23 dimensions au total. Passer à plusieurs bâtiments impose de changer la
+normalisation de l'amplitude~: le \code{StandardScaler} global suffisant au
+\S\ref{sec:clustering-jours-types} (un seul bâtiment) séparerait ici surtout les \og gros \fg{}
+logements des \og petits \fg{}, pas les jours atypiques d'un jour ordinaire \emph{pour un bâtiment
+donné}. L'amplitude est donc transformée en $\log(1+x)$ puis centrée-réduite \emph{par bâtiment}
+(moyenne et écart-type calculés sur les 365 jours de chaque logement pris individuellement, pas sur
+l'ensemble du panel) - un jour à $z=+1$ signifie \og journée inhabituellement chargée pour ce
+logement \fg{}, quelle que soit sa taille. La météo, elle, reste standardisée globalement (pas de
+log, pas de centrage par bâtiment) pour rester directement interprétable dans les corrélations qui
+suivent. La méthode du coude retient
+$k=6$, mais le score de silhouette culmine nettement à $k=2$ (0,33) puis décroît de façon quasi
+monotone jusqu'à $\sim$0,10 - un signal ambigu, plus caractéristique d'un continuum de
+comportements que de régimes bien séparés que de 6 régimes nettement tranchés. Le clustering final
+($k=6$) reste néanmoins interprétable~: tailles 5\,210 / 4\,867 / 12\,526 / 5\,280 / 4\,327 / 4\,290
+jours, \textbf{aucun bâtiment ne dépasse $\sim$4\% d'un cluster donné} (vérifié par validation
+croisée bâtiment$\times$cluster) - les régimes trouvés sont bien des comportements partagés à
+l'échelle du parc, pas des identités de bâtiments recyclées.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{timeseries_multi_coude_multivarie.png}
+  \caption{Méthode du coude et score de silhouette  -  clustering multivarié (forme + amplitude +
+  météo) sur les 36\,500 jours-bâtiment du panel.}
+  \label{fig:clustering-panel-elbow}
+\end{figure}
+
+\begin{resultbox}[Source : \code{06\_timeseries/timeseries\_clustering\_multi.ipynb} - clustering multivarié final - 36\,500 jours-bâtiment]
+La température extérieure moyenne sépare nettement les 6 clusters (1,8\degree C à 25,4\degree C
+de médiane) et son lien avec l'amplitude relative (z-score par bâtiment) est directement lisible~:
+les deux clusters les plus froids (3~: 1,8\degree C ; 5~: 3,8\degree C) portent l'amplitude la plus
+élevée ($+1{,}1$ et $+0{,}8$), les deux plus tempérés (0~: 20,1\degree C ; 4~: 15,2\degree C)
+l'amplitude la plus basse ($-0{,}8$ et $-1{,}0$) - un lien quasi monotone froid $\to$ surconsommation
+qui confirme, à l'échelle du panel, le rôle du chauffage déjà identifié au
+\S\ref{sec:clustering-jours-types} sur un seul bâtiment. Le cluster majoritaire (2, $n=12\,526$,
+34\% des jours) est le plus chaud (25,4\degree C) mais reste proche de l'amplitude moyenne
+($-0{,}1$), la climatisation ne crée pas le même effet de surconsommation marquée que le
+chauffage sur ce périmètre tout-électrique. La répartition semaine/weekend, elle, reste uniforme
+sur tous les clusters (69--76\% de jours de semaine, proche du ratio naturel 5/7) - comme au
+\S\ref{sec:clustering-jours-types}, le climat structure ces régimes, pas le rythme hebdomadaire.
+
+Les profils de forme moyens par cluster révèlent un second axe de variation, orthogonal à
+l'amplitude~: certains clusters (1, 3) culminent tôt (pic vers 6--8h puis déclin), d'autres (2,
+majoritaire) culminent tard (pic vers 16--17h), un axe \emph{matin vs soir} qui n'apparaît pas
+dans l'analyse mono-bâtiment du \S\ref{sec:clustering-jours-types} et qui n'est visible qu'à
+l'échelle du panel, où la composante principale de forme (38\% de variance, la plus forte des 10
+composantes) capture ce décalage de phase plutôt qu'une simple différence d'intensité.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{timeseries_multi_meteo_amplitude_calendrier.png}
+  \caption{Température extérieure, amplitude relative et répartition semaine/weekend par cluster
+   -  36\,500 jours-bâtiment.}
+  \label{fig:clustering-panel-meteo}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.62\textwidth]{cluster_shape_profiles_colorblind_safe.png}
+  \caption{Profils de forme moyens par cluster  -  axe matin/soir visible à l'échelle du panel.}
+  \label{fig:clustering-panel-profils}
+\end{figure}
+
+\FloatBarrier
+\section{Un modèle hybride RNN+MLP pour deux horizons de prédiction}
+\label{sec:rnn-mlp-hybride}
+\begin{resultbox}[Source : \code{06\_timeseries/rnn\_mlp\_hybrid\_electricite.ipynb} - 100 bâtiments tout-électriques - architecture GRU+MLP à deux branches]
+L'architecture combine une branche séquentielle (GRU, qui encode une fenêtre de consommation et
+météo passées) et une branche statique (MLP, qui encode les métadonnées physiques du bâtiment - 
+dont les 5 agrégats d'enveloppe du \S\ref{sec:agregation-physique}), concaténées avant une tête de
+régression commune (figure~\ref{fig:rnn-mlp-archi}). Le split train/val/test (70/15/15) se fait
+\emph{par bâtiment}, pas par fenêtre temporelle~: le modèle est testé sur des bâtiments jamais vus,
+condition plus proche d'un usage en diagnostic énergétique qu'un split temporel intra-bâtiment. La
+même architecture sert aux deux parties~; seuls la longueur de fenêtre, la taille du GRU et le
+dropout changent (précisés ci-dessous).
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+      node distance=8mm and 10mm,
+      box/.style={rectangle, rounded corners, draw=energydark, thick, align=center,
+        minimum width=3.6cm, minimum height=1.1cm, font=\small},
+      seqbox/.style={box, fill=energydark!8},
+      staticbox/.style={box, fill=energygreen!12},
+      mergebox/.style={box, fill=energyaccent!15, minimum width=5cm},
+      arr/.style={-{Stealth[length=2.2mm]}, thick, draw=energygrey},
+    ]
+    \node[seqbox] (seqin) {Entrée séquentielle\\[1pt]\footnotesize consommation + météo passées};
+    \node[staticbox, right=18mm of seqin] (statin) {Entrée statique\\[1pt]\footnotesize métadonnées physiques (dont 5 agrégats d'enveloppe)};
+
+    \node[seqbox, below=of seqin] (gru) {GRU\\[1pt]\footnotesize encode la fenêtre temporelle};
+    \node[staticbox, below=of statin] (mlp) {MLP (2 couches denses)\\[1pt]\footnotesize encode le vecteur statique};
+
+    \coordinate (mid) at ($(gru)!0.5!(mlp)$);
+    \node[mergebox, below=14mm of mid] (concat) {Concaténation};
+    \node[mergebox, below=of concat] (head) {Tête de régression (dense)};
+    \node[box, below=of head, fill=energygrey!15] (out) {Consommation prédite};
+
+    \draw[arr] (seqin) -- (gru);
+    \draw[arr] (statin) -- (mlp);
+    \draw[arr] (gru.south) -- ++(0,-7mm) -| (concat.north);
+    \draw[arr] (mlp.south) -- ++(0,-7mm) -| (concat.north);
+    \draw[arr] (concat) -- (head);
+    \draw[arr] (head) -- (out);
+  \end{tikzpicture}
+  \caption{Architecture hybride à deux branches (\og two-tower\fg{}) - commune aux parties A et
+  B, seuls la fenêtre d'entrée et les tailles de couches diffèrent.}
+  \label{fig:rnn-mlp-archi}
+\end{figure}
+
+\begin{resultbox}[Source : \code{06\_timeseries/rnn\_mlp\_hybrid\_electricite.ipynb} - Partie A - prévision à t+1]
+Avec une fenêtre de 24h, 611\,520 fenêtres d'entraînement (70 bâtiments $\times$ 8\,736 fenêtres)
+et un GRU à 32 unités, le modèle hybride bat la baseline de persistance (dernière heure
+observée)~: $R^2=0{,}877$ contre $0{,}827$, RMSE $=1{,}00$~kWh contre $1{,}19$~kWh (-16\%). Le gain
+est net mais mesuré~: la persistance est déjà un concurrent sérieux à l'échelle horaire, la
+dynamique de consommation étant fortement autocorrélée d'une heure à l'autre. Les résidus sont
+centrés sur zéro mais asymétriques~: le modèle a tendance à \emph{sous}-estimer les pointes de
+consommation les plus fortes (queue négative visible au-delà de 10~kWh réels), pas à les
+sur-estimer - un biais prudent, cohérent avec une tête de régression qui moyenne les régimes
+plutôt que de traquer les extrêmes rares.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{rnn_mlp_partieA_metrics_bar.png}
+    \caption{RMSE / MAE vs persistance.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{rnn_mlp_partieA_residus.png}
+    \caption{Distribution des résidus (prédit $-$ réel).}
+  \end{subfigure}
+  \caption{Partie A  -  prévision t+1 (24h) : métriques et résidus.}
+  \label{fig:rnn-mlp-partieA-metrics}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{rnn_mlp_partieA_timeseries.png}
+  \caption{Partie A  -  consommation réelle vs prédite, bâtiment de test \#41, deux premières
+  semaines. Le modèle suit le rythme journalier mais lisse certains pics.}
+  \label{fig:rnn-mlp-partieA-timeseries}
+\end{figure}
+
+\begin{resultbox}[Source : \code{06\_timeseries/rnn\_mlp\_hybrid\_electricite.ipynb} - Partie B - extrapolation annuelle]
+À partir des 90 premiers jours observés, avec seulement 70 exemples d'entraînement (une
+observation par bâtiment) et un réseau volontairement réduit (GRU 16 unités, dropout 0,3), le
+modèle hybride explique $R^2=0{,}803$ de la variance du total annuel (RMSE $=5\,607$~kWh contre
+$12\,637$~kWh pour une baseline naïve - la moyenne du train, -56\%). Le signal est réel mais
+évalué sur seulement 15 bâtiments de test~: à confirmer sur un panel plus large avant toute
+conclusion définitive, comme le note explicitement le notebook source. Le détail par bâtiment
+confirme cette prudence~: la prédiction suit bien le classement des logements du moins au plus
+consommateur, mais le bâtiment le plus extrême du test (55\,500~kWh réels) est nettement
+sous-estimé ($\sim$40\,000~kWh prédits) - avec seulement 70 exemples d'entraînement, le modèle
+n'a simplement pas vu assez de cas aussi extrêmes pour bien les extrapoler.
+\end{resultbox}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{rnn_mlp_partieB_metrics_bar.png}
+    \caption{RMSE / MAE vs baseline naïve.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{rnn_mlp_partieB_bar.png}
+    \caption{Réel vs prédit par bâtiment de test.}
+  \end{subfigure}
+  \caption{Partie B  -  extrapolation annuelle (90j) : métriques et détail par bâtiment.}
+  \label{fig:rnn-mlp-partieB-metrics}
+\end{figure}
+
+% ============================================================================
+\chapter{Discussion et limites}
+\label{ch:discussion}
+
+Les six chapitres précédents établissent des résultats vérifiés, mais construits sur des choix de
+périmètre et des données qui bornent leur portée. Ce chapitre revient sur ces limites plutôt que
+d'en ajouter de nouvelles~: transférabilité des données sources, taille des échantillons mobilisés
+au chapitre~\ref{ch:dynamique-temporelle}, et choix de modélisation délibérément écartés.
+
+\section{Portée et transférabilité}
+\label{sec:portee-transferabilite}
+Le choix méthodologique du \S\ref{sec:jeu-donnees-resstock} (recours à ResStock faute de base
+résidentielle française comparable) pèse sur l'ensemble du rapport et n'est pas un détail
+cosmétique~: le chapitre~\ref{ch:beyond-climate} montre par exemple que 43,8\% seulement des
+bâtiments américains ont un thermostat programmable pour le chauffage, un chiffre sans valeur
+transposable au parc français sans donnée comparable. Toute utilisation opérationnelle des
+déterminants identifiés ici (zone climatique, agrégats d'enveloppe, jours types) devra être
+revalidée sur des données françaises dès qu'elles seront disponibles.
+
+Le recentrage \textbf{tout-électrique}, décidé en cours de stage pour la cohérence du périmètre
+(chapitres~\ref{ch:features} à \ref{ch:dynamique-temporelle}), a le même effet à plus petite
+échelle~: les 64\,062 logements tout-électriques plain-pied du chapitre~\ref{ch:modelisation} et
+les 100 bâtiments du chapitre~\ref{ch:dynamique-temporelle} ne représentent qu'une fraction du
+parc ResStock complet (549\,971 bâtiments). Le \S\ref{sec:visual-national} rappelle que le gaz
+naturel pèse encore 1\,479~TWh au niveau national, quasi autant que l'électricité, une part
+significative du parc reste donc hors du périmètre étudié en détail dans ce rapport.
+
+\section{Limites méthodologiques}
+\label{sec:limites-methodo}
+\textbf{Taille des échantillons au chapitre~\ref{ch:dynamique-temporelle}.} Le clustering
+multivarié et le modèle RNN+MLP reposent sur 100 bâtiments, contre 64\,062 pour la modélisation
+LightGBM du chapitre~\ref{ch:modelisation}, deux ordres de grandeur d'écart. La partie B du
+\S\ref{sec:rnn-mlp-hybride} (extrapolation annuelle) est la plus exposée~: 70 exemples
+d'entraînement et 15 bâtiments de test seulement, avec un biais net sur le bâtiment le plus
+consommateur du test (sous-estimé de $\sim$28\%, figure~\ref{fig:rnn-mlp-partieB-metrics}). Le
+notebook source le signale explicitement~: ces résultats sont un signal réel, pas une conclusion
+définitive.
+
+\textbf{Ambiguïté du clustering à l'échelle du panel.} Le \S\ref{sec:clustering-panel} retient
+$k=6$ par méthode du coude, mais le score de silhouette y culmine à $k=2$ (0,33) et décroît
+ensuite, signe que les 6 régimes identifiés forment un \emph{continuum} de comportements plus
+que des catégories nettement séparées. La typologie reste utile pour décrire le panel
+(température, amplitude, axe matin/soir), mais ne doit pas être lue comme une segmentation
+définitive du parc en 6 profils de ménages.
+
+\textbf{Biais sur les valeurs extrêmes.} Le modèle RNN+MLP de la partie A
+(\S\ref{sec:rnn-mlp-hybride}) sous-estime systématiquement les pointes de consommation les plus
+fortes (figure~\ref{fig:rnn-mlp-partieA-metrics}) - un biais prudent plutôt qu'aberrant, mais qui
+borne la fiabilité du modèle pour des usages qui viseraient spécifiquement la détection de pics
+(effacement, alerte de dépassement).
+
+\section{Choix de modélisation écartés}
+\label{sec:choix-ecartes}
+Le \S\ref{sec:lgbm-electricite} compare le LightGBM à une simple baseline de persistance/naïve,
+pas à d'autres familles de modèles~: un MLP avait été envisagé, mais sans justification liée à la
+nature des métadonnées (catégorielles, tabulaires, mélange d'échelles), contrairement à LightGBM,
+qui les gère nativement et reste cohérent avec l'objectif d'interprétabilité physique du
+chapitre~\ref{ch:features}. Il a donc été écarté plutôt que présenté sans justification. Une
+comparaison LightGBM/MLP motivée, par exemple sur les interactions non linéaires entre agrégats
+physiques, resterait une extension raisonnable non menée ici.
+
+% ============================================================================
+\chapter{Conclusion et perspectives}
+\label{ch:conclusion}
+
+\section{Synthèse}
+\label{sec:synthese}
+Le fil conducteur annoncé en introduction se vérifie à chaque échelle abordée~: le climat
+structure la consommation électrique résidentielle avant tout autre facteur. À l'échelle
+annuelle, la zone climatique ASHRAE domine la dispersion entre bâtiments
+(chapitre~\ref{ch:exploration}) et reste, une fois le modèle prédictif entraîné, son déterminant
+n°1 - latitude et longitude météo pèsent 18,4\% de l'importance LightGBM, devant l'enveloppe
+elle-même (\S\ref{sec:global-vs-physique}). À l'échelle journalière, c'est encore le climat qui
+sépare les jours types d'un même bâtiment (\S\ref{sec:clustering-jours-types}) et les régimes du
+panel de 100 bâtiments (\S\ref{sec:clustering-panel}). À l'échelle horaire enfin, c'est le
+chauffage, piloté par un thermostat programmable, qui porte, à lui seul, les pics de
+consommation d'un foyer type (\S\ref{sec:clustering-jours-types}).
+
+Entre ces deux bornes, le bâti et le comportement expliquent la dispersion résiduelle
+(chapitre~\ref{ch:beyond-climate})~: 108 attributs bruts, propres au parc états-unien, se
+réduisent à 83 features sans perte de performance notable (\S\ref{sec:agregation-physique}), et un
+LightGBM entraîné sur le périmètre tout-électrique atteint $R^2=0{,}9254$, nette amélioration par
+rapport au premier modèle du stage avant le recentrage tout-électrique
+(\S\ref{sec:lgbm-electricite}). La dynamique temporelle
+(chapitre~\ref{ch:dynamique-temporelle}) ajoute ce que l'analyse annuelle ne pouvait pas montrer~:
+des jours types identifiables, un panel où aucun bâtiment ne domine un régime donné, et un modèle
+hybride RNN+MLP qui bat une simple persistance horaire ($R^2=0{,}877$ contre $0{,}827$) tout en
+restant prudent sur les extrêmes.
+
+Le rapport livre ainsi une chaîne complète et reproductible, du nettoyage des métadonnées brutes
+à la prévision horaire, plutôt qu'un unique modèle final. Chaque étape reste vérifiable
+indépendamment (source notebook citée à chaque résultat), condition nécessaire pour que ce travail
+serve de point de départ à la suite du programme FlexiMax plutôt que d'une boîte noire.
+
+\section{Perspectives}
+\label{sec:perspectives}
+Les limites identifiées au chapitre~\ref{ch:discussion} dessinent assez directement les
+prochaines étapes.
+
+\textbf{Élargir le panel du chapitre~\ref{ch:dynamique-temporelle}.} 100 bâtiments suffisent pour
+poser le cadre méthodologique du clustering multivarié et du modèle RNN+MLP, mais pas pour en
+valider les résultats avec la même robustesse que les 64\,062 logements du
+chapitre~\ref{ch:modelisation}. Le pipeline de téléchargement (\S\ref{sec:clustering-panel}) est
+déjà en place~: l'étendre est une extension directe, en particulier pour fiabiliser la partie B du
+\S\ref{sec:rnn-mlp-hybride} (70 exemples d'entraînement seulement).
+
+\textbf{Relier clustering et modèles supervisés.} Les jours types du
+\S\ref{sec:clustering-jours-types} et les régimes du panel (\S\ref{sec:clustering-panel}) restent
+aujourd'hui une lecture descriptive, jamais réinjectée dans le modèle prédictif. Utiliser
+l'appartenance à un cluster comme feature supplémentaire du RNN+MLP (\S\ref{sec:rnn-mlp-hybride}) -
+notamment pour la partie B, où le signal manque - est une piste naturelle non explorée ici.
+
+\textbf{Généraliser la décomposition par poste.} Le \S\ref{sec:clustering-jours-types} montre, sur
+un seul bâtiment, que le chauffage porte les pics de consommation. Étendre cette décomposition à
+l'échelle du panel confirmerait, ou nuancerait, si ce résultat se généralise à des foyers aux
+profils météo, revenus et équipements différents.
+
+\textbf{Comparer avec une désagrégation exogène.} Une autre approche du projet FlexiMax prédit le
+niveau annuel par LightGBM puis le désagrège heure par heure via un GRU piloté par la météo et le
+calendrier (pas la consommation passée), sur un panel plus large. Les deux méthodes répondent à des
+questions différentes - prévision autorégressive ici, désagrégation d'un total déjà connu là - une
+comparaison à périmètre égal resterait à mener.
+
+\textbf{Comparer les architectures avec une justification explicite.} Comme noté au
+\S\ref{sec:choix-ecartes}, une comparaison LightGBM/MLP (ou GRU/LSTM/SimpleRNN, déjà paramétrable
+dans \code{build\_hybrid\_model}) resterait à mener, motivée par une hypothèse claire plutôt que
+par la seule disponibilité du modèle.
+
+\textbf{Valider sur données françaises.} La limite la plus structurante
+(\S\ref{sec:portee-transferabilite}) - c'est la condition pour que ce travail dépasse le cadre du
+stage.
+
+% ============================================================================
+\begin{thebibliography}{9}
+
+\bibitem{nrel2025}
+Reyna, J., Fontanini, A., Present, E., Liu, L., Adhikari, R., Bianchi, C., et al.,
+\textit{ResStock Technical Reference Documentation v3.3.0}, National Renewable Energy Laboratory
+(NREL), Golden, CO, 2025.
+\url{https://research-hub.nlr.gov/en/publications/resstock-technical-reference-documentation-v330/}
+
+\bibitem{resstock_platform}
+National Renewable Energy Laboratory (NREL), \textit{ResStock -- Residential Building Stock
+Modeling}. Site officiel du projet.
+\url{https://resstock.nlr.gov/}
+
+\bibitem{ademe2030}
+ADEME, \textit{Appel à Projets de Recherche (APR) -- Vers des bâtiments responsables 2026},
+Programme France 2030, ADEME, 2025.
+\url{https://agirpourlatransition.ademe.fr/entreprises/aides-financieres/catalogue/aap/appel-projets-de-recherche-vers-des-batiments-responsables-2026}
+
+\bibitem{ke2017lightgbm}
+Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q., Liu, T.-Y., \textit{LightGBM: A
+Highly Efficient Gradient Boosting Decision Tree}, Proceedings of the 31st Conference on Neural
+Information Processing Systems (NeurIPS 2017), p.~3149--3157, 2017.
+\url{https://dl.acm.org/doi/10.5555/3294996.3295074}
+
+\bibitem{pedregosa2011sklearn}
+Pedregosa, F., Varoquaux, G., Gramfort, A., et al., \textit{Scikit-learn: Machine Learning in
+Python}, Journal of Machine Learning Research, vol.~12, p.~2825--2830, 2011.
+\url{https://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf}
+
+\bibitem{chollet2015keras}
+Chollet, F. et al., \textit{Keras}, 2015.
+\url{https://keras.io}
+
+\bibitem{macqueen1967kmeans}
+MacQueen, J., \textit{Some Methods for Classification and Analysis of Multivariate Observations},
+Proceedings of the 5th Berkeley Symposium on Mathematical Statistics and Probability, vol.~1,
+p.~281--297, 1967.
+\url{https://projecteuclid.org/ebooks/berkeley-symposium-on-mathematical-statistics-and-probability/Proceedings-of-the-Fifth-Berkeley-Symposium-on-Mathematical-Statistics-and/chapter/Some-methods-for-classification-and-analysis-of-multivariate-observations/bsmsp/1200512992}
+
+\bibitem{alvarez2017climat}
+Alvarez, C., \textit{États-Unis~: le dérèglement climatique va accroître la pauvreté et les
+inégalités}, Novethic, 25 juillet 2017.
+\url{https://www.novethic.fr/actualite/environnement/climat/isr-rse/etats-unis-le-climat-va-accroitre-la-pauvrete-et-les-inegalites-144602.html}
+
+\end{thebibliography}
+\addcontentsline{toc}{chapter}{Bibliographie}
+
+% ============================================================================
+\appendix
 \begin{landscape}
+\chapter{Annexes}
+Deux compléments techniques au rapport~: le détail variable par variable des attributs
+\code{in.*} encodés (\S\ref{app:variables-detail}), et une vue d'ensemble du pipeline de
+notebooks qui produit l'ensemble des résultats cités (\S\ref{app:pipeline}).
+
+\section{Description détaillée des attributs \code{in.*} encodés}
+\label{app:variables-detail}
+
 {\footnotesize
 \setlength{\extrarowheight}{3pt}
 \renewcommand{\arraystretch}{1.15}
 \setlength{\tabcolsep}{4pt}
 
 \begin{center}
-{\Large\bfseries Description des variables --- \texttt{X.parquet} (statut réel : supprimé / conservé)}\\[4pt]
-{\small Modèle réduit \og physique \fg{} --- subset filtré (64\,062 logements : maisons plain-pied, chauffage électrique, sans VE/piscine/PV).}
+{\Large\bfseries Description des variables - \texttt{X\_aggregates.parquet} (statut réel : supprimé / conservé)}\\[4pt]
+{\small Modèle réduit \og physique \fg{} - subset filtré (64\,062 logements : maisons plain-pied, chauffage électrique, sans VE/piscine/PV).}
 \end{center}
 
 \vspace{2pt}
@@ -942,9 +1556,8 @@ modèle prédictif est vérifiée au chapitre~\ref{ch:modelisation}.
 \Sup \; = attribut supprimé \\
 \Keep   & = attribut conservé & \\
 \end{tabular}\\[3pt]
-{\footnotesize \textbf{Bilan : 108 attributs $\rightarrow$ 83 features} (5 agrégats physiques + 78 conservés).
-Suppressions : \emph{(a) fondus dans les agrégats} --- enveloppe (30) + gaines (4) ; \emph{(b) élagués}
-(importance nulle / redondance) --- socio-éco (5), chauffe-eau (8), usages (20).}
+{\footnotesize \textbf{Bilan : 108 attributs $\rightarrow$ 83 features} - détail du calcul en
+\S\ref{sec:agregation-physique}.}
 \end{center}
 
 \vspace{4pt}
@@ -976,7 +1589,7 @@ Suppressions : \emph{(a) fondus dans les agrégats} --- enveloppe (30) + gaines 
 
 % ===== GROUPE 0 --- AGRÉGATS PHYSIQUES =====
 \rowcolor{hagg}
-\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 0 \quad Agrégats physiques --- modèle RC (remplacent le bloc enveloppe)}\\[1pt]
+\multicolumn{7}{l}{\bfseries\normalsize\color{white}\quad 0 \quad Agrégats physiques - modèle RC (remplacent le bloc enveloppe)}\\[1pt]
 
 \rowcolor{cagg}
 \var{UA} & Déperdition par transmission des parois (W/K) & \texttt{$\sim$30 attributs} & \texttt{$\approx$390 W/K} &
@@ -985,7 +1598,7 @@ $\sum_i U(R_i)\,A_i + U_\mathrm{fen}A_\mathrm{fen} + 1{,}14\,A_\mathrm{porte}$ &
 \var{H\_ve} & Déperdition par renouvellement d'air (W/K) & \texttt{ACH50} & \texttt{$\approx$75 W/K} &
 $0{,}34\,(\mathrm{ACH50}/20)\,V$ & RC & \Newagg \\
 \rowcolor{cagg}
-\var{C} & Inertie thermique --- stockage (kJ/K) & \texttt{type mur} & \texttt{$\approx$11\,600 kJ/K} &
+\var{C} & Inertie thermique - stockage (kJ/K) & \texttt{type mur} & \texttt{$\approx$11\,600 kJ/K} &
 $C_\mathrm{classe}\!\times\!A_\mathrm{pl}$ (ISO 13790) & RC & \Newagg \\
 \rowcolor{cagg}
 \var{A\_solaire} & Surface solaire équivalente (m²) & \texttt{SHGC+orient.} & \texttt{$\approx$8 m²} &
@@ -1196,7 +1809,7 @@ $(\sum A_\mathrm{parois})/V$ & RC & \Newagg \\
 \rowcolor{cusage}
 \var{in.misc\_extra\_refrigerator\_ef} & EF frigo/congélateur supplémentaire & \texttt{EF 10.5} & \texttt{10.5} & Extraction EF & Usages & \Keep \\
 \rowcolor{cusage}
-\var{in.misc\_extra\_refrigerator\_has} & Présence 2ᵉ frigo/congélateur & \texttt{EF 10.5} & \texttt{1} & Binaire & Usages & \Keep \\
+\var{in.misc\_extra\_refrigerator\_has} & Présence 2\textsuperscript{e} frigo/congélateur & \texttt{EF 10.5} & \texttt{1} & Binaire & Usages & \Keep \\
 \rowcolor{cusage}
 \var{in.misc\_freezer\_ef} & EF du congélateur dédié & \texttt{EF 12.0} & \texttt{12.0} & Extraction EF & Usages & \Keep \\
 \rowcolor{cusage}
@@ -1272,240 +1885,12 @@ $(\sum A_\mathrm{parois})/V$ & RC & \Newagg \\
 }
 \end{landscape}
 
-% ============================================================================
-\chapter{Modélisation}
-\label{ch:modelisation}
+\section{Pipeline complet des notebooks}
+\label{app:pipeline}
+Chaque résultat cité dans ce rapport est reproductible à partir d'un notebook source précis~;
+le tableau ci-dessous en donne la vue d'ensemble, dans l'ordre d'exécution.
 
-Le climat structure la consommation (chapitre~\ref{ch:exploration}), l'enveloppe et les
-équipements expliquent une partie de la dispersion résiduelle (chapitre~\ref{ch:beyond-climate}),
-et 108 attributs bruts ont été réduits à un jeu de features exploitable, physique ou complet
-(chapitre~\ref{ch:features}). Reste à vérifier si un modèle prédictif retrouve effectivement ces
-déterminants, et jusqu'à quel point il peut prédire la consommation électrique.
-
-\section{Un modèle LightGBM sur le périmètre tout-électrique}
-\label{sec:lgbm-electricite}
-\begin{resultbox}[{Source : \code{05\_deeplearning/lgbm\_electricity.ipynb} --- sous-ensemble tout-électrique plain-pied, 64\,062 logements}]
-Un LightGBM entraîné sur les 107 features encodées (\S\ref{sec:principe-encodage}), avec split
-stratifié par zone ASHRAE (Train 40\,999 / Val 10\,250 / Test 12\,813) et 50 essais
-d'optimisation Optuna, atteint sur le test $R^2=0{,}9254$ (RMSE $=2\,712$~kWh, soit 13,8\% de la
-consommation moyenne ; écart train/test $=0{,}057$, contrôlé). C'est une nette amélioration par
-rapport au premier modèle du stage, entraîné avant le recentrage tout-électrique sur les
-549\,971 bâtiments et les cinq vecteurs énergétiques (\code{lightgbm\_stratified.ipynb},
-$R^2=0{,}8446$, RMSE $=28{,}9\%$) : le gain ($+0{,}08$ de $R^2$, RMSE relative divisée par deux)
-tient moins à un modèle différent qu'au périmètre lui-même --- un sous-ensemble tout-électrique
-et géométriquement homogène, sur une cible unique, stratifié directement sur la zone climatique
-plutôt que sur une stratification composite plus généraliste.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{modelisation_comparaison_electricite.png}
-  \caption{$R^2$, RMSE et RMSE relative --- modèle multi-cibles pré-recentrage
-  (\code{lightgbm\_stratified}) vs modèle électricité sur le périmètre tout-électrique
-  (\code{lgbm\_electricity}).}
-  \label{fig:modelisation-comparaison}
-\end{figure}
-
-L'erreur par zone climatique (test) confirme le fil conducteur du rapport : les zones rares et
-extrêmes (7B, $n=8$, RMSE $=9\,044$~kWh ; 6A, $n=233$, RMSE $=4\,168$~kWh) concentrent l'essentiel
-de l'erreur et du biais, tandis que les zones tempérées majoritaires (2A, 3A, 4A) restent sous
-3\,300~kWh de RMSE --- une limite de taille d'échantillon plus qu'une faiblesse du modèle.
-
-\section{Global vs Physique : le compromis interprétabilité}
-\label{sec:global-vs-physique}
-\begin{resultbox}[{Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} --- même sous-ensemble, 64\,062 logements}]
-Remplacer les 30 attributs bruts d'enveloppe par les 5 agrégats physiques du
-\S\ref{sec:agregation-physique} (83 features au lieu de 107, jeu \og Physique\fg) coûte peu :
-$R^2=0{,}9120$ (RMSE $=2\,945$~kWh, 15,0\%) contre $0{,}9254$ pour le jeu \og Global\fg{} --- une
-perte de 1,3 point de $R^2$ pour cinq variables interprétables en moins de description physique
-du bâti. L'importance des variables confirme que cette perte est mesurée, pas accidentelle : $UA$
-arrive en 2\textsuperscript{e} position (8,85\% de l'importance totale, juste derrière la latitude
-météo), et les 5 agrégats cumulés pèsent \textbf{32,3\%} de l'importance du modèle --- l'enveloppe
-compte, même réduite à cinq nombres. La latitude et la longitude météo dominent toujours
-largement (18,4\% cumulés), confirmant à l'échelle du modèle prédictif ce que l'exploration
-suggérait déjà (\S\ref{sec:localisation-climat}) : le climat prime sur le bâti. Une courbe du
-coude sur le nombre de features retenues montre par ailleurs que la moitié des attributs
-(50 sur 83, ou 80 sur 107 pour le jeu Global) suffit à retrouver la performance du jeu complet ---
-la longue traîne de variables à faible importance (VE, PV, spa, piscine, redondantes avec le
-filtre du sous-ensemble) n'apporte rien de plus.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{modelisation_importance_agregats.png}
-  \caption{Importance des 83 variables du jeu Physique (gain LightGBM) --- les 5 agrégats
-  physiques en rouge.}
-  \label{fig:modelisation-importance}
-\end{figure}
-
-\section{Performance par usage électrique}
-\label{sec:performance-usages}
-\begin{resultbox}[{Source : \code{05\_deeplearning/lgbm\_electricity\_5features.ipynb} --- quatre modèles, mêmes features et split}]
-Prédire chaque usage séparément (mêmes 83 features, mêmes hyperparamètres qu'en
-\S\ref{sec:global-vs-physique}) révèle une hétérogénéité nette : l'eau chaude sanitaire est
-l'usage le plus facile ($R^2=0{,}980$, RMSE $=214$~kWh) et le chauffage le plus difficile
-($R^2=0{,}816$, RMSE relative $=54{,}0\%$). Ce n'est pas un défaut du modèle mais une conséquence
-de la variance du signal : la consommation de chauffage varie fortement d'un ménage à l'autre
-(moyenne 6\,030~kWh, mais 98,9\% des logements seulement en ont --- contre 84,6\% pour l'eau
-chaude, dont la consommation moyenne, plus faible et plus stable, est mécaniquement plus facile à
-approcher en valeur relative). La climatisation se situe entre les deux ($R^2=0{,}930$,
-18,9\%). Ce classement --- eau chaude $>$ climatisation $>$ total $>$ chauffage --- est cohérent
-avec le rôle du climat déjà établi : le chauffage est l'usage le plus exposé à la variabilité
-climatique inter-zones, donc le plus dur à généraliser sur un modèle unique.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{modelisation_par_usage.png}
-  \caption{$R^2$ et RMSE par usage électrique (total, chauffage, climatisation, eau chaude),
-  jeu de features Physique.}
-  \label{fig:modelisation-par-usage}
-\end{figure}
-
-% ============================================================================
-\chapter{Dynamique temporelle}
-\label{ch:dynamique-temporelle}
-
-Les chapitres précédents traitent la consommation électrique comme une grandeur annuelle : un
-seul nombre par logement, expliqué par le climat, le bâti et les équipements
-(chapitres~\ref{ch:exploration} à \ref{ch:modelisation}). Or l'électricité qui compte pour la
-flexibilité se joue à l'heure, pas à l'année. Ce chapitre explore la dimension temporelle sur le
-même périmètre tout-électrique~: d'abord en cherchant des \og jours types \fg{} par clustering non
-supervisé des profils journaliers, à l'échelle d'un bâtiment puis d'un panel de 100 bâtiments,
-puis en entraînant un modèle hybride RNN+MLP pour prédire la consommation à deux horizons
-(l'heure suivante, et le total annuel à partir de 90 jours observés).
-
-\section{Jours types~: clustering du profil journalier d'un bâtiment de référence}
-\label{sec:clustering-jours-types}
-\begin{resultbox}[{Source : \code{06\_timeseries/timeseries\_clustering\_multi.ipynb} --- bâtiment 10672-0, premier des 100 bâtiments tout-électriques du panel}]
-Chaque journée (pas horaire, 24 valeurs) est normalisée de deux façons concurrentes~: un z-score
-\emph{intra-jour} qui ne garde que la \og forme \fg{} du profil (où se situent les pics, quel que
-soit le niveau), et un \code{StandardScaler} \emph{global} qui garde surtout le niveau
-d'\og amplitude \fg{} du jour. Un K-Means est ajusté séparément sur chaque représentation, avec $k$
-choisi par méthode du coude puis vérifié par score de silhouette. Les deux normalisations donnent
-des résultats très différents~: la forme retient $k=6$ (tailles 63/44/133/55/38/32) mais avec une
-silhouette faible et décroissante (0,34 à $k=3$, 0,25 à $k=6$) --- les formes de profil se
-chevauchent beaucoup ; l'amplitude retient $k=5$ (tailles 22/231/11/71/30) avec une silhouette
-nettement meilleure (0,58 à $k=2$, encore 0,44 à $k=5$). Pour ce logement, les journées se
-distinguent donc bien plus par leur \emph{niveau} de consommation que par la \emph{forme} de leur
-courbe horaire --- un grand cluster majoritaire (231 jours) porte le régime courant, entouré de
-clusters minoritaires qui captent les jours extrêmes.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.95\textwidth]{timeseries_multi_calendrier_composition_forme.png}
-  \caption{Composition des 6 clusters de \og forme \fg{} par répartition semaine/weekend et par
-  mois --- bâtiment 10672-0.}
-  \label{fig:clustering-jours-types-calendrier}
-\end{figure}
-
-La composition calendaire des clusters de forme (figure~\ref{fig:clustering-jours-types-calendrier})
-confirme ce diagnostic~: la répartition semaine/weekend reste proche de 70--78\% dans tous les
-clusters, c'est-à-dire proche du ratio naturel des jours ouvrés (5/7~$\approx$~71\%) --- le
-weekend n'isole pas un cluster à part. En revanche la répartition mensuelle est très marquée
-(clusters 0 et 3~: hiver ; clusters 4 et 5~: printemps ; clusters 1 et 2~: été), ce qui confirme
-à l'échelle du profil horaire ce que le chapitre~\ref{ch:exploration} établit à l'échelle
-annuelle~: le climat structure la consommation avant le rythme hebdomadaire.
-
-\section{Vers un clustering à l'échelle du panel}
-\label{sec:clustering-panel}
-\begin{resultbox}[{Source : \code{06\_timeseries/timeseries\_clustering\_multi.ipynb} --- 100 bâtiments tout-électriques, 36\,500 jours-bâtiment}]
-Passer du bâtiment unique au panel change l'échelle~: 100 bâtiments tout-électriques (même filtre
-que les chapitres~\ref{ch:modelisation}, plain-pied et sans équipement électrifiable annexe)
-téléchargés en séries horaires (8\,760~h/an chacun), soit 36\,500 jours-bâtiment. Chaque jour est
-décrit par sa forme (réduite par PCA --- une seule composante suffit à expliquer 90\% de la
-variance de forme sur l'ensemble du panel, signe d'un mode de variation dominant), son amplitude
-(log, centrée-réduite \emph{par bâtiment} pour ne pas confondre \og jour atypique \fg{} et
-\og gros bâtiment \fg{}) et 12 variables météo (moyenne/min/max de température, humidité relative,
-température humide, ratio d'humidité), soit 23 dimensions au total. La méthode du coude retient
-$k=6$, mais le score de silhouette culmine nettement à $k=2$ (0,33) puis décroît de façon quasi
-monotone jusqu'à $\sim$0,10 --- un signal ambigu, plus caractéristique d'un continuum de
-comportements que de régimes bien séparés. L'ajustement final du clustering multivarié sur
-l'ensemble du panel n'a pas été mené à terme dans le temps du stage~: cette section pose le cadre
-méthodologique (extraction, réduction, choix de $k$) plutôt qu'une typologie de jours types
-validée à l'échelle du parc.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.85\textwidth]{timeseries_multi_coude_multivarie.png}
-  \caption{Méthode du coude et score de silhouette --- clustering multivarié (forme + amplitude +
-  météo) sur les 36\,500 jours-bâtiment du panel.}
-  \label{fig:clustering-panel-elbow}
-\end{figure}
-
-\section{Un modèle hybride RNN+MLP pour deux horizons de prédiction}
-\label{sec:rnn-mlp-hybride}
-\begin{resultbox}[{Source : \code{06\_timeseries/rnn\_mlp\_hybrid\_electricite.ipynb} --- 100 bâtiments tout-électriques, architecture GRU+MLP à deux branches}]
-L'architecture combine une branche séquentielle (GRU, qui encode une fenêtre de consommation et
-météo passées) et une branche statique (MLP, qui encode les métadonnées physiques du bâtiment ---
-dont les 5 agrégats d'enveloppe du \S\ref{sec:agregation-physique}), concaténées avant une tête de
-régression commune. Le split train/val/test (70/15/15) se fait \emph{par bâtiment}, pas par
-fenêtre temporelle~: le modèle est testé sur des bâtiments jamais vus, condition plus proche d'un
-usage en diagnostic énergétique qu'un split temporel intra-bâtiment.
-
-\textbf{Partie A --- prévision à t+1 (fenêtre de 24h).} Avec 611\,520 fenêtres d'entraînement (70
-bâtiments $\times$ 8\,736 fenêtres) et un GRU à 32 unités, le modèle hybride bat la baseline de
-persistance (dernière heure observée)~: $R^2=0{,}877$ contre $0{,}827$, RMSE $=1{,}00$~kWh contre
-$1{,}19$~kWh (-16\%). Le gain est net mais mesuré~: la persistance est déjà un concurrent sérieux à
-l'échelle horaire, la dynamique de consommation étant fortement autocorrélée d'une heure à l'autre.
-
-\textbf{Partie B --- extrapolation du total annuel (90 premiers jours observés).} Avec seulement 70
-exemples d'entraînement (une observation par bâtiment) et un réseau volontairement réduit (GRU 16
-unités, dropout 0,3), le modèle hybride explique $R^2=0{,}803$ de la variance du total annuel
-(RMSE $=5\,607$~kWh contre $12\,637$~kWh pour une baseline naïve --- la moyenne du train, -56\%).
-Le signal est réel mais évalué sur seulement 15 bâtiments de test~: à confirmer sur un panel plus
-large avant toute conclusion définitive, comme le note explicitement le notebook source.
-\end{resultbox}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{rnn_mlp_partieA_metrics_bar.png}
-    \caption{Partie A --- prévision t+1 (24h).}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.48\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{rnn_mlp_partieB_metrics_bar.png}
-    \caption{Partie B --- extrapolation annuelle (90j).}
-  \end{subfigure}
-  \caption{RMSE et MAE --- modèle hybride GRU+MLP contre baseline, pour les deux horizons de
-  prédiction.}
-  \label{fig:rnn-mlp-metriques}
-\end{figure}
-
-% ============================================================================
-\begin{thebibliography}{99}
-
-\bibitem{resstock} National Renewable Energy Laboratory (NREL), \textit{ResStock --- Technical
-Reference Guide}, 2025 Release 1.
-
-\bibitem{ademe} ADEME, \textit{Programme France 2030} --- [préciser la référence exacte du
-programme/appel à projets FlexiMax].
-
-\bibitem{lightgbm} Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q., Liu, T.-Y.,
-\textit{LightGBM: A Highly Efficient Gradient Boosting Decision Tree}, NeurIPS, 2017.
-
-\bibitem{sklearn} Pedregosa, F. et al., \textit{Scikit-learn: Machine Learning in Python},
-Journal of Machine Learning Research, 2011.
-
-\bibitem{keras} Chollet, F. et al., \textit{Keras}, 2015.
-
-\bibitem{kmeans} MacQueen, J., \textit{Some Methods for Classification and Analysis of
-Multivariate Observations}, Proceedings of the 5th Berkeley Symposium on Mathematical
-Statistics and Probability, 1967.
-
-\end{thebibliography}
-\addcontentsline{toc}{chapter}{Bibliographie}
-
-% ============================================================================
-\appendix
-\chapter{Pipeline complet des notebooks}
-
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Vue d'ensemble du pipeline de notebooks du dépôt FlexiMax.}
 \begin{tabular}{@{}p{2.7cm}p{9.5cm}@{}}
@@ -1518,7 +1903,7 @@ climat/localisation, vue d'ensemble des groupes \code{in.*}). \\
 \code{03\_visualisation} & Classification métier des variables, décomposition nationale par
 usage/vecteur énergétique, visualisation du sous-ensemble national. \\
 \code{04\_features} & Transformations numériques, encodage catégoriel, feature engineering
-physique, préparation finale $\to$ \code{X.parquet}/\code{y.parquet}. \\
+physique, préparation finale $\to$ \code{X.parquet}/\code{Y.parquet}. \\
 \code{05\_deeplearning} & Modélisation LightGBM (électricité, Global vs Physique, par usage),
 clustering stratifié pour le split partagé. \\
 \code{06\_timeseries} & Extraction OEDI, clustering des profils (univarié/multivarié), RNN/MLP
@@ -1527,6 +1912,29 @@ hybride pour la prévision. \\
 \end{tabular}
 \end{table}
 
+Cette chaîne, du nettoyage des métadonnées brutes à la prévision horaire, couvre l'intégralité
+des résultats présentés dans ce rapport.
 
+\section{Profils moyens par cluster en valeurs réelles}
+\label{app:profils-kwh-reels}
+La figure~\ref{fig:clustering-panel-profils} (\S\ref{sec:clustering-panel}) montre les profils
+de forme moyens par cluster en z-score, l'axe sur lequel le clustering est effectivement
+réalisé : les valeurs négatives et positives y représentent un écart à la consommation moyenne
+du jour, pas une consommation réelle. À titre complémentaire, la figure~\ref{fig:clustering-panel-profils-kwh}
+ci-dessous moyenne directement les profils bruts (en kWh) par cluster. Les deux lectures sont
+cohérentes~: les clusters 3 et 5 (les plus froids, \S\ref{sec:clustering-panel}) affichent aussi
+les niveaux réels les plus élevés (5 à 8~kWh), tandis que les clusters 0 et 4 restent les plus
+bas (1 à 2~kWh), confirmant en valeurs réelles le lien température-amplitude déjà établi.
+Nuance à garder en tête~: les clusters étant formés surtout sur la forme et non sur le niveau,
+un cluster peut mélanger des logements de tailles différentes, la moyenne en kWh brut peut donc
+être influencée par les plus gros consommateurs du cluster.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.75\textwidth]{cluster_profils_kwh_reel.png}
+  \caption{Profils moyens par cluster en valeurs réelles (kWh), complément à la
+  figure~\ref{fig:clustering-panel-profils}.}
+  \label{fig:clustering-panel-profils-kwh}
+\end{figure}
 
 \end{document}
