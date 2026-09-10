@@ -1,48 +1,80 @@
 # FlexiMax
 
-Projet de stage Data Science — MINES Paris–PSL / ARMINES  
-Analyse de la flexibilité de la demande résidentielle en électricité (France 2030, ADEME).
+Projet de stage Data Science, MINES Paris PSL / ARMINES (programme France 2030, ADEME).
 
-## Structure du projet
+## Objectif
+
+Prédire la consommation énergétique des bâtiments résidentiels à partir des données
+ResStock 2025 Release 1 (NREL), puis analyser la structure de cette consommation
+(déterminants climatiques, enveloppe, équipements) et sa dynamique temporelle.
+
+Le périmètre d'étude est restreint aux **bâtiments tout électriques** : l'électricité
+est la cible principale, à l'échelle annuelle comme à l'échelle horaire.
+
+## Données
+
+Les données ResStock 2025 Release 1 (NREL) ne sont pas versionnées (volume trop
+important). Elles se placent dans `data/raw/` et `data/processed/`.
+
+| Fichier | Description |
+|---|---|
+| `upgrade0.parquet` | Métadonnées nationales, 549 971 bâtiments x 771 colonnes |
+| `metadata_clean.parquet` | Métadonnées nettoyées, produites par `02_nettoyage/` |
+| `{bldg_id}-{upgrade}.parquet` | Séries temporelles individuelles, pas 15 min, 35 040 lignes par an |
+
+Références externes (dictionnaires d'attributs, table d'énumération, géométrie des
+États) : `data/external/`.
+
+## Structure du dépôt
 
 ```
 FlexiMax/
 ├── data/
-│   ├── raw/            # Données brutes (parquet, csv) — ne pas versionner
-│   ├── processed/      # Données nettoyées et prêtes à l'emploi
-│   └── external/       # Références externes (data_dictionary, geographic_info)
+│   ├── raw/           # Données brutes ResStock (non versionnées)
+│   ├── processed/     # Jeux nettoyés et features (non versionnés)
+│   └── external/      # Dictionnaires et références ResStock
 │
 ├── notebooks/
-│   ├── 01_exploration/         # Exploration initiale des données
-│   ├── 02_nettoyage/           # Nettoyage et sélection des attributs
-│   ├── 03_visualisation/       # Visualisations des metadata et séries temporelles
-│   ├── 04_feature_engineering/ # Construction des variables pour les modèles
-│   ├── 05_flexibilite/         # Analyse du potentiel de flexibilité HVAC
-│   └── 06_modeles/             # Modèles ML/DL de prédiction
+│   ├── 01_exploration/    # Exploration : enveloppe, HVAC, occupants, climat, groupes
+│   ├── 02_nettoyage/      # Nettoyage et sélection des attributs de métadonnées
+│   ├── 03_visualisation/  # Visualisations métadonnées, classification des variables
+│   ├── 04_features/       # Feature engineering : encodage, transformations, features physiques
+│   ├── 05_deeplearning/   # Modèles annuels : LightGBM, MLP, clustering stratifié, SHAP
+│   ├── 06_timeseries/     # Séries temporelles : extraction, clustering, RNN/MLP hybride
+│   └── 07_flexibilite/    # Gisement de flexibilité
 │
-├── src/                # Fonctions Python réutilisables entre notebooks
+├── experiments/      # Scripts de banc d'essai (entraînements en lot, génération de figures)
 ├── reports/
-│   └── figures/        # Graphiques exportés pour les rapports
+│   ├── figures/      # Figures exportées pour le rapport et la soutenance
+│   ├── rapport_stage.tex
+│   └── soutenance.tex
+├── docs/
+│   └── PIPELINE.md   # Enchaînement détaillé des étapes, entrées et sorties
 └── README.md
 ```
 
-## Données
+## Pipeline
 
-Les données ResStock 2025 Release 1 (NREL) ne sont pas versionnées dans ce repo car trop volumineuses.
+L'enchaînement complet des étapes, avec pour chacune ses entrées, ses sorties et les
+notebooks concernés, est décrit dans [docs/PIPELINE.md](docs/PIPELINE.md).
 
-| Fichier | Description |
-|---------|-------------|
-| `upgrade0.parquet` | Metadata nationale — 549 971 bâtiments × 771 colonnes |
-| `metadata_clean.parquet` | Metadata nettoyée — produite par `02_nettoyage` |
-| `{bldg_id}-{upgrade}.parquet` | Séries temporelles individuelles (15 min, 35 040 lignes) |
+Vue d'ensemble :
 
-## Missions
+1. Exploration des métadonnées (`01_exploration/`).
+2. Nettoyage et sélection des attributs (`02_nettoyage/`).
+3. Visualisation et classification des variables (`03_visualisation/`).
+4. Feature engineering (`04_features/`), produit `X.parquet` et `Y.parquet`.
+5. Modèles de consommation annuelle et clustering (`05_deeplearning/`).
+6. Extraction et modélisation des séries temporelles (`06_timeseries/`).
+7. Analyse du gisement de flexibilité (`07_flexibilite/`).
 
-1. Exploration et nettoyage des données
-2. Feature engineering
-3. Détection des appareils
-4. Analyse de la flexibilité HVAC (upgrades dr_001–dr_005)
-5. Prédiction de la consommation
-6. Modèles ML/DL
-7. Évaluation des modèles
-8. Interprétation (SHAP)
+## Environnement
+
+Python 3.12. Principales dépendances : `pandas`, `numpy`, `pyarrow`, `scikit-learn`,
+`lightgbm`, `optuna`, `tensorflow`, `torch`, `matplotlib`, `seaborn`, `shap`,
+`geopandas`.
+
+## Rapports
+
+- `reports/rapport_stage.tex` : rapport de stage (source LaTeX) et `rapport_stage.pdf`.
+- `reports/soutenance.tex` : support de soutenance et `soutenance.pdf`.
