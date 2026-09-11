@@ -64,83 +64,37 @@ Tous les notebooks calculent la racine du projet par
 
 ## 3. Schéma du pipeline
 
+Vue d'ensemble par étape. Le détail notebook par notebook (30 notebooks, entrées
+et sorties précises) est dans le tableau de la section 4.
+
 ```mermaid
 flowchart TD
-    DL["upgrade0.parquet (telechargement manuel OEDI)"]
-    N02["Etape 1 - 02_nettoyage/nettoyage_metadata"]
+    DL["upgrade0.parquet<br/>telechargement manuel OEDI"]
+    E1["1. Nettoyage<br/>02_nettoyage"]
     MC[("metadata_clean.parquet")]
-    E01["Etape 2 - 01_exploration x5"]
-    VM["Etape 2 - 03_visualisation/visualisation_metadata"]
-    VV["Etape 2 - 03_visualisation/visual"]
-    T1["Etape 3a - 04_features/transformations_numeriques"]
-    T2["Etape 3b - 04_features/encodage_categoriel"]
-    T3["Etape 3c - 04_features/preparation_finale"]
-    T4["Etape 3d - 04_features/physical_feature_engineering"]
-    CV["Etape 3e - 03_visualisation/classification_variables"]
-    MF[("metadata_features.parquet")]
-    FE[("features_encodees.parquet")]
-    XY[("X.parquet + Y.parquet")]
-    XP[("X_physical_engineered.parquet")]
-    CS["Etape 4 - 05_deeplearning/clustering_stratifie"]
-    CL[("cluster_labels.parquet + idx_train.npy + idx_test.npy")]
-    TS_EXT["Etape 5a - 06_timeseries/extraction_timeseries_oedi"]
-    WS[("weather_static.parquet")]
-    TSB[("series 15 min par batiment (data/raw, data/processed)")]
-    M_BASE["Etape 5b - baseline_lgbm"]
-    M_ELEC["Etape 5c/5d - lgbm_electricity / _usages"]
-    M_5F["Etape 5e - lgbm_electricity_5features"]
-    M_CA["Etape 5f - lgbm_consommation_annuelle"]
-    M_AE["Etape 5g - analyse_exploratoires"]
-    M_STR["Etape 5h/5i/5j - lgbm_stratified, lightgbm_stratified, mlp_stratified"]
-    M_SHAP["Etape 5k - lgbm_shap"]
-    XA[("X_aggregates.parquet")]
-    X47[("X_47features.parquet + static_preds_oos.parquet")]
-    TS_PARC["Etape 6a - etude_parc_503"]
-    TS_CL["Etape 6b - timeseries_clustering"]
-    TS_CLM["Etape 6c - timeseries_clustering_multi"]
-    TS_NET["Etape 6d/6e - timeseries_net / timeseries_conv"]
-    TS_RNN["Etape 6f - rnn_mlp_hybrid_electricite"]
-    TS_RNNF["Etape 6g - rnn_mlp_hybrid_electricite_full"]
-    FLEX["Etape 7 - 07_flexibilite/flexibilite"]
-    NB1["Annexe - notebooks1/03_visualisation1/visualisation_timeseries"]
+    E2["2. Exploration et visualisation<br/>01_exploration, 03_visualisation"]
+    E3["3. Feature engineering<br/>04_features"]
+    XY[("X.parquet, Y.parquet")]
+    E4["4. Clustering de stratification<br/>05_deeplearning/clustering_stratifie"]
+    CL[("cluster_labels.parquet, idx_train/test.npy")]
+    E5["5. Modeles annuels<br/>05_deeplearning"]
+    E6A["6a. Extraction series temporelles<br/>extraction_timeseries_oedi"]
+    E6B["6b. Modelisation series temporelles<br/>06_timeseries"]
+    E7["7. Flexibilite<br/>07_flexibilite"]
 
-    DL --> N02 --> MC
-    MC --> E01
-    DL --> VM
-    DL --> VV
-    MC --> T1 --> MF --> T2 --> FE --> T3 --> XY --> T4 --> XP
-    MF --> CV
-    XY --> CS
-    MC --> CS
-    CS --> CL
-    XY --> M_BASE
-    XY --> M_ELEC
-    XY --> M_5F
-    XY --> M_CA
-    XY --> M_AE
-    XP --> M_STR
-    XP --> M_SHAP
-    CL --> M_STR
-    CL --> M_SHAP
-    M_5F --> XA
-    WS --> M_CA
-    M_CA --> X47
-    DL --> TS_EXT --> WS
-    TS_EXT --> TSB
-    X47 --> TS_PARC
-    X47 --> TS_NET
-    WS --> TS_PARC
-    TSB --> TS_CL --> TS_CLM
-    XA --> TS_RNN
-    XA --> TS_RNNF
-    XP --> TS_RNN
-    XP --> TS_RNNF
-    TSB --> FLEX
-    X47 --> FLEX
-    MF --> NB1
+    DL --> E1 --> MC
+    MC --> E2
+    MC --> E3 --> XY
+    XY --> E4 --> CL
+    XY --> E5
+    CL --> E5
+    DL --> E6A
+    E5 --> E6B
+    E6A --> E6B
+    E6B --> E7
 
     classDef data fill:#fef7e0,stroke:#c08a2e;
-    class DL,MC,MF,FE,XY,XP,CL,WS,TSB,XA,X47 data;
+    class DL,MC,XY,CL data;
 ```
 
 ## 4. Ordre d'exécution détaillé
