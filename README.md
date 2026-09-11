@@ -9,8 +9,6 @@ ResStock 2025 Release 1 (NREL), analyser la structure de cette consommation
 (déterminants climatiques, enveloppe, équipements) et sa dynamique temporelle.
 Le périmètre d'étude est restreint aux **bâtiments tout électriques**.
 
-Auteurs des notebooks : **(Y)** Yassmin Zouarhi, **(B)** Boubaker Amdyoun, **(E)** Eyua Assoumou.
-
 Pour l'enchaînement détaillé des sept étapes (entrées, sorties, notebook par
 notebook), voir [PIPELINE.md](PIPELINE.md).
 
@@ -69,42 +67,42 @@ Tous les notebooks calculent la racine du projet par
 ```mermaid
 flowchart TD
     DL["upgrade0.parquet (telechargement manuel OEDI)"]
-    N02["Etape 1 - 02_nettoyage/nettoyage_metadata (Y,B)"]
+    N02["Etape 1 - 02_nettoyage/nettoyage_metadata"]
     MC[("metadata_clean.parquet")]
-    E01["Etape 2 - 01_exploration x5 (Y,B,E)"]
-    VM["Etape 2 - 03_visualisation/visualisation_metadata (Y,B)"]
-    VV["Etape 2 - 03_visualisation/visual (Y,E)"]
-    T1["Etape 3a - 04_features/transformations_numeriques (Y,B,E)"]
-    T2["Etape 3b - 04_features/encodage_categoriel (Y,B,E)"]
-    T3["Etape 3c - 04_features/preparation_finale (Y,B,E)"]
-    T4["Etape 3d - 04_features/physical_feature_engineering (Y)"]
-    CV["Etape 3e - 03_visualisation/classification_variables (Y)"]
+    E01["Etape 2 - 01_exploration x5"]
+    VM["Etape 2 - 03_visualisation/visualisation_metadata"]
+    VV["Etape 2 - 03_visualisation/visual"]
+    T1["Etape 3a - 04_features/transformations_numeriques"]
+    T2["Etape 3b - 04_features/encodage_categoriel"]
+    T3["Etape 3c - 04_features/preparation_finale"]
+    T4["Etape 3d - 04_features/physical_feature_engineering"]
+    CV["Etape 3e - 03_visualisation/classification_variables"]
     MF[("metadata_features.parquet")]
     FE[("features_encodees.parquet")]
     XY[("X.parquet + Y.parquet")]
     XP[("X_physical_engineered.parquet")]
-    CS["Etape 4 - 05_deeplearning/clustering_stratifie (Y,B)"]
+    CS["Etape 4 - 05_deeplearning/clustering_stratifie"]
     CL[("cluster_labels.parquet + idx_train.npy + idx_test.npy")]
-    TS_EXT["Etape 5a - 06_timeseries/extraction_timeseries_oedi (Y,B)"]
+    TS_EXT["Etape 5a - 06_timeseries/extraction_timeseries_oedi"]
     WS[("weather_static.parquet")]
     TSB[("series 15 min par batiment (data/raw, data/processed)")]
-    M_BASE["Etape 5b - baseline_lgbm (Y,B)"]
-    M_ELEC["Etape 5c/5d - lgbm_electricity / _usages (Y,B)"]
-    M_5F["Etape 5e - lgbm_electricity_5features (Y,B)"]
-    M_CA["Etape 5f - lgbm_consommation_annuelle (B)"]
-    M_AE["Etape 5g - analyse_exploratoires (Y)"]
-    M_STR["Etape 5h/5i/5j - lgbm_stratified (Y), lightgbm_stratified (Y,B), mlp_stratified (Y)"]
-    M_SHAP["Etape 5k - lgbm_shap (Y)"]
+    M_BASE["Etape 5b - baseline_lgbm"]
+    M_ELEC["Etape 5c/5d - lgbm_electricity / _usages"]
+    M_5F["Etape 5e - lgbm_electricity_5features"]
+    M_CA["Etape 5f - lgbm_consommation_annuelle"]
+    M_AE["Etape 5g - analyse_exploratoires"]
+    M_STR["Etape 5h/5i/5j - lgbm_stratified, lightgbm_stratified, mlp_stratified"]
+    M_SHAP["Etape 5k - lgbm_shap"]
     XA[("X_aggregates.parquet")]
     X47[("X_47features.parquet + static_preds_oos.parquet")]
-    TS_PARC["Etape 6a - etude_parc_503 (B)"]
-    TS_CL["Etape 6b - timeseries_clustering (Y)"]
-    TS_CLM["Etape 6c - timeseries_clustering_multi (Y)"]
-    TS_NET["Etape 6d/6e - timeseries_net / timeseries_conv (B)"]
-    TS_RNN["Etape 6f - rnn_mlp_hybrid_electricite (Y)"]
-    TS_RNNF["Etape 6g - rnn_mlp_hybrid_electricite_full (Y)"]
-    FLEX["Etape 7 - 07_flexibilite/flexibilite (B)"]
-    NB1["Annexe - notebooks1/03_visualisation1/visualisation_timeseries (E,Y)"]
+    TS_PARC["Etape 6a - etude_parc_503"]
+    TS_CL["Etape 6b - timeseries_clustering"]
+    TS_CLM["Etape 6c - timeseries_clustering_multi"]
+    TS_NET["Etape 6d/6e - timeseries_net / timeseries_conv"]
+    TS_RNN["Etape 6f - rnn_mlp_hybrid_electricite"]
+    TS_RNNF["Etape 6g - rnn_mlp_hybrid_electricite_full"]
+    FLEX["Etape 7 - 07_flexibilite/flexibilite"]
+    NB1["Annexe - notebooks1/03_visualisation1/visualisation_timeseries"]
 
     DL --> N02 --> MC
     MC --> E01
@@ -147,43 +145,43 @@ flowchart TD
 
 ## 4. Ordre d'exécution détaillé
 
-| # | Notebook | Auteur | Lit | Produit |
-|---|---|---|---|---|
-| 0 | placer `data/raw/upgrade0.parquet` | | (OEDI) | |
-| 1 | `02_nettoyage/nettoyage_metadata.ipynb` | Y, B | `upgrade0.parquet` | `metadata_clean.parquet` |
-| 2a | `01_exploration/exploration_enveloppe_thermique.ipynb` | Y, B | `metadata_clean.parquet` | figures |
-| 2b | `01_exploration/exploration_hvac.ipynb` | Y, B | `metadata_clean.parquet` | figures |
-| 2c | `01_exploration/exploration_occupants.ipynb` | Y, B | `metadata_clean.parquet` | figures |
-| 2d | `01_exploration/exploration_localisation_climat.ipynb` | Y, B | `metadata_clean.parquet` | figures |
-| 2e | `01_exploration/exploration_in_groups.ipynb` | B, E, Y | `metadata_clean.parquet` | figures |
-| 2f | `03_visualisation/visualisation_metadata.ipynb` | Y, B | `upgrade0.parquet` | figures |
-| 2g | `03_visualisation/visual.ipynb` | Y, E | `upgrade0.parquet` | figures |
-| 3a | `04_features/transformations_numeriques.ipynb` | Y, B, E | `metadata_clean.parquet` | `metadata_features.parquet` |
-| 3b | `04_features/encodage_categoriel.ipynb` | Y, B, E | `metadata_features.parquet` | `features_encodees.parquet` |
-| 3c | `04_features/preparation_finale.ipynb` | Y, B, E | `features_encodees.parquet` | `X.parquet`, `Y.parquet` |
-| 3d | `04_features/physical_feature_engineering.ipynb` | Y | `X.parquet`, `Y.parquet` | `X_physical_engineered.parquet` |
-| 3e | `03_visualisation/classification_variables.ipynb` | Y | `metadata_clean.parquet`, `metadata_features.parquet`, `upgrade0.parquet` | `classification_variables_metier.csv` |
-| 4 | `05_deeplearning/clustering_stratifie.ipynb` | Y, B | `X.parquet`, `Y.parquet`, `metadata_clean.parquet` | `cluster_labels.parquet`, `cluster_labels_sub.parquet`, `idx_train.npy`, `idx_test.npy`, `idx_sub_maisons_elec.npy` |
-| 5a | `06_timeseries/extraction_timeseries_oedi.ipynb` | Y, B | `upgrade0.parquet` + OEDI (auto) | `weather_static.parquet`, `nn_buildings.csv`, séries `{bldg_id}-0.parquet` |
-| 5b | `05_deeplearning/baseline_lgbm.ipynb` | Y, B | `X.parquet`, `Y.parquet`, `metadata_clean.parquet` | métriques |
-| 5c | `05_deeplearning/lgbm_electricity.ipynb` | Y, B | `X.parquet`, `Y.parquet`, `metadata_clean.parquet` | métriques |
-| 5d | `05_deeplearning/lgbm_electricity_usages.ipynb` | Y, B | `X.parquet`, `metadata_clean.parquet`, `upgrade0.parquet` | métriques |
-| 5e | `05_deeplearning/lgbm_electricity_5features.ipynb` | Y, B | `X.parquet`, `metadata_clean.parquet`, `upgrade0.parquet` | `X_aggregates.parquet` |
-| 5f | `05_deeplearning/lgbm_consommation_annuelle.ipynb` | B | `X.parquet`, `metadata_clean.parquet`, `upgrade0.parquet`, `weather_static.parquet` | `X_47features.parquet`, `X_features_v2.parquet`, `static_preds_oos.parquet` |
-| 5g | `05_deeplearning/analyse_exploratoires.ipynb` | Y | `X.parquet`, `Y.parquet` | figures |
-| 5h | `05_deeplearning/lgbm_stratified.ipynb` | Y | `X.parquet`, `X_physical_engineered.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy` | métriques |
-| 5i | `05_deeplearning/lightgbm_stratified.ipynb` | Y, B | `X.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy` | métriques |
-| 5j | `05_deeplearning/mlp_stratified.ipynb` | Y | `X.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy` | métriques |
-| 5k | `05_deeplearning/lgbm_shap.ipynb` | Y | `X.parquet`, `X_physical_engineered.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy`, `metadata_clean.parquet` | figures SHAP |
-| 6a | `06_timeseries/etude_parc_503.ipynb` | B | `X_47features.parquet`, `metadata_clean.parquet`, `weather_static.parquet`, séries par bâtiment | panel d'étude |
-| 6b | `06_timeseries/timeseries_clustering.ipynb` | Y | `data/raw/347201-0.parquet`, `data/raw/timeseries_100_all_electric/` | `clustering_multivarie_jours_types.parquet`, `*.joblib` |
-| 6c | `06_timeseries/timeseries_clustering_multi.ipynb` | Y | `347201-0.parquet`, `upgrade0.parquet` + OEDI (auto, ~100 bâtiments) | artefacts de clustering `*.joblib` |
-| 6d | `06_timeseries/timeseries_net.ipynb` | B | `X_47features.parquet`, `metadata_clean.parquet`, `static_preds_oos.parquet`, `nn_buildings_elargi.csv` + OEDI (auto) | métriques |
-| 6e | `06_timeseries/timeseries_conv.ipynb` | B | idem `timeseries_net` | métriques |
-| 6f | `06_timeseries/rnn_mlp_hybrid_electricite.ipynb` | Y | `X_aggregates.parquet`, `X_physical_engineered.parquet`, `metadata_clean.parquet` | métriques |
-| 6g | `06_timeseries/rnn_mlp_hybrid_electricite_full.ipynb` | Y | `X_aggregates.parquet`, `X_physical_engineered.parquet`, `metadata_clean.parquet`, `upgrade0.parquet` + OEDI (auto, ~6700 bâtiments) | `buildings_full_download_failed.parquet` |
-| 7 | `07_flexibilite/flexibilite.ipynb` | B | `experiments/results/flex_chauffage.json` | figures de gisement |
-| annexe | `notebooks1/03_visualisation1/visualisation_timeseries.ipynb` | E, Y | `metadata_features.parquet` | figures (visualisations time series d'Eyua) |
+| # | Notebook | Lit | Produit |
+|---|---|---|---|
+| 0 | placer `data/raw/upgrade0.parquet` | (OEDI) | |
+| 1 | `02_nettoyage/nettoyage_metadata.ipynb` | `upgrade0.parquet` | `metadata_clean.parquet` |
+| 2a | `01_exploration/exploration_enveloppe_thermique.ipynb` | `metadata_clean.parquet` | figures |
+| 2b | `01_exploration/exploration_hvac.ipynb` | `metadata_clean.parquet` | figures |
+| 2c | `01_exploration/exploration_occupants.ipynb` | `metadata_clean.parquet` | figures |
+| 2d | `01_exploration/exploration_localisation_climat.ipynb` | `metadata_clean.parquet` | figures |
+| 2e | `01_exploration/exploration_in_groups.ipynb` | `metadata_clean.parquet` | figures |
+| 2f | `03_visualisation/visualisation_metadata.ipynb` | `upgrade0.parquet` | figures |
+| 2g | `03_visualisation/visual.ipynb` | `upgrade0.parquet` | figures |
+| 3a | `04_features/transformations_numeriques.ipynb` | `metadata_clean.parquet` | `metadata_features.parquet` |
+| 3b | `04_features/encodage_categoriel.ipynb` | `metadata_features.parquet` | `features_encodees.parquet` |
+| 3c | `04_features/preparation_finale.ipynb` | `features_encodees.parquet` | `X.parquet`, `Y.parquet` |
+| 3d | `04_features/physical_feature_engineering.ipynb` | `X.parquet`, `Y.parquet` | `X_physical_engineered.parquet` |
+| 3e | `03_visualisation/classification_variables.ipynb` | `metadata_clean.parquet`, `metadata_features.parquet`, `upgrade0.parquet` | `classification_variables_metier.csv` |
+| 4 | `05_deeplearning/clustering_stratifie.ipynb` | `X.parquet`, `Y.parquet`, `metadata_clean.parquet` | `cluster_labels.parquet`, `cluster_labels_sub.parquet`, `idx_train.npy`, `idx_test.npy`, `idx_sub_maisons_elec.npy` |
+| 5a | `06_timeseries/extraction_timeseries_oedi.ipynb` | `upgrade0.parquet` + OEDI (auto) | `weather_static.parquet`, `nn_buildings.csv`, séries `{bldg_id}-0.parquet` |
+| 5b | `05_deeplearning/baseline_lgbm.ipynb` | `X.parquet`, `Y.parquet`, `metadata_clean.parquet` | métriques |
+| 5c | `05_deeplearning/lgbm_electricity.ipynb` | `X.parquet`, `Y.parquet`, `metadata_clean.parquet` | métriques |
+| 5d | `05_deeplearning/lgbm_electricity_usages.ipynb` | `X.parquet`, `metadata_clean.parquet`, `upgrade0.parquet` | métriques |
+| 5e | `05_deeplearning/lgbm_electricity_5features.ipynb` | `X.parquet`, `metadata_clean.parquet`, `upgrade0.parquet` | `X_aggregates.parquet` |
+| 5f | `05_deeplearning/lgbm_consommation_annuelle.ipynb` | `X.parquet`, `metadata_clean.parquet`, `upgrade0.parquet`, `weather_static.parquet` | `X_47features.parquet`, `X_features_v2.parquet`, `static_preds_oos.parquet` |
+| 5g | `05_deeplearning/analyse_exploratoires.ipynb` | `X.parquet`, `Y.parquet` | figures |
+| 5h | `05_deeplearning/lgbm_stratified.ipynb` | `X.parquet`, `X_physical_engineered.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy` | métriques |
+| 5i | `05_deeplearning/lightgbm_stratified.ipynb` | `X.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy` | métriques |
+| 5j | `05_deeplearning/mlp_stratified.ipynb` | `X.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy` | métriques |
+| 5k | `05_deeplearning/lgbm_shap.ipynb` | `X.parquet`, `X_physical_engineered.parquet`, `Y.parquet`, `cluster_labels.parquet`, `idx_*.npy`, `metadata_clean.parquet` | figures SHAP |
+| 6a | `06_timeseries/etude_parc_503.ipynb` | `X_47features.parquet`, `metadata_clean.parquet`, `weather_static.parquet`, séries par bâtiment | panel d'étude |
+| 6b | `06_timeseries/timeseries_clustering.ipynb` | `data/raw/347201-0.parquet`, `data/raw/timeseries_100_all_electric/` | `clustering_multivarie_jours_types.parquet`, `*.joblib` |
+| 6c | `06_timeseries/timeseries_clustering_multi.ipynb` | `347201-0.parquet`, `upgrade0.parquet` + OEDI (auto, ~100 bâtiments) | artefacts de clustering `*.joblib` |
+| 6d | `06_timeseries/timeseries_net.ipynb` | `X_47features.parquet`, `metadata_clean.parquet`, `static_preds_oos.parquet`, `nn_buildings_elargi.csv` + OEDI (auto) | métriques |
+| 6e | `06_timeseries/timeseries_conv.ipynb` | idem `timeseries_net` | métriques |
+| 6f | `06_timeseries/rnn_mlp_hybrid_electricite.ipynb` | `X_aggregates.parquet`, `X_physical_engineered.parquet`, `metadata_clean.parquet` | métriques |
+| 6g | `06_timeseries/rnn_mlp_hybrid_electricite_full.ipynb` | `X_aggregates.parquet`, `X_physical_engineered.parquet`, `metadata_clean.parquet`, `upgrade0.parquet` + OEDI (auto, ~6700 bâtiments) | `buildings_full_download_failed.parquet` |
+| 7 | `07_flexibilite/flexibilite.ipynb` | `experiments/results/flex_chauffage.json` | figures de gisement |
+| annexe | `notebooks1/03_visualisation1/visualisation_timeseries.ipynb` | `metadata_features.parquet` | figures |
 
 `visual.ipynb` à la racine est un notebook exploratoire du tout début de projet,
 conservé pour historique et non intégré au pipeline.
