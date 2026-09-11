@@ -258,6 +258,13 @@ figures du rapport et de la soutenance :
 
 ## 7. Rapports
 
-- `reports/rapport_stage.pdf` : rapport de stage.
-- `reports/soutenance.pdf` : support de soutenance.
+- `reports/rapport_stage.pdf` : rapport de stage (livrable principal).
+- `reports/soutenance.pdf` : support de soutenance (livrable principal).
+- `reports/presentation/` : présentation associée à la soutenance.
+- `reports/annexes/` : PDF et documents complémentaires produits en cours de
+  stage (courbes de charge, PCA, prédiction weekend, etc.), non repris dans le
+  rapport final.
+- `reports/notes/` : notes de travail (fiche technique des modèles, consignes,
+  attributs des séries temporelles).
+- `reports/figures/` : figures exportées par les notebooks, non versionnées.
 - `PIPELINE.md` : description synthétique des sept étapes.
