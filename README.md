@@ -64,37 +64,123 @@ Tous les notebooks calculent la racine du projet par
 
 ## 3. Schéma du pipeline
 
-Vue d'ensemble par étape. Le détail notebook par notebook (30 notebooks, entrées
-et sorties précises) est dans le tableau de la section 4.
+Un nœud par notebook, coloré par étape ; les fichiers de données sont en jaune.
+Le détail entrées/sorties de chaque notebook est dans le tableau de la section 4.
 
 ```mermaid
 flowchart TD
     DL["upgrade0.parquet<br/>telechargement manuel OEDI"]
-    E1["1. Nettoyage<br/>02_nettoyage"]
+
+    subgraph S1["1. Nettoyage"]
+        N02["nettoyage_metadata"]
+    end
     MC[("metadata_clean.parquet")]
-    E2["2. Exploration et visualisation<br/>01_exploration, 03_visualisation"]
-    E3["3. Feature engineering<br/>04_features"]
+
+    subgraph S2["2. Exploration et visualisation"]
+        E01["01_exploration (x5 notebooks)"]
+        VM["visualisation_metadata"]
+        VV["visual"]
+    end
+
+    subgraph S3["3. Feature engineering"]
+        T1["transformations_numeriques"]
+        T2["encodage_categoriel"]
+        T3["preparation_finale"]
+        T4["physical_feature_engineering"]
+        CV["classification_variables"]
+    end
+    MF[("metadata_features.parquet")]
+    FE[("features_encodees.parquet")]
     XY[("X.parquet, Y.parquet")]
-    E4["4. Clustering de stratification<br/>05_deeplearning/clustering_stratifie"]
+    XP[("X_physical_engineered.parquet")]
+
+    subgraph S4["4. Clustering de stratification"]
+        CS["clustering_stratifie"]
+    end
     CL[("cluster_labels.parquet, idx_train/test.npy")]
-    E5["5. Modeles annuels<br/>05_deeplearning"]
-    E6A["6a. Extraction series temporelles<br/>extraction_timeseries_oedi"]
-    E6B["6b. Modelisation series temporelles<br/>06_timeseries"]
-    E7["7. Flexibilite<br/>07_flexibilite"]
 
-    DL --> E1 --> MC
-    MC --> E2
-    MC --> E3 --> XY
-    XY --> E4 --> CL
-    XY --> E5
-    CL --> E5
-    DL --> E6A
-    E5 --> E6B
-    E6A --> E6B
-    E6B --> E7
+    subgraph S5["5. Modeles annuels"]
+        M_BASE["baseline_lgbm"]
+        M_ELEC["lgbm_electricity / _usages"]
+        M_5F["lgbm_electricity_5features"]
+        M_CA["lgbm_consommation_annuelle"]
+        M_AE["analyse_exploratoires"]
+        M_STR["lgbm_stratified, lightgbm_stratified, mlp_stratified"]
+        M_SHAP["lgbm_shap"]
+    end
+    XA[("X_aggregates.parquet")]
+    X47[("X_47features.parquet, static_preds_oos.parquet")]
 
-    classDef data fill:#fef7e0,stroke:#c08a2e;
-    class DL,MC,XY,CL data;
+    subgraph S6["6. Series temporelles"]
+        TS_EXT["extraction_timeseries_oedi"]
+        TS_PARC["etude_parc_503"]
+        TS_CL["timeseries_clustering"]
+        TS_CLM["timeseries_clustering_multi"]
+        TS_NET["timeseries_net / timeseries_conv"]
+        TS_RNN["rnn_mlp_hybrid_electricite"]
+        TS_RNNF["rnn_mlp_hybrid_electricite_full"]
+    end
+    WS[("weather_static.parquet")]
+    TSB[("series 15 min par batiment")]
+
+    subgraph S7["7. Flexibilite"]
+        FLEX["flexibilite"]
+    end
+
+    NB1["Annexe : visualisation_timeseries<br/>(notebooks1/)"]
+
+    DL --> N02 --> MC
+    MC --> E01
+    DL --> VM
+    DL --> VV
+    MC --> T1 --> MF --> T2 --> FE --> T3 --> XY --> T4 --> XP
+    MF --> CV
+    XY --> CS
+    MC --> CS
+    CS --> CL
+    XY --> M_BASE
+    XY --> M_ELEC
+    XY --> M_5F
+    XY --> M_CA
+    XY --> M_AE
+    XP --> M_STR
+    XP --> M_SHAP
+    CL --> M_STR
+    CL --> M_SHAP
+    M_5F --> XA
+    WS --> M_CA
+    M_CA --> X47
+    DL --> TS_EXT --> WS
+    TS_EXT --> TSB
+    X47 --> TS_PARC
+    X47 --> TS_NET
+    WS --> TS_PARC
+    TSB --> TS_CL --> TS_CLM
+    XA --> TS_RNN
+    XA --> TS_RNNF
+    XP --> TS_RNN
+    XP --> TS_RNNF
+    TSB --> FLEX
+    X47 --> FLEX
+    MF --> NB1
+
+    classDef data fill:#fef7e0,stroke:#c08a2e,color:#1a1a1a;
+    classDef s1 fill:#dbeafe,stroke:#2563eb,color:#1a1a1a;
+    classDef s2 fill:#dcfce7,stroke:#16a34a,color:#1a1a1a;
+    classDef s3 fill:#ede9fe,stroke:#7c3aed,color:#1a1a1a;
+    classDef s4 fill:#ffedd5,stroke:#ea580c,color:#1a1a1a;
+    classDef s5 fill:#fce7f3,stroke:#db2777,color:#1a1a1a;
+    classDef s6 fill:#cffafe,stroke:#0891b2,color:#1a1a1a;
+    classDef s7 fill:#e5e7eb,stroke:#4b5563,color:#1a1a1a;
+
+    class DL,MC,MF,FE,XY,XP,CL,WS,TSB,XA,X47 data;
+    class N02 s1;
+    class E01,VM,VV,NB1 s2;
+    class T1,T2,T3,T4,CV s3;
+    class CS s4;
+    class M_BASE,M_ELEC,M_5F,M_CA,M_AE,M_STR,M_SHAP s5;
+    class TS_EXT,TS_PARC,TS_CL,TS_CLM,TS_NET,TS_RNN,TS_RNNF s6;
+    class FLEX s7;
 ```
 
 ## 4. Ordre d'exécution détaillé
