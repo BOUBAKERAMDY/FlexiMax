@@ -223,9 +223,6 @@ flowchart TD
 | 7 | `07_flexibilite/flexibilite.ipynb` | `experiments/results/flex_chauffage.json` | figures de gisement |
 | annexe | `notebooks1/03_visualisation1/visualisation_timeseries.ipynb` | `metadata_features.parquet` | figures |
 
-`visual.ipynb` à la racine est un notebook exploratoire du tout début de projet,
-conservé pour historique et non intégré au pipeline.
-
 ## 5. Cellules qui téléchargent automatiquement des données
 
 Tous ces téléchargements visent le data lake public OEDI, sans clé AWS.
@@ -261,6 +258,6 @@ figures du rapport et de la soutenance :
 
 ## 7. Rapports
 
-- `reports/rapport_stage.tex` et `reports/rapport_stage.pdf` : rapport de stage.
-- `reports/soutenance.tex` et `reports/soutenance.pdf` : support de soutenance.
+- `reports/rapport_stage.pdf` : rapport de stage.
+- `reports/soutenance.pdf` : support de soutenance.
 - `PIPELINE.md` : description synthétique des sept étapes.
