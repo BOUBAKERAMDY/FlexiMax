@@ -25,7 +25,7 @@ Source : data lake public OEDI (NREL), aucune clé AWS requise.
 
 - Dossier : `https://data.openei.org/s3_viewer?bucket=oedi-data-lake&prefix=nrel-pds-building-stock%2Fend-use-load-profiles-for-us-building-stock%2F2025%2Fresstock_amy2018_release_1%2Fmetadata_and_annual_results%2Fnational%2Ffull%2Fparquet%2F`
 - Fichier : `upgrade0.parquet` (465 060 991 octets, déjà nommé ainsi à la source)
-- URL directe (vérifiée) :
+- URL directe :
   `https://oedi-data-lake.s3.amazonaws.com/nrel-pds-building-stock/end-use-load-profiles-for-us-building-stock/2025/resstock_amy2018_release_1/metadata_and_annual_results/national/full/parquet/upgrade0.parquet`
 
 Télécharger ce fichier et le placer tel quel dans `data/raw/`.
