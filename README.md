@@ -11,6 +11,9 @@ Le périmètre d'étude est restreint aux **bâtiments tout électriques**.
 
 Auteurs des notebooks : **(Y)** Yassmin Zouarhi, **(B)** Boubaker Amdyoun, **(E)** Eyua Assoumou.
 
+Pour l'enchaînement détaillé des sept étapes (entrées, sorties, notebook par
+notebook), voir [PIPELINE.md](PIPELINE.md).
+
 ## 1. Récupérer les données avant de commencer
 
 Aucune donnée volumineuse n'est versionnée. Il faut deux choses.
@@ -222,4 +225,4 @@ figures du rapport et de la soutenance :
 
 - `reports/rapport_stage.tex` et `reports/rapport_stage.pdf` : rapport de stage.
 - `reports/soutenance.tex` et `reports/soutenance.pdf` : support de soutenance.
-- `docs/PIPELINE.md` : description synthétique des sept étapes.
+- `PIPELINE.md` : description synthétique des sept étapes.
